@@ -23,6 +23,14 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(I
 			$
 		} else
 			throw new IllegalStateException("map is empty at " + p)
+	final def move(p: MapPoint) = {
+		if (isOccupied(p) == false) throw new IllegalStateException
+		val o = apply(p)
+		new {
+			def to(p: MapPoint) = update(p, o)
+		}
+	}
+
 }
 
 object BattleMap {
