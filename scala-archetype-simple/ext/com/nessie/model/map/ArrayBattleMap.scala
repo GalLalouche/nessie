@@ -12,7 +12,7 @@ class ArrayBattleMap(width: Int, height: Int) extends BattleMap(width, height) {
 		}
 	}
 
-	override def apply(p: MapPoint) = array(p._1)(p._2)
+	override def get(p: MapPoint) = array(p._1)(p._2)
 	override def update(p: MapPoint, o: BattleMapObject) = array(p._1)(p._2) = o
 
 }

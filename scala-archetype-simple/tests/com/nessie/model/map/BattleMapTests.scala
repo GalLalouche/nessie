@@ -21,7 +21,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	var $: BattleMap = new ArrayBattleMap(5, 10)
 	private def mockObject = mock[BattleMapObject]
 	val o = mockObject
-
+	val p = (0, 1)
 	before($ = new ArrayBattleMap(5, 10))
 
 	"Contructor" should "return the correct height and width" in {
@@ -54,8 +54,13 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 		$ should forAll[(Int, Int, BattleMapObject)](x => x._3 == EmptyMapObject);
 	}
 
+	it should "throw an exception on empty apply" in {
+		evaluating { $(p) } should produce[IllegalStateException]
+	}
 	it should "also work with an (Int, Int) parameter)" in {
-		$((0, 0)) should be === EmptyMapObject
+		val (x, y) = p
+		$(x, y) = o
+		$(p) should be === o
 	}
 
 	"Update" should "place an object" in {
