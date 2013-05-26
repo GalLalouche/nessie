@@ -57,6 +57,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	it should "throw an exception on empty apply" in {
 		evaluating { $(p) } should produce[IllegalStateException]
 	}
+
 	it should "also work with an (Int, Int) parameter)" in {
 		val (x, y) = p
 		$(x, y) = o
@@ -66,6 +67,11 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	"Update" should "place an object" in {
 		$(0, 0) = o
 		$(0, 0) should be === o
+	}
+
+	it should "throw an exception on non-empty" in {
+		$(p) = o
+		evaluating($(p) = o) should produce[IllegalStateException]
 	}
 
 	it should "untuple the point parameter correctly" in {

@@ -9,24 +9,22 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(I
 		BattleMap.check(y, height)
 	}
 
-	protected def get(p: MapPoint): BattleMapObject = apply(p._1, p._2)
+	protected def get(p: MapPoint): BattleMapObject
+	protected def set(p: MapPoint, o: BattleMapObject): Unit
 	final def apply(x: Int, y: Int): BattleMapObject = apply(BattleMap.tupleToPoint(x, y))
 	final def apply(p: MapPoint): BattleMapObject = if (isOccupied(p)) get(p) else throw new IllegalStateException
-	def update(p: MapPoint, o: BattleMapObject): Unit = update(p._1, p._2, o)
 	final def update(x: Int, y: Int, o: BattleMapObject): Unit = update(BattleMap.tupleToPoint(x, y), o)
+	final def update(p: MapPoint, o: BattleMapObject): Unit = if (isOccupied(p) == false) set(p, o) else throw new IllegalStateException
 	final def isOccupied(x: Int, y: Int): Boolean = isOccupied(BattleMap.tupleToPoint(x, y))
 	final def isOccupied(p: MapPoint): Boolean = get(p) != EmptyMapObject
 	final def remove(x: Int, y: Int): BattleMapObject = remove(BattleMap.tupleToPoint(x, y))
-	final def remove(p: MapPoint): BattleMapObject =
-		if (isOccupied(p)) {
-			val $ = this(p)
-			this(p) = EmptyMapObject
-			$
-		} else
-			throw new IllegalStateException("map is empty at " + p)
+	final def remove(p: MapPoint): BattleMapObject = {
+		val $ = this(p)
+		set(p, EmptyMapObject)
+		$
+	}
 	final def move(p: MapPoint) = {
-		if (isOccupied(p) == false) throw new IllegalStateException
-		val o = apply(p)
+		val o = this(p)
 		new {
 			def to(p: MapPoint) = update(p, o)
 		}
