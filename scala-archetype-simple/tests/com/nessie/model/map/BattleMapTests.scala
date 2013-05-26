@@ -21,8 +21,12 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	var $: BattleMap = new ArrayBattleMap(5, 10)
 	private def mockObject = mock[BattleMapObject]
 	val o = mockObject
-	val p = (0, 1)
-	before($ = new ArrayBattleMap(5, 10))
+	val emptyP = (0, 1)
+	val occupiedP = (1, 0)
+	before({
+		$ = new ArrayBattleMap(5, 10)
+		$(occupiedP) = mockObject
+	})
 
 	"Contructor" should "return the correct height and width" in {
 		$ = new ArrayBattleMap(5, 10);
@@ -51,27 +55,28 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	it should "start out as all empty" in {
+		$ = new ArrayBattleMap(10, 20)
 		$ should forAll[(Int, Int, BattleMapObject)](x => x._3 == EmptyMapObject);
 	}
 
 	it should "throw an exception on empty apply" in {
-		evaluating { $(p) } should produce[MapEmptyException]
+		evaluating { $(emptyP) } should produce[MapEmptyException]
 	}
 
 	it should "also work with an (Int, Int) parameter)" in {
-		val (x, y) = p
-		$(x, y) = o
-		$(p) should be === o
+		val (x, y) = emptyP
+		$(emptyP) = o
+		$(emptyP) should be === o
 	}
 
 	"Update" should "place an object" in {
-		$(0, 0) = o
-		$(0, 0) should be === o
+		$(emptyP) = o
+		$(emptyP) should be === o
 	}
 
 	it should "throw an exception on non-empty" in {
-		$(p) = o
-		evaluating($(p) = o) should produce[MapOccupiedException]
+		$(emptyP) = o
+		evaluating($(emptyP) = o) should produce[MapOccupiedException]
 	}
 
 	it should "untuple the point parameter correctly" in {
@@ -83,25 +88,29 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	"IsOccupied" should "return false on empty slot" in {
-		$.isOccupied(0, 0) should be === false
+		$.isOccupied(emptyP) should be === false
 	}
 
 	it should "return true on occupied slot" in {
-		$(0, 0) = o;
-		$.isOccupied(0, 0) should be === true
+		$.isOccupied(occupiedP) should be === true
 	}
 
 	"Remove" should "throw exception on unoccupied cell" in {
-		evaluating($.remove(0, 0)) should produce[MapEmptyException]
+		evaluating { $.remove(emptyP) } should produce[MapEmptyException]
 	}
 
 	it should "return the removed object" in {
-		$(0, 0) = o
-		$.remove(0, 0) should be === o
+		$(emptyP) = o
+		$.remove(emptyP) should be === o
 	}
 
-	"Move" should "throw exception on unoccupied cell" in {
-		evaluating($.move(0, 0).to(1, 1)) should produce[MapEmptyException]
+	"Move" should "throw exception on unoccupied source" in {
+		evaluating { $.move(emptyP).to(occupiedP) } should produce[MapEmptyException]
+	}
+
+	it should "throw an exception on occupied destination" in {
+		$(emptyP) = o
+		evaluating { $.move(emptyP).to(occupiedP) } should produce[MapOccupiedException]
 	}
 }
 
