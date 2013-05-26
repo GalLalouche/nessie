@@ -79,5 +79,14 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 		$(0, 0) = o;
 		$.isOccupied(0, 0) should be === true
 	}
+
+	"Remove" should "throw exception on unoccupied cell" in {
+		evaluating($.remove(0, 0)) should produce[IllegalStateException]
+	}
+
+	it should "return the removed object" in {
+		$(0, 0) = o
+		$.remove(0, 0) should be === o
+	}
 }
 
