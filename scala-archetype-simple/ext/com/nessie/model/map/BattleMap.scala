@@ -23,10 +23,13 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(I
 		set(p, EmptyMapObject)
 		$
 	}
-	final def move(p: MapPoint) = {
-		val o = this(p)
+	final def move(src: MapPoint) = {
+		val o = this(src)
 		new {
-			def to(p: MapPoint) = update(p, o)
+			def to(dst: MapPoint) = {
+				update(dst, o)
+				remove(src)
+			}
 		}
 	}
 

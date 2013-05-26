@@ -112,5 +112,27 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 		$(emptyP) = o
 		evaluating { $.move(emptyP).to(occupiedP) } should produce[MapOccupiedException]
 	}
+	
+	it should "move the object" in {
+		$.remove(occupiedP)
+		$(occupiedP) = o
+		$.move(occupiedP).to(emptyP)
+		$(emptyP) should be === o
+		$.isOccupied(occupiedP) should be === false
+	}
+	
+	it should "not remove the source if dst isn't clear" in {
+		$(emptyP) = o
+		evaluating { $.move(occupiedP).to(emptyP) } should produce[MapOccupiedException]
+		$.isOccupied(occupiedP) should be === true
+		$(emptyP) should be === o
+		
+	}
+	
+	it should "should not place the object if the destination is occupied" in {
+		$(emptyP) = o
+		evaluating { $.move(emptyP).to(occupiedP) } should produce[MapOccupiedException]
+		$(emptyP) should be === o
+	}
 }
 
