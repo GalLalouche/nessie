@@ -12,9 +12,9 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(I
 	protected def get(p: MapPoint): BattleMapObject
 	protected def set(p: MapPoint, o: BattleMapObject): Unit
 	final def apply(x: Int, y: Int): BattleMapObject = apply(BattleMap.tupleToPoint(x, y))
-	final def apply(p: MapPoint): BattleMapObject = if (isOccupied(p)) get(p) else throw new IllegalStateException
+	final def apply(p: MapPoint): BattleMapObject = if (isOccupied(p)) get(p) else throw new MapEmptyException(p)
 	final def update(x: Int, y: Int, o: BattleMapObject): Unit = update(BattleMap.tupleToPoint(x, y), o)
-	final def update(p: MapPoint, o: BattleMapObject): Unit = if (isOccupied(p) == false) set(p, o) else throw new IllegalStateException
+	final def update(p: MapPoint, o: BattleMapObject): Unit = if (isOccupied(p) == false) set(p, o) else throw new MapOccupiedException(p)
 	final def isOccupied(x: Int, y: Int): Boolean = isOccupied(BattleMap.tupleToPoint(x, y))
 	final def isOccupied(p: MapPoint): Boolean = get(p) != EmptyMapObject
 	final def remove(x: Int, y: Int): BattleMapObject = remove(BattleMap.tupleToPoint(x, y))

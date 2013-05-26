@@ -55,7 +55,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	it should "throw an exception on empty apply" in {
-		evaluating { $(p) } should produce[IllegalStateException]
+		evaluating { $(p) } should produce[MapEmptyException]
 	}
 
 	it should "also work with an (Int, Int) parameter)" in {
@@ -71,7 +71,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 
 	it should "throw an exception on non-empty" in {
 		$(p) = o
-		evaluating($(p) = o) should produce[IllegalStateException]
+		evaluating($(p) = o) should produce[MapOccupiedException]
 	}
 
 	it should "untuple the point parameter correctly" in {
@@ -92,7 +92,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	"Remove" should "throw exception on unoccupied cell" in {
-		evaluating($.remove(0, 0)) should produce[IllegalStateException]
+		evaluating($.remove(0, 0)) should produce[MapEmptyException]
 	}
 
 	it should "return the removed object" in {
@@ -101,7 +101,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	"Move" should "throw exception on unoccupied cell" in {
-		evaluating($.move(0, 0).to(1, 1)) should produce[IllegalStateException]
+		evaluating($.move(0, 0).to(1, 1)) should produce[MapEmptyException]
 	}
 }
 
