@@ -6,7 +6,7 @@ import org.scalatest.matchers._
 import scala.collection.GenTraversable
 import org.scalatest.BeforeAndAfter
 
-trait CustumMatchers extends ShouldMatchers {
+trait CustomMatchers extends ShouldMatchers {
 	def forAll[T](right: T => Boolean) = new Matcher[GenTraversable[T]] {
 		override def apply(left: GenTraversable[T]) = {
 			val leftPretty = left.take(3) + { if (left.size > 3) "..." else "" }
@@ -17,7 +17,7 @@ trait CustumMatchers extends ShouldMatchers {
 	}
 }
 
-class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustumMatchers with BeforeAndAfter {
+class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with BeforeAndAfter {
 	var $: BattleMap = new ArrayBattleMap(5, 10)
 	private def mockObject = mock[BattleMapObject]
 	val o = mockObject
