@@ -1,4 +1,4 @@
-package com.nessie.view.map
+package com.nessie.view.map.swing
 
 import scala.swing.GridPanel
 import com.nessie.model.map.BattleMap
