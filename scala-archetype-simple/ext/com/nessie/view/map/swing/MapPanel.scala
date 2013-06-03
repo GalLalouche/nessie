@@ -16,6 +16,7 @@ import scala.swing.event.ActionEvent
 
 case class CellClicked(p:MapPoint) extends Event
 class MapPanel(map: BattleMap) extends GridPanel(map.width, map.height) {
+	require (map != null)
 	contents ++= map map (x => {
 		val b = new Button(Action(print(x._2)) {
 			publish(CellClicked(x._1))

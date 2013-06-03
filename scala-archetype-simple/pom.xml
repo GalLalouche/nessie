@@ -62,6 +62,11 @@
     	<artifactId>scalatest_2.10.0-M5</artifactId>
     	<version>1.9-2.10.0-M5-B2</version>
     </dependency>
+    <dependency>
+    	<groupId>org.mockito</groupId>
+    	<artifactId>mockito-all</artifactId>
+    	<version>1.9.5</version>
+    </dependency>
   </dependencies>
 
   <repositories>
@@ -178,7 +183,7 @@
         </executions>
         <configuration>
           <jvmArgs>
-            <jvmArg>-Xmx1024m</jvmArg>
+            <jvmArg>-Xmx512m</jvmArg>
           </jvmArgs>
           <args>
             <!-- arg>-unchecked</arg -->
@@ -186,16 +191,6 @@
           </args>
           <scala-version>${scala-version}</scala-version>
           <recompileMode>incremental</recompileMode>
-        </configuration>
-      </plugin>
-
-     
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <warSourceDirectory>${basedir}/src</warSourceDirectory>
         </configuration>
       </plugin>
       
