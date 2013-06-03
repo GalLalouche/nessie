@@ -1,5 +1,9 @@
 package com.nessie.model.map
 
+import com.nessie.model.map.`object`.EmptyMapObject
+
+import com.nessie.model.map.`object`.BattleMapObject
+
 class ArrayBattleMap(width: Int, height: Int) extends BattleMap(width, height) {
 	val array = Array.ofDim[BattleMapObject](width, height)
 	for (cell <- this.map(x => (x._1, x._2))) this(cell) = EmptyMapObject

@@ -1,8 +1,8 @@
 package com.nessie.view.map
 
 import com.nessie.model.map.BattleMap
-import com.nessie.model.map.BattleMapObject
-import com.nessie.model.map.EmptyMapObject
+import com.nessie.model.map.object.BattleMapObject
+import com.nessie.modobject.el.map.EmptyMapObject
 
 class StringBattleMapViewer(m: BattleMap) {
 	override def toString() = {

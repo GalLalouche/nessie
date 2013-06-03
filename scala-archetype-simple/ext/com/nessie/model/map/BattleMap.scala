@@ -1,5 +1,7 @@
 package com.nessie.model.map
 
+import com.nessie.model.map.`object`.BattleMapObject
+
 abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(Int, Int, BattleMapObject)] {
 	require(width > 0)
 	require(height > 0)

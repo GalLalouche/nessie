@@ -1,5 +1,9 @@
 package com.nessie.model.map
 
+import com.nessie.model.map.`object`.EmptyMapObject
+
+import com.nessie.model.map.`object`.BattleMapObject
+
 
 class BattleMapController(map: BattleMap) {
 	require(map != null)
