@@ -9,7 +9,7 @@ class StringBattleMapViewer(m: BattleMap) {
 		val sb = new StringBuilder
 		for (c <- m) {
 			sb append print(c._2)
-			if (c._1._1 != m.width - 1) sb append ","
+			if (c._1.x != m.width - 1) sb append ","
 			else sb append "\n"
 		}
 		sb toString

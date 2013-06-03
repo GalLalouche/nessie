@@ -1,5 +1,5 @@
 package com.nessie.model
 
 package object map {
-	type MapPoint = (Int, Int)
+	class MapPoint(val x: Int, val y: Int)
 }

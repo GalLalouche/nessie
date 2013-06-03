@@ -10,7 +10,7 @@ class ArrayBattleMap(width: Int, height: Int) extends BattleMap(width, height) {
 	for (cell <- this) this(cell._1) = EmptyMapObject
 	
 
-	override def apply(p: MapPoint) = array(p._1)(p._2)
-	override def update(p: MapPoint, o: BattleMapObject) = array(p._1)(p._2) = o
+	override def apply(p: MapPoint) = array(p.x)(p.y)
+	override def update(p: MapPoint, o: BattleMapObject) = array(p.x)(p.y) = o
 
 }
