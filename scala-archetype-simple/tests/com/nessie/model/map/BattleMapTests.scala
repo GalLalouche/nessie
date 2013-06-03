@@ -58,7 +58,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 
 	it should "start out as all empty" in {
 		$ = new ArrayBattleMap(10, 20)
-		$ should forAll[(Int, Int, BattleMapObject)](x => x._3 == EmptyMapObject);
+		$ should forAll[(MapPoint, BattleMapObject)](x => x._2 == EmptyMapObject);
 	}
 
 	"Update" should "place an object" in {

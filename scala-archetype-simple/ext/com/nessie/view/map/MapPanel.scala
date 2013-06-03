@@ -11,7 +11,7 @@ import com.nessie.units.Skeleton
 
 class MapPanel(map: BattleMap) extends GridPanel(map.width, map.height) {
 	contents ++= map map (x => {
-		val b = new Button(print(x._3));
+		val b = new Button(print(x._2));
 		listenTo(b)
 		b
 	})

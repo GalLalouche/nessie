@@ -8,8 +8,8 @@ class StringBattleMapViewer(m: BattleMap) {
 	override def toString() = {
 		val sb = new StringBuilder
 		for (c <- m) {
-			sb append print(c._3)
-			if (c._1 != m.width - 1) sb append ","
+			sb append print(c._2)
+			if (c._1._1 != m.width - 1) sb append ","
 			else sb append "\n"
 		}
 		sb toString
