@@ -16,5 +16,8 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(I
 	}
 
 	def apply(p: MapPoint): BattleMapObject
+	def apply(x: Int, y: Int): BattleMapObject = apply((x, y))
 	def update(p: MapPoint, o: BattleMapObject): Unit
+	def update(x: Int, y: Int, o: BattleMapObject): Unit = update((x, y), o)
+
 }
