@@ -6,8 +6,8 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(I
 	
 	override def foreach[T](f: ((Int, Int, BattleMapObject)) => T) = {
 		for (
-			x <- 0 until width;
-			y <- 0 until height
+			y <- 0 until height;
+			x <- 0 until width
 		) {
 			f(x, y, this(x, y))
 		}
