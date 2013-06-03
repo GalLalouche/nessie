@@ -12,6 +12,6 @@ class StringBattleMapViewer(m: BattleMap) {
 	}
 	
 	private def print(o: BattleMapObject) = o match {
-		case _ => "_"
+		case EmptyMapObject => "_"
 	}
 }
