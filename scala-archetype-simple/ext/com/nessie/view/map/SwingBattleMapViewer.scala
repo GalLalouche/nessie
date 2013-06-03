@@ -2,8 +2,8 @@ package com.nessie.view.map
 
 import scala.swing._
 import com.nessie.model.map.ArrayBattleMap
-import com.nessie.model.map.object.BattleMapObject
-import com.nessie.modobject.el.map.EmptyMapObject
+import com.nessie.model.map.objects.BattleMapObject
+import com.nessie.model.map.objects.EmptyMapObject
 
 object HelloWorld extends SimpleSwingApplication {
 	val map = new ArrayBattleMap(3, 5)

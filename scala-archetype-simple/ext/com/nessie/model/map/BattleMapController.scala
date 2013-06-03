@@ -1,8 +1,7 @@
 package com.nessie.model.map
 
-import com.nessie.model.map.`object`.EmptyMapObject
-
-import com.nessie.model.map.`object`.BattleMapObject
+import com.nessie.model.map.objects.BattleMapObject
+import com.nessie.model.map.objects.EmptyMapObject
 
 
 class BattleMapController(map: BattleMap) {

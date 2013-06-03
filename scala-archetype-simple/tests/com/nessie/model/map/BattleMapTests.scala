@@ -1,11 +1,12 @@
 package com.nessie.model.map
 
 import scala.collection.GenTraversable
-
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FlatSpec
 import org.scalatest.matchers._
+import com.nessie.model.map.objects.BattleMapObject
+import com.nessie.model.map.objects.EmptyMapObject
 
 trait CustomMatchers extends ShouldMatchers {
 	def forAll[T](right: T => Boolean) = new Matcher[GenTraversable[T]] {

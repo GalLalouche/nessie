@@ -6,6 +6,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
+import com.nessie.model.map.objects.BattleMapObject
 
 
 
