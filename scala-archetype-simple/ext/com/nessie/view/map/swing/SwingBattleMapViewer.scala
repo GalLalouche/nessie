@@ -14,7 +14,7 @@ object HelloWorld extends SimpleSwingApplication {
 	map(2, 4) = new Skeleton
 	val ctrl = new BattleMapController(map)
 	def top = new MainFrame {
-		val m =new MapPanel(map)
+		val m =new MapPanel(map, new SimpleSwingBuilder)
 		contents = m;
 		listenTo(m)
 		reactions += {
