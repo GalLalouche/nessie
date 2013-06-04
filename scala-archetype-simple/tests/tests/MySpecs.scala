@@ -1,6 +1,5 @@
 package tests
 
-import org.scalatest.Finders
 import org.scalatest.FlatSpec
 import org.scalatest.Suite
 package object common {

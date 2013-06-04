@@ -11,7 +11,9 @@ import com.nessie.model.map.objects.EmptyMapObject
 trait CustomMatchers extends ShouldMatchers {
 	def forAll[T](right: T => Boolean) = new Matcher[GenTraversable[T]] {
 		override def apply(left: GenTraversable[T]) = {
-			val leftPretty = left.take(3) + { if (left.size > 3) "..." else "" }
+			val leftPretty = left.take(3) + {
+				if (left.size > 3) "..." else ""
+			}
 			MatchResult(left.forall(right),
 				right + " does not apply to all of " + leftPretty,
 				right + " applies too all of " + leftPretty)
@@ -20,9 +22,13 @@ trait CustomMatchers extends ShouldMatchers {
 }
 
 class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with BeforeAndAfter {
+
 	import BattleMap.tupleToMapPoint
+
 	var $: BattleMap = new ArrayBattleMap(5, 10)
+
 	private def mockObject = mock[BattleMapObject]
+
 	val o = mockObject
 	val emptyP = (0, 1)
 	val occupiedP = (1, 0)
@@ -31,14 +37,16 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 		$(occupiedP) = mockObject
 	})
 
-	"Contructor" should "return the correct height and width" in {
+	"Constructor" should "return the correct height and width" in {
 		$ = new ArrayBattleMap(5, 10);
 		$.width should be === 5
 		$.height should be === 10
 	}
 
 	it should "throw IllegalArgumentException on negative height" in {
-		evaluating { new ArrayBattleMap(-3, 10) } should produce[IllegalArgumentException]
+		evaluating {
+			new ArrayBattleMap(-3, 10)
+		} should produce[IllegalArgumentException]
 	}
 
 	it should "should be of size width*height" in {
@@ -46,15 +54,21 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	"Apply" should "throw IllegalArgumentException on zero width" in {
-		evaluating { new ArrayBattleMap(5, 0) } should produce[IllegalArgumentException]
+		evaluating {
+			new ArrayBattleMap(5, 0)
+		} should produce[IllegalArgumentException]
 	}
 
 	it should "should throw exception on negative apply" in {
-		evaluating { $(-3, 10) } should produce[IndexOutOfBoundsException]
+		evaluating {
+			$(-3, 10)
+		} should produce[IndexOutOfBoundsException]
 	}
 
 	it should "should throw exception on too large of apply" in {
-		evaluating { $(0, 10) } should produce[IndexOutOfBoundsException]
+		evaluating {
+			$(0, 10)
+		} should produce[IndexOutOfBoundsException]
 	}
 
 	it should "start out as all empty" in {
