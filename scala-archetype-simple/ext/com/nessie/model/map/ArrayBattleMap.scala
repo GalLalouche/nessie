@@ -4,11 +4,24 @@ import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject
 
 
+class ArrayBattleMap(list: List[List[BattleMapObject]]) extends BattleMap(list.length, list(0).length) {
+	override def apply(p: MapPoint) = list(p.x)(p.y)
 
-class ArrayBattleMap(width: Int, height: Int) extends BattleMap(width, height) {
-	val array = Array.ofDim[BattleMapObject](width, height)
-	for (cell <- this) this(cell._1) = EmptyMapObject
+	override def place(p: MapPoint, o: BattleMapObject) = new ArrayBattleMap(list.updated(p.x, list(p.x).updated(p.y, o)))
+}
 
-	override def apply(p: MapPoint) = array(p.x)(p.y)
-	override def update(p: MapPoint, o: BattleMapObject) = array(p.x)(p.y) = o
+object ArrayBattleMap {
+	def apply(width: Int, height: Int) = new ArrayBattleMap({
+		require(width > 0)
+		require(height > 0)
+		List.fill(width)(List.fill[BattleMapObject](height)(EmptyMapObject))
+	})
+}
+
+trait T
+
+object O extends T
+
+class B {
+	val x: List[T] = (1 until 10) map (x => O) toList
 }

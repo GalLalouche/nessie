@@ -8,9 +8,7 @@ import com.nessie.units.Skeleton
 import com.nessie.units.Warrior
 
 object SwingBattleMapViewer extends SimpleSwingApplication {
-	val map = new ArrayBattleMap(3, 5)
-	map(1, 2) = new Warrior
-	map(2, 4) = new Skeleton
+	val map = ArrayBattleMap(3, 5).place((1, 2), new Warrior).place(2, 4, new Skeleton)
 	val ctrl = new BattleMapController(map)
 
 

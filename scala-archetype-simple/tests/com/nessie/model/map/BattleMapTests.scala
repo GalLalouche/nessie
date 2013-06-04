@@ -22,7 +22,7 @@ trait CustomMatchers extends ShouldMatchers {
 }
 
 class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with BeforeAndAfter {
-	var $: BattleMap = new ArrayBattleMap(5, 10)
+	var $: BattleMap = ArrayBattleMap(5, 10)
 
 	private def mockObject = mock[BattleMapObject]
 
@@ -30,19 +30,19 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	val emptyP = (0, 1)
 	val occupiedP = (1, 0)
 	before({
-		$ = new ArrayBattleMap(5, 10)
-		$(occupiedP) = mockObject
+		$ = ArrayBattleMap(5, 10)
+		$.place(occupiedP, mockObject)
 	})
 
 	"Constructor" should "return the correct height and width" in {
-		$ = new ArrayBattleMap(5, 10);
+		$ = ArrayBattleMap(5, 10);
 		$.width should be === 5
 		$.height should be === 10
 	}
 
 	it should "throw IllegalArgumentException on negative height" in {
 		evaluating {
-			new ArrayBattleMap(-3, 10)
+			ArrayBattleMap(-3, 10)
 		} should produce[IllegalArgumentException]
 	}
 
@@ -52,7 +52,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 
 	"Apply" should "throw IllegalArgumentException on zero width" in {
 		evaluating {
-			new ArrayBattleMap(5, 0)
+			ArrayBattleMap(5, 0)
 		} should produce[IllegalArgumentException]
 	}
 
@@ -69,13 +69,13 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	it should "start out as all empty" in {
-		$ = new ArrayBattleMap(10, 20)
+		$ = ArrayBattleMap(10, 20)
 		$ should forAll[(MapPoint, BattleMapObject)](x => x._2 == EmptyMapObject);
 	}
 
 	"Update" should "place an object" in {
-		$(emptyP) = o
-		$(emptyP) should be === o
+		$.place(emptyP, o)
+		$.place(emptyP, o)(emptyP) should be === o
 	}
 }
 
