@@ -5,7 +5,7 @@ import com.nessie.model.map.BattleMap
 import com.nessie.model.map.MapPoint
 import scala.swing.event.{ActionEvent, Event}
 
-case class CellClicked(p: MapPoint) extends Event {
+case class CellClicked(val p: MapPoint) extends Event {
 	override def equals(obj: Any) = obj.isInstanceOf[CellClicked] && obj.asInstanceOf[CellClicked].p == p
 
 	override def hashCode(): Int = p.hashCode
@@ -21,6 +21,16 @@ class MapPanel(map: BattleMap, builder: SwingBuilder) extends GridPanel(map.widt
 		}
 		b
 	})
+	val BACKGROUND_COLOR = contents(0).background
 
 	override def toString = "MapPanel"
+	private implicit def pointToIndex(p: MapPoint) = p.y *  map.width + p.x;
+
+	def select(p: MapPoint) {
+		contents(p).background = java.awt.Color.RED;
+	}
+
+	def unselect(p: MapPoint) {
+		contents(p).background = BACKGROUND_COLOR;
+	}
 }

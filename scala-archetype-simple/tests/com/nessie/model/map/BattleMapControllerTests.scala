@@ -11,7 +11,6 @@ import com.nessie.model.map.objects.BattleMapObject
 
 
 class BattleMapControllerTests extends FlatSpec with ShouldMatchers with MockFactory with BeforeAndAfter {
-	import BattleMap.tupleToMapPoint
 	var $: BattleMapController = null
 	private def mockObject = mock[BattleMapObject]
 	val o = mockObject

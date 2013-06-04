@@ -8,7 +8,6 @@ import tests.{SwingSpecs, MockitoSyrup}
 import scala.swing.{Frame, Button}
 
 class MapPanelTests extends FlatSpec with ShouldMatchers with MockitoSyrup with BeforeAndAfter with SwingSpecs {
-	import BattleMap._
 	var $: MapPanel = null
 	val map = new ArrayBattleMap(10, 5)
 	before({

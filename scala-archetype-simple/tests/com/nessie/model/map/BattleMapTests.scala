@@ -22,9 +22,6 @@ trait CustomMatchers extends ShouldMatchers {
 }
 
 class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with BeforeAndAfter {
-
-	import BattleMap.tupleToMapPoint
-
 	var $: BattleMap = new ArrayBattleMap(5, 10)
 
 	private def mockObject = mock[BattleMapObject]
