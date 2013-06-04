@@ -1,7 +1,7 @@
 package tests
 
-import org.scalatest.matchers.{ MatchResult, Matcher, ShouldMatchers }
-import scala.swing.{ Frame, Publisher }
+import org.scalatest.matchers.{MatchResult, Matcher, ShouldMatchers}
+import scala.swing.{Frame, Publisher}
 
 //def forAll[T](right: T => Boolean) = new Matcher[GenTraversable[T]] {
 //override def apply(left: GenTraversable[T]) = {
@@ -15,7 +15,9 @@ import scala.swing.{ Frame, Publisher }
 //}
 
 trait SwingSpecs extends ShouldMatchers {
+
 	trait Verb;
+
 	def publishOn(f: () => Any) = new Matcher[Publisher] {
 		override def apply(left: Publisher) = {
 			var didPublish = false;
@@ -31,8 +33,30 @@ trait SwingSpecs extends ShouldMatchers {
 				left + " did publish")
 		}
 	}
+
+	def publish[T](e: T) = new {
+		def on(f: () => Any) = {
+			new Matcher[Publisher] {
+				override def apply(left: Publisher) = {
+					var didPublish = false;
+					val x = new Frame() {
+						listenTo(left);
+						reactions += {
+							case x if (x == e) => didPublish = true;
+						}
+					}
+					f()
+					MatchResult(didPublish,
+						left + " did not publish " + e,
+						left + " did publish " + e)
+				}
+			}
+		}
+	}
+
 	implicit def richEvaluation(r: ResultOfEvaluatingApplication) = new {
 		def publish = throw new Error
+
 		def should(p: Verb) = throw new Error
 	}
 }
