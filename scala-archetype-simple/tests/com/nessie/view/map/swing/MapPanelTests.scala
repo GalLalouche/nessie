@@ -12,7 +12,7 @@ class MapPanelTests extends FlatSpec with ShouldMatchers with MockitoSyrup with 
 	var $: MapPanel = null
 	val map = new ArrayBattleMap(10, 5)
 	before({
-		$ = new MapPanel(map)
+		$ = new MapPanel(map, new SimpleSwingBuilder)
 	})
 	//(foo.bar(baz)).bam(bim)
 	"Panel" should "publish button clicked when a button is clicked" in {
@@ -20,6 +20,6 @@ class MapPanelTests extends FlatSpec with ShouldMatchers with MockitoSyrup with 
 	}
 
 	it should "publish correct cell location when a button is clicked" in {
-		$ should publish(CellClicked((0, 0))).on {$.contents(0).asInstanceOf[Button].doClick}
+		$ should publish(CellClicked((1, 1))).on {$.contents(11).asInstanceOf[Button].doClick}
 	}
 }

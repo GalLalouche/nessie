@@ -2,6 +2,7 @@ package tests
 
 import org.scalatest.matchers.{MatchResult, Matcher, ShouldMatchers}
 import scala.swing.{Frame, Publisher}
+import scala.swing.event.Event
 
 //def forAll[T](right: T => Boolean) = new Matcher[GenTraversable[T]] {
 //override def apply(left: GenTraversable[T]) = {
@@ -16,21 +17,21 @@ import scala.swing.{Frame, Publisher}
 
 trait SwingSpecs extends ShouldMatchers {
 
-	trait Verb;
+	trait Verb
 
 	def publishOn(f: () => Any) = new Matcher[Publisher] {
 		override def apply(left: Publisher) = {
-			var didPublish = false;
+			var passed = false
 			val x = new Frame() {
-				listenTo(left);
+				listenTo(left)
 				reactions += {
-					case _ => didPublish = true;
+					case _ => passed = true
 				}
 			}
 			f()
-			MatchResult(didPublish,
+			MatchResult(passed,
 				left + " did not publish",
-				left + " did publish")
+				left + " published ")
 		}
 	}
 
@@ -38,17 +39,19 @@ trait SwingSpecs extends ShouldMatchers {
 		def on(f: () => Any) = {
 			new Matcher[Publisher] {
 				override def apply(left: Publisher) = {
-					var didPublish = false;
+					var passed = false
+					var didPublish: Event = null
 					val x = new Frame() {
-						listenTo(left);
+						listenTo(left)
 						reactions += {
-							case x if (x == e) => didPublish = true;
+							case `e` => passed = true
+							case other => didPublish = other
 						}
 					}
 					f()
-					MatchResult(didPublish,
-						left + " did not publish " + e,
-						left + " did publish " + e)
+					MatchResult(passed,
+						left + " did not publish " + e + (if (didPublish != null) "; did publish " + didPublish else ""),
+						left + " published " + e)
 				}
 			}
 		}
