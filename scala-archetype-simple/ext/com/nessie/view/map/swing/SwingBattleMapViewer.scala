@@ -6,9 +6,10 @@ import scala.swing.SimpleSwingApplication
 import com.nessie.model.map.{MapPoint, ArrayBattleMap, BattleMapController}
 import com.nessie.units.Skeleton
 import com.nessie.units.Warrior
+import java.awt.Point
 
 object SwingBattleMapViewer extends SimpleSwingApplication {
-	var ctrl = new BattleMapController(ArrayBattleMap(3, 5).place((1, 2), new Warrior).place(2, 4, new Skeleton))
+	var ctrl = new BattleMapController(ArrayBattleMap(5, 5).place((1, 2), new Warrior).place(2, 4, new Skeleton))
 
 
 	def top = new MainFrame {
@@ -28,12 +29,14 @@ object SwingBattleMapViewer extends SimpleSwingApplication {
 					contents = createMapPanel
 				}
 				case _ => {
+					currentlySelected = null
 					m.unselect
 				}
 			}
 			m
 		}
 
+		location = new Point(500, 500)
 		contents = createMapPanel
 	}
 
