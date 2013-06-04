@@ -24,13 +24,18 @@ class MapPanel(map: BattleMap, builder: SwingBuilder) extends GridPanel(map.widt
 	val BACKGROUND_COLOR = contents(0).background
 
 	override def toString = "MapPanel"
-	private implicit def pointToIndex(p: MapPoint) = p.y *  map.width + p.x;
+
+	private implicit def pointToIndex(p: MapPoint) = p.y * map.width + p.x;
 
 	def select(p: MapPoint) {
+		require(p != null)
 		contents(p).background = java.awt.Color.RED;
 	}
 
+	def unselect = contents.foreach(_.background = BACKGROUND_COLOR)
+
 	def unselect(p: MapPoint) {
-		contents(p).background = BACKGROUND_COLOR;
+		if (p != null)
+			contents(p).background = BACKGROUND_COLOR;
 	}
 }

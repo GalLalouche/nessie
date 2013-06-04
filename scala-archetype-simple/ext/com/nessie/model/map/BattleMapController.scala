@@ -4,7 +4,7 @@ import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject
 
 
-class BattleMapController(map: BattleMap) {
+class BattleMapController(val map: BattleMap) {
 	require(map != null)
 
 	def apply(p: MapPoint) = if (isOccupied(p)) map(p) else throw new MapEmptyException(p)

@@ -8,31 +8,33 @@ import com.nessie.units.Skeleton
 import com.nessie.units.Warrior
 
 object SwingBattleMapViewer extends SimpleSwingApplication {
-	val map = ArrayBattleMap(3, 5).place((1, 2), new Warrior).place(2, 4, new Skeleton)
-	val ctrl = new BattleMapController(map)
+	var ctrl = new BattleMapController(ArrayBattleMap(3, 5).place((1, 2), new Warrior).place(2, 4, new Skeleton))
 
 
 	def top = new MainFrame {
-		createMapPanel
 
 		private def createMapPanel: MapPanel = {
-			val m = new MapPanel(map, new SimpleSwingBuilder)
-			contents = m;
+			val m = new MapPanel(ctrl.map, new SimpleSwingBuilder)
 			listenTo(m)
-			var currentlySelected: MapPoint = new MapPoint(0, 0)
+			var currentlySelected: MapPoint = null
 			reactions += {
 				case CellClicked(c) if (ctrl.isOccupied(c)) => {
 					m.unselect(currentlySelected)
 					currentlySelected = c
 					m.select(c)
 				}
-				case CellClicked(c) => if (currentlySelected != null) {
-					ctrl.move(currentlySelected).to(c)
+				case CellClicked(c) => if (currentlySelected != null && ctrl.isOccupied(c) == false) {
+					ctrl = ctrl.move(currentlySelected).to(c)
 					contents = createMapPanel
+				}
+				case _ => {
+					m.unselect
 				}
 			}
 			m
 		}
+
+		contents = createMapPanel
 	}
 
 }
