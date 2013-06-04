@@ -1,5 +1,3 @@
-
-
 package com.nessie.model.map
 
 import org.scalamock.scalatest.MockFactory
