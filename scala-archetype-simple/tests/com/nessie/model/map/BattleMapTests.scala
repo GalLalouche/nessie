@@ -55,7 +55,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	it should "should throw exception on negative apply" in {
 		evaluating {
 			$(-3, 10)
-		} should produce[IndexOutOfBoundsException]
+		} should produce[IllegalArgumentException]
 	}
 
 	it should "should throw exception on too large of apply" in {

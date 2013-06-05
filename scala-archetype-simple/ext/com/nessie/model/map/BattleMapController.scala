@@ -3,7 +3,6 @@ package com.nessie.model.map
 import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject
 
-
 class BattleMapController(val map: BattleMap) {
 	require(map != null)
 

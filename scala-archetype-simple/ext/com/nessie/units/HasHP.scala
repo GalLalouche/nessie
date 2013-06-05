@@ -1,6 +1,8 @@
 package com.nessie.units
 
-class HasHP protected(val currentHp: Int, val maxHp: Int) {
+import com.nessie.model.map.objects.BattleMapObject
+
+class HasHP protected(val currentHp: Int, val maxHp: Int) extends BattleMapObject {
 	def isDead = currentHp == 0
 
 	require(currentHp >= 0)
