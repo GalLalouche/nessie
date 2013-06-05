@@ -3,8 +3,17 @@ package com.nessie.units
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{OneInstancePerTest, FlatSpec}
 import org.scalatest.matchers._
+import scala.reflect.Manifest
 
 class HasHPTests extends FlatSpec with ShouldMatchers with MockFactory with OneInstancePerTest {
+	protected def instanceOf[T](implicit manifest: Manifest[T]) =
+		new BePropertyMatcher[Any] {
+			def apply(left: Any) = {
+				val clazz = manifest.runtimeClass.asInstanceOf[Class[T]]
+				new BePropertyMatchResult(left.getClass == clazz, "instance of " + clazz.getSimpleName)
+			}
+		}
+
 	def $: HasHP = new HasHP(10)
 
 	"Constructor" should "return the correct maxHP" in {
@@ -39,6 +48,10 @@ class HasHPTests extends FlatSpec with ShouldMatchers with MockFactory with OneI
 		$.reduceHp(11).currentHp should be === 0
 	}
 
+	it should "return an object of the same type as the original" in {
+		$.reduceHp(5).getClass should be === $.getClass
+	}
+
 	"Heal" should "throw exception on negative amount" in {
 		evaluating {
 			$.healHp(-1)
@@ -57,12 +70,24 @@ class HasHPTests extends FlatSpec with ShouldMatchers with MockFactory with OneI
 		$.reduceHp(5).healHp(10).currentHp should be === 10
 	}
 
-	"isDead?" should "return true if currentHp is 0" in {
+	it should "return an object of the same type as the original" in {
+		$.healHp(5).getClass should be === $.getClass
+	}
+
+	"isDead" should "return true if currentHp is 0" in {
 		$.reduceHp(10).isDead should be === true
 	}
 
 	it should "return false if currentHp is not 0" in {
 		$.isDead should be === false
+	}
+
+	"getAttacked" should "return an object minus the attack's damage" in {
+		$.getAttacked(Attack(5)).currentHp should be === 5
+	}
+
+	it should "return an object of the same type as the original" in {
+		$.getAttacked(Attack(5)).getClass should be === $.getClass
 	}
 }
 

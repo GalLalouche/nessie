@@ -6,6 +6,8 @@ class CombatUnit protected(currentHp: Int, maxHp: Int) extends HasHP(currentHp, 
 	override def reduceHp(i: Int): HasHP = CombatUnit(super.reduceHp(i))
 
 	override def healHp(i: Int): HasHP = CombatUnit(super.healHp(i))
+
+	def getBasicAttack = Attack(5)
 }
 
 object CombatUnit {

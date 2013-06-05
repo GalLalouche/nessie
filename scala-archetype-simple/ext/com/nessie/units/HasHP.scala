@@ -18,4 +18,9 @@ class HasHP protected(val currentHp: Int, val maxHp: Int) {
 		require(i >= 0)
 		new HasHP(Math.min(currentHp + i, maxHp), maxHp)
 	}
+
+	def getAttacked(a: Attack) = {
+		require(a != null)
+		reduceHp(a.damage)
+	}
 }
