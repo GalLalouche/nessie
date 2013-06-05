@@ -1,6 +1,8 @@
 package com.nessie.units
 
 class HasHP protected(val currentHp: Int, val maxHp: Int) {
+	def isDead = currentHp == 0
+
 	require(currentHp >= 0)
 	require(currentHp <= maxHp)
 	require(maxHp > 0)
