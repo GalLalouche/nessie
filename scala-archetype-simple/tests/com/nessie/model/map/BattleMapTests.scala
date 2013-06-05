@@ -2,8 +2,7 @@ package com.nessie.model.map
 
 import scala.collection.GenTraversable
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.BeforeAndAfter
-import org.scalatest.FlatSpec
+import org.scalatest.{OneInstancePerTest, FlatSpec}
 import org.scalatest.matchers._
 import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject
@@ -21,18 +20,15 @@ trait CustomMatchers extends ShouldMatchers {
 	}
 }
 
-class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with BeforeAndAfter {
-	var $: BattleMap = ArrayBattleMap(5, 10)
-
+class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with OneInstancePerTest {
 	private def mockObject = mock[BattleMapObject]
 
 	val o = mockObject
+
 	val emptyP = (0, 1)
 	val occupiedP = (1, 0)
-	before({
-		$ = ArrayBattleMap(5, 10)
-		$.place(occupiedP, mockObject)
-	})
+
+	var $: BattleMap = ArrayBattleMap(5, 10).place(occupiedP, mockObject)
 
 	"Constructor" should "return the correct height and width" in {
 		$ = ArrayBattleMap(5, 10);

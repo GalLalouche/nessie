@@ -13,6 +13,7 @@ case class CellClicked(val p: MapPoint) extends Event {
 
 class MapPanel(map: BattleMap, builder: SwingBuilder) extends GridPanel(map.width, map.height) {
 	require(map != null)
+	require(builder != null)
 	contents ++= map map (x => {
 		val b = builder(x._2)
 		listenTo(b)

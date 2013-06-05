@@ -14,5 +14,8 @@ package object map {
 		override def hashCode(): Int = x.hashCode * 17 + y.hashCode
 	}
 
-	implicit def tupleToMapPoint(p: (Int, Int)) = new MapPoint(p._1, p._2)
+	implicit def tupleToMapPoint(p: (Int, Int)) = {
+		require(p != null)
+		new MapPoint(p._1, p._2)
+	}
 }
