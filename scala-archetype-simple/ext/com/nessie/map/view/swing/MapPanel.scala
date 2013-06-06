@@ -1,18 +1,14 @@
 package com.nessie.view.map.swing
 
 import scala.swing.GridPanel
-import scala.swing.event.{ActionEvent, Event}
+import scala.swing.event.ActionEvent
 import com.nessie.map.model.{BattleMap, MapPoint}
+import com.nessie.map.view.{MapView, CellClicked, SwingBuilder}
 
-case class CellClicked(val p: MapPoint) extends Event {
-	override def equals(obj: Any) = obj.isInstanceOf[CellClicked] && obj.asInstanceOf[CellClicked].p == p
-
-	override def hashCode(): Int = p.hashCode
-}
-
-class MapPanel(map: BattleMap, builder: SwingBuilder) extends GridPanel(map.width, map.height) {
+class MapPanel(map: BattleMap, builder: SwingBuilder) extends GridPanel(map.width, map.height) with MapView {
 	require(map != null)
 	require(builder != null)
+
 	contents ++= map map (x => {
 		val b = builder(x._2)
 		listenTo(b)
@@ -38,4 +34,6 @@ class MapPanel(map: BattleMap, builder: SwingBuilder) extends GridPanel(map.widt
 		if (p != null)
 			contents(p).background = BACKGROUND_COLOR;
 	}
+
+	def build(m: BattleMap): MapView = new MapPanel(m, builder)
 }

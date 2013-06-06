@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import tests.{SwingSpecs, MockitoSyrup}
 import scala.swing.Button
 import com.nessie.map.model.ArrayBattleMap
+import com.nessie.map.view.CellClicked
 
 class MapPanelTests extends FlatSpec with ShouldMatchers with MockitoSyrup with OneInstancePerTest with SwingSpecs {
 	val map = ArrayBattleMap(10, 5)

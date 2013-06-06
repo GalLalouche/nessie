@@ -1,4 +1,4 @@
-package com.nessie.view.map.swing
+package com.nessie.map.view
 
 import com.nessie.model.map.objects.BattleMapObject
 import scala.swing.Component

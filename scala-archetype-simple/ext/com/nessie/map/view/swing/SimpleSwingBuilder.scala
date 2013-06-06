@@ -4,6 +4,7 @@ import com.nessie.model.map.objects.{EmptyMapObject, BattleMapObject}
 import scala.swing.{Component, Button}
 import com.nessie.units.{Skeleton, Warrior}
 import java.awt.Dimension
+import com.nessie.map.view.SwingBuilder
 
 class SimpleSwingBuilder extends SwingBuilder {
 	def apply(o: BattleMapObject): Component = new Button(string(o)) {

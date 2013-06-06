@@ -6,14 +6,18 @@ import scala.swing.SimpleSwingApplication
 import com.nessie.units.{Skeleton, Warrior}
 import java.awt.Point
 import com.nessie.map.model.{BattleMapModifier, BattleMap, ArrayBattleMap, MapPoint}
-import com.nessie.view.map.swing.{CellClicked, SimpleSwingBuilder, MapPanel}
+import com.nessie.view.map.swing.{SimpleSwingBuilder, MapPanel}
+import com.nessie.map.view.{MapView, CellClicked}
 
-object SwingBattleMapController extends SimpleSwingApplication {
+class SwingBattleMapController(m: BattleMap, v: MapView) extends SimpleSwingApplication {
+	require(v != null)
+	require(m != null)
 
 	import com.nessie.map._
 
 	var currentlySelected: MapPoint = null
 	var ctrl: BattleMap = ArrayBattleMap(5, 5).place((1, 2), new Warrior).place(2, 4, new Skeleton)
+	var view = v.build(m)
 
 	def top = new MainFrame {
 
