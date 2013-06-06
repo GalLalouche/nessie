@@ -1,4 +1,4 @@
-package com.nessie.model.map
+package com.nessie.map.model
 
 import scala.collection.GenTraversable
 import org.scalamock.scalatest.MockFactory

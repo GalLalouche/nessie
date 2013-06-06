@@ -1,4 +1,4 @@
-package com.nessie.model.map
+package com.nessie.map.model
 
 class MapPoint(val x: Int, val y: Int) {
 	require(x >= 0)
