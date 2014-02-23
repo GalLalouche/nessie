@@ -20,6 +20,7 @@ object ArrayBattleMap {
 	 * @return A new immutable map, whose cell are all empty to begin with
 	 */
 	def apply(width: Int, height: Int) = new ArrayBattleMap({
+		// these are required as otherwise the list.fill will throw an IndexOutOfBoundsException, which is not what we want
 		require(width > 0)
 		require(height > 0)
 		List.fill(width)(List.fill[BattleMapObject](height)(EmptyMapObject))

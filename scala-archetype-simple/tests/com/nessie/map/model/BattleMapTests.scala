@@ -2,7 +2,7 @@ package com.nessie.map.model
 
 import scala.collection.GenTraversable
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{OneInstancePerTest, FlatSpec}
+import org.scalatest.{ OneInstancePerTest, FlatSpec }
 import org.scalatest.matchers._
 import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject
@@ -58,7 +58,7 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 		} should produce[IllegalArgumentException]
 	}
 
-	it should "should throw exception on too large of apply" in {
+	it should "should throw exception on to large of apply" in {
 		evaluating {
 			$(0, 10)
 		} should produce[IndexOutOfBoundsException]
@@ -70,8 +70,11 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	}
 
 	"Update" should "place an object" in {
-		$.place(emptyP, o)
 		$.place(emptyP, o)(emptyP) should be === o
+	}
+
+	"Iteration" should "be done by rows" in {
+		$.place((1, 0), o).toList(1)._2 should be === o
 	}
 }
 
