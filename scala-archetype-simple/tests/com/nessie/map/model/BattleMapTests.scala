@@ -72,9 +72,5 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	"Update" should "place an object" in {
 		$.place(emptyP, o)(emptyP) should be === o
 	}
-
-	"Iteration" should "be done by rows" in {
-		$.place((1, 0), o).toList(1)._2 should be === o
-	}
 }
 
