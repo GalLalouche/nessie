@@ -37,4 +37,10 @@ abstract class BattleMap(val width: Int, val height: Int) extends Traversable[(M
 	def place(p: MapPoint, o: BattleMapObject): BattleMap
 
 	def place(x: Int, y: Int, o: BattleMapObject): BattleMap = place((x, y), o)
+
+	def column(c: Int): Seq[BattleMapObject] = (0 until height) map (this(c, _))
+	def row(r: Int): Seq[BattleMapObject] = (0 until width) map (this(_, r))
+
+	lazy val rows = (0 until height) map (row(_))
+	lazy val columns = (0 until width) map (column(_))
 }

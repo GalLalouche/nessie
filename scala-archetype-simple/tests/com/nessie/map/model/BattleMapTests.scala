@@ -72,5 +72,43 @@ class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with 
 	"Update" should "place an object" in {
 		$.place(emptyP, o)(emptyP) should be === o
 	}
+
+	"row" should "throw exception on negative value" in {
+		evaluating { $ row -4 } should produce[IllegalArgumentException]
+	}
+
+	it should "throw exception on value that is larger than width" in {
+		evaluating { $ row $.height } should produce[IndexOutOfBoundsException]
+	}
+
+	it should "return the nth row" in {
+		$ = (ArrayBattleMap(5, 5)).place((2, 3), o)
+		$ row 3 should be === List.fill(5)(EmptyMapObject).updated(2, o)
+		$ row 2 should be === List.fill(5)(EmptyMapObject)
+	}
+
+	"column" should "throw exception on negative value" in {
+		evaluating { $ column -1 } should produce[IllegalArgumentException]
+	}
+
+	it should "throw exception on value that is larger than width" in {
+		evaluating { $ column $.width } should produce[IndexOutOfBoundsException]
+	}
+
+	it should "return the nth column" in {
+		$ = (ArrayBattleMap(5, 5)).place((2, 3), o)
+		$ column 2 should be === List.fill(5)(EmptyMapObject).updated(3, o)
+		$ column 3 should be === List.fill(5)(EmptyMapObject)
+	}
+
+	"rows" should "returns all the rows" in {
+		$ = (ArrayBattleMap(5, 5)).place((2, 3), o)
+		$ rows 3 should be === List.fill(5)(EmptyMapObject).updated(2, o)
+	}
+
+	"columns" should "returns all the columns" in {
+		$ = (ArrayBattleMap(5, 5)).place((2, 3), o)
+		$ columns 2 should be === List.fill(5)(EmptyMapObject).updated(3, o)
+	}
 }
 
