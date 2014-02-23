@@ -1,8 +1,8 @@
 /target
 /project
 /src
-/.cache
 
-.cache
-/.cache
 scala-archetype-simple/.cache
+./.settings/*
+/.settings
+/*.cache
