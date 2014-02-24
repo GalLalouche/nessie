@@ -38,11 +38,11 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with MockFacto
 	}
 
 	"IsOccupied" should "return false on empty slot" in {
-		$.isOccupied(emptyP) should be === false
+		$.isOccupiedAt(emptyP) should be === false
 	}
 
 	it should "return true on occupied slot" in {
-		$.isOccupied(occupiedP) should be === true
+		$.isOccupiedAt(occupiedP) should be === true
 	}
 
 	"Remove" should "throw exception on unoccupied cell" in {
@@ -66,7 +66,7 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with MockFacto
 	it should "move the object" in {
 		$ = $.remove(occupiedP).place(occupiedP, o).move(occupiedP).to(emptyP)
 		$(emptyP) should be === o
-		$.isOccupied(occupiedP) should be === false
+		$.isOccupiedAt(occupiedP) should be === false
 	}
 }
 

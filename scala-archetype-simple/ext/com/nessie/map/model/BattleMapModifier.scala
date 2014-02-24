@@ -17,7 +17,7 @@ class BattleMapModifier private(map: BattleMap) extends BattleMap(map.width, map
 	 * @return The object at point p
 	 * @throws MapEmptyException if there is no object at p
 	 */
-	def apply(p: MapPoint) = if (isOccupied(p)) map(p) else throw new MapEmptyException(p)
+	def apply(p: MapPoint) = if (isOccupiedAt(p)) map(p) else throw new MapEmptyException(p)
 
 	/**
 	 * Places an object on the map
@@ -28,13 +28,13 @@ class BattleMapModifier private(map: BattleMap) extends BattleMap(map.width, map
 	 *                              use { @link BattleMapModifier#remove(MapPoint)} first.
 	 */
 	def place(p: MapPoint, o: BattleMapObject): BattleMapModifier =
-		if (isOccupied(p)) throw new MapOccupiedException(p) else BattleMapModifier(map.place(p, o))
+		if (isOccupiedAt(p)) throw new MapOccupiedException(p) else BattleMapModifier(map.place(p, o))
 
 	/**
 	 * @param p The point to check at
 	 * @return true iff the map is occupied at p
 	 */
-	def isOccupied(p: MapPoint): Boolean = map(p) != EmptyMapObject
+	def isOccupiedAt(p: MapPoint): Boolean = map(p) != EmptyMapObject
 
 	/**
 	 * Removes an object from the map
@@ -43,7 +43,7 @@ class BattleMapModifier private(map: BattleMap) extends BattleMap(map.width, map
 	 * @throws MapEmptyException if there is no object at p
 	 */
 	def remove(p: MapPoint): BattleMapModifier =
-		if (isOccupied(p) == false) throw new MapEmptyException(p)
+		if (isOccupiedAt(p) == false) throw new MapEmptyException(p)
 		else BattleMapModifier(map.place(p, EmptyMapObject))
 
 	/**
@@ -73,5 +73,5 @@ object BattleMapModifier {
 	 * @param m The map to wrap
 	 * @return A controller
 	 */
-	def apply(m: BattleMap): BattleMapModifier = new BattleMapModifier(m)
+	implicit def apply(m: BattleMap): BattleMapModifier = new BattleMapModifier(m)
 }

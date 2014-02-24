@@ -12,9 +12,9 @@ class StringBattleMapViewerTests extends FlatSpec with ShouldMatchers with MockF
 		val map = ArrayBattleMap(2, 3);
 		val $ = new StringBattleMapViewer(map)
 		$.toString should be ===
-				"_,_\n" +
-						"_,_\n" +
-						"_,_\n";
+			"_,_\n" +
+			"_,_\n" +
+			"_,_\n";
 	}
 }
 
