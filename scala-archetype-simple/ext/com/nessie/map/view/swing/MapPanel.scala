@@ -3,35 +3,39 @@ package com.nessie.map.view.swing
 import scala.swing.GridPanel
 import scala.swing.event.ActionEvent
 import com.nessie.map.model.{ BattleMap, MapPoint }
-import com.nessie.map.view.{ MapView, CellClicked, SwingBuilder }
-import akka.actor.Actor
+import com.nessie.map.view.{ MapActor, CellClicked, SwingBuilder }
 import scala.swing.Component
 import com.nessie.map.view.SwingBuilder
 import java.awt.Color
 import javax.swing.plaf.ColorUIResource
+import com.nessie.map.view.MapView
+import akka.actor.ActorRef
 
-class MapPanel(builder: SwingBuilder) extends MapView {
-
+class MapPanel(builder: SwingBuilder, owner: ActorRef) extends MapView {
+	require(builder != null)
+	require(owner != null)
 	override def toString = "MapPanel"
-	var v: GridPanel = null
-	val BACKGROUND_COLOR: Color = new ColorUIResource(238, 238, 238)
+	private var v: GridPanel = null
+	private var width: Int = -1
+	private val BACKGROUND_COLOR: Color = new ColorUIResource(238, 238, 238)
+	protected def createGridPanel(m: BattleMap): GridPanel = new GridPanel(m.width, m.height)
 	override def generateMap(m: BattleMap): GridPanel = {
-		v = new GridPanel(m.width, m.height) {
-			contents ++= m map ({
-				case (point, o) => {
-					val b = builder(o)
-					listenTo(b)
-					reactions += {
-						case y: ActionEvent if (y.source == b) => MapPanel.this.self ! CellClicked(point)
-					}
-					b
+		v = createGridPanel(m)
+		v.contents ++= m map ({
+			case (point, o) => {
+				val b = builder(o)
+				v.listenTo(b)
+				v.reactions += {
+					case y: ActionEvent if (y.source == b) => owner ! CellClicked(point)
 				}
-			})
-		}
+				b
+			}
+		})
 		unselect
+		width = m.width
 		v
 	}
-	private implicit def pointToIndex(p: MapPoint) = p.y * m.width + p.x;
+	private implicit def pointToIndex(p: MapPoint) = p.y * width + p.x;
 	def select(p: MapPoint) {
 		require(p != null)
 		v.contents(p).background = java.awt.Color.RED;

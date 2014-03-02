@@ -1,37 +1,56 @@
 package com.nessie.map.view.swing
 
-import org.scalatest.{ OneInstancePerTest, FlatSpec }
-import org.scalatest.matchers.ShouldMatchers
-import tests.{ SwingSpecs, MockitoSyrup }
-import scala.swing.Button
-import com.nessie.map.model.ArrayBattleMap
-import com.nessie.map.view.CellClicked
-import akka.testkit.TestActorRef
-import akka.actor.ActorSystem
-import com.nessie.map.view.MapView
-import akka.testkit.TestKitBase
-import com.nessie.map.ctrl.SwingBattleMapController
+import scala.swing.GridPanel
+import scala.swing.event.ActionEvent
 import org.scalatest.BeforeAndAfter
-import akka.testkit.TestProbe
+import org.scalatest.FlatSpec
+import org.scalatest.OneInstancePerTest
+import org.scalatest.matchers.ShouldMatchers
+import com.nessie.map.model.ArrayBattleMap
+import com.nessie.map.model.BattleMap
+import akka.actor.ActorSystem
 import akka.testkit.ImplicitSender
-import scala.concurrent.duration._
+import akka.testkit.TestKitBase
+import akka.testkit.TestProbe
+import tests.MockitoSyrup
+import com.nessie.map.view.CellClicked
 
 class MapPanelTests extends FlatSpec with ShouldMatchers with MockitoSyrup with OneInstancePerTest with BeforeAndAfter
 	with TestKitBase with ImplicitSender {
-	val map = ArrayBattleMap(10, 5)
+	val map = ArrayBattleMap(5, 5)
 	implicit lazy val system = ActorSystem()
-	val $ = TestActorRef(new MapPanel(new SimpleSwingBuilder))
-	
-	"GenerateMap" should "generate a component in response" in {
-		$ ! MapView.GenerateMap(map)
-		expectMsgPF() {
-			case SwingBattleMapController.Map(_) => true
-		}
+	val probe = new TestProbe(system)
+	val grid = new GridPanel(5, 5)
+	val $ = new MapPanel(new SimpleSwingBuilder, probe.ref) {
+		override def createGridPanel(m: BattleMap): GridPanel = grid
 	}
-	//
-	//	it should "publish correct cell location when a button is clicked" in {
-	//		$ should publish(CellClicked((1, 1))).on {
-	//			$.contents(11).asInstanceOf[Button].doClick
-	//		}
-	//	}
+	$.generateMap(map) should be === grid
+	"GenerateMap" should "generate a component in response" in {
+		$.generateMap(map) should be === grid
+	}
+
+	"MapPanel" should "send the owner a message on onclick" in {
+		val firstEntry = grid.contents(0)
+		firstEntry publish new ActionEvent(firstEntry)
+		probe expectMsg CellClicked((0, 0))
+	}
+
+	it should "send the owner a message with the correct point" in {
+		val firstEntry = grid.contents(7)
+		firstEntry publish new ActionEvent(firstEntry)
+		probe expectMsg CellClicked((2, 1))
+	}
+
+	"select" should "change the color of the cell" in {
+		val originalColor = grid.contents(0).background
+		$.select((0, 0))
+		grid.contents(0).background should not be originalColor
+	}
+
+	"unselect" should "change the color back" in {
+		val originalColor = grid.contents(0).background
+		$.select((0, 0))
+		$.unselect
+		grid.contents(0).background should be === originalColor
+	}
 }
