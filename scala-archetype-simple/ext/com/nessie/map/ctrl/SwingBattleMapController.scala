@@ -10,18 +10,19 @@ import akka.actor.ActorRef
 import scala.swing.Component
 import scala.swing.Button
 import scala.swing.MainFrame
+import com.nessie.map.view.MapView
+import akka.actor.Props
 
-class SwingBattleMapController(m: BattleMap, mapView: ActorRef) extends SimpleSwingApplication with Actor {
-	require(mapView != null)
-	require(m != null)
-
+class SwingBattleMapController(startingMap: BattleMap) extends SimpleSwingApplication with Actor {
+	require(startingMap != null)
+	
 	import com.nessie.map._
 
 	var view: Frame = new MainFrame {
 		contents = new Button("foobar")
 	}
 	def top = view
-
+	val mapActor = context.actorOf(Props(new MapActor()))
 	//
 	//		def updateMap(controller: BattleMapModifier) {
 	//			ctrl = controller
@@ -66,24 +67,31 @@ class SwingBattleMapController(m: BattleMap, mapView: ActorRef) extends SimpleSw
 	import SwingBattleMapController._
 	override def receive: Receive = {
 		case Startup =>
-			startup(null)
-			context become {
-				case Map(c) =>
-					view.close
-					view = new MainFrame {
-						contents = c
-					}
-					startup(null)
-					context unbecome
-			}
-			mapView ! MapActor.GenerateMap(m)
+			updateMapView(startingMap)
+		case Move(src: MapPoint, dst: MapPoint) => {
+			println("Hayush from " + this.self)
+			updateMapView(startingMap.move(src).to(dst))
+		}
+	}
+
+	private def updateMapView(m: BattleMap) {
+		context become {
+			case Map(c) =>
+				view.close
+				view = new MainFrame {
+					contents = c
+				}
+				startup(null)
+				context unbecome
+		}
+		mapActor ! MapActor.GenerateMap(m)
 	}
 }
 
 object SwingBattleMapController {
 	case class Startup
 	case class Map(c: Component)
-	case class Move(from: MapPoint, to: MapPoint) {
-		def this(from: (Int, Int), to: (Int, Int)) = this (new MapPoint(from), new MapPoint(to))
+	case class Move(src: MapPoint, dst: MapPoint) {
+		def this(src: (Int, Int), dst: (Int, Int)) = this(new MapPoint(src), new MapPoint(dst))
 	}
 }

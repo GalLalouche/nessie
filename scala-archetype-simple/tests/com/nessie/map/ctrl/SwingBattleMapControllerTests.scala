@@ -9,7 +9,7 @@ import org.scalatest.matchers.ShouldMatchers
 import com.nessie.map.model.BattleMap
 import com.nessie.map.tupleToMapPoint
 import com.nessie.map.view.CellClicked
-import com.nessie.map.view.MapView
+import com.nessie.map.view.MapActor
 import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject
 
@@ -24,7 +24,7 @@ class SwingBattleMapControllerTests extends FlatSpec with ShouldMatchers with Mo
 	import com.nessie.map._
 
 	implicit lazy val system = ActorSystem()
-	val v = new TestProbe(system)
+	val probe = new TestProbe(system)
 	val m: BattleMap = mock[BattleMap]
 	val event = CellClicked(0, 0)
 
@@ -34,12 +34,14 @@ class SwingBattleMapControllerTests extends FlatSpec with ShouldMatchers with Mo
 	when(m.width).thenReturn(10)
 	when(m.height).thenReturn(5)
 	when(m.place(any(), any())).thenReturn(m)
-	val $ = TestActorRef(new SwingBattleMapController(m, v.ref))
+	val $ = TestActorRef(new SwingBattleMapController(m) {
+		override val mapActor = probe.ref
+	})
 	$ ! SwingBattleMapController.Startup
 
 	"Startup" should "call GenerateMap on mapview" in {
 		$ ! SwingBattleMapController.Startup
-		v expectMsg MapView.GenerateMap(m)
+		probe expectMsg MapActor.GenerateMap(m)
 	}
 }
 

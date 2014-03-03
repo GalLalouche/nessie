@@ -15,9 +15,8 @@ class BattleMapModifier private(map: BattleMap) extends BattleMap(map.width, map
 	/**
 	 * @param p The point to look at
 	 * @return The object at point p
-	 * @throws MapEmptyException if there is no object at p
 	 */
-	def apply(p: MapPoint) = if (isOccupiedAt(p)) map(p) else throw new MapEmptyException(p)
+	def apply(p: MapPoint) = map(p)
 
 	/**
 	 * Places an object on the map

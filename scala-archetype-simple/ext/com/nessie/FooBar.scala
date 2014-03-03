@@ -17,6 +17,5 @@ object FooBar extends App {
 	val m = ArrayBattleMap(5, 5)
 		.place((0, 0), new CombatUnitObject(new Skeleton))
 	val system = ActorSystem("foobar")
-	val mapview = system.actorOf(Props(new MapPanel(new SimpleSwingBuilder)))
-	system.actorOf(Props(new SwingBattleMapController(m, mapview))) ! SwingBattleMapController.Startup
+	system.actorOf(Props(new SwingBattleMapController(m))) ! SwingBattleMapController.Startup
 }

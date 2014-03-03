@@ -40,7 +40,6 @@ class MapActorTests extends FlatSpec with ShouldMatchers with MockitoSyrup with 
 	}
 
 	"move" should "be sent after clicking on a unit and then clicking an empty space" in {
-		println("Actor is " + testActor)
 		val m = mock[BattleMap]
 		when(m height) thenReturn 5
 		when(m width) thenReturn 5
@@ -51,6 +50,24 @@ class MapActorTests extends FlatSpec with ShouldMatchers with MockitoSyrup with 
 		$ ! CellClicked((1, 1))
 		fishForMessage(1 seconds) {
 			case SwingBattleMapController.Move(x, y) if (x == (0, 0) && y == (1, 1)) => true
+			case _ => false
+		}
+	}
+
+	it should "reset the behavior to accept a generated map" in {
+		val m = mock[BattleMap]
+		when(m height) thenReturn 5
+		when(m width) thenReturn 5
+		$ ! MapActor.GenerateMap(m)
+		when(m.apply((0, 0))).thenReturn(mock[Warrior])
+		$ ! CellClicked((0, 0))
+		when(m.apply((1, 1))).thenReturn(EmptyMapObject)
+		$ ! CellClicked((1, 1))
+		val c = mock[GridPanel]
+		when(panel.generateMap(any())).thenReturn(c)
+		$ ! MapActor.GenerateMap(mock[BattleMap])
+		fishForMessage(1 seconds) {
+			case SwingBattleMapController.Map(x) if x == c => true
 			case _ => false
 		}
 	}

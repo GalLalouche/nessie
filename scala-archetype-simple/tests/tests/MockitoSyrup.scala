@@ -1,8 +1,8 @@
 package tests
 
-import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito
 import org.mockito.verification.VerificationMode
+import org.scalatest.mock.MockitoSugar
 
 trait MockitoSyrup extends MockitoSugar {
 	def when[T](a: T) = Mockito.when(a)

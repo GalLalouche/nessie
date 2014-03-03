@@ -33,7 +33,7 @@ class MapActor extends Actor {
 	private def waitForSecondClick(m: BattleMap, currentlySelect: MapPoint): Receive = {
 		case CellClicked(p) => if (m isOccupiedAt p) () else {
 			v.unselect
-			context become waitForFirstClick(m)
+			context become receive
 			println(context.parent)
 			context.parent ! SwingBattleMapController.Move(currentlySelect, p)
 		}

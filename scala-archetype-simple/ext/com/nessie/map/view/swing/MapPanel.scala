@@ -1,20 +1,22 @@
 package com.nessie.map.view.swing
 
+import java.awt.Color
+import scala.swing.Component
 import scala.swing.GridPanel
 import scala.swing.event.ActionEvent
-import com.nessie.map.model.{ BattleMap, MapPoint }
-import com.nessie.map.view.{ MapActor, CellClicked, SwingBuilder }
-import scala.swing.Component
-import com.nessie.map.view.SwingBuilder
-import java.awt.Color
-import javax.swing.plaf.ColorUIResource
+import com.nessie.map.model.BattleMap
+import com.nessie.map.model.MapPoint
 import com.nessie.map.view.MapView
+import com.nessie.map.view.SwingBuilder
+import com.nessie.map.view.SwingBuilder
 import akka.actor.ActorRef
+import javax.swing.plaf.ColorUIResource
+import com.nessie.map.view.CellClicked
 
 class MapPanel(builder: SwingBuilder, owner: ActorRef) extends MapView {
 	require(builder != null)
 	require(owner != null)
-	override def toString = "MapPanel"
+	override def toString = "MapPanel of " + v
 	private var v: GridPanel = null
 	private var width: Int = -1
 	private val BACKGROUND_COLOR: Color = new ColorUIResource(238, 238, 238)
@@ -41,9 +43,4 @@ class MapPanel(builder: SwingBuilder, owner: ActorRef) extends MapView {
 		v.contents(p).background = java.awt.Color.RED;
 	}
 	def unselect = v.contents.foreach(_.background = BACKGROUND_COLOR)
-	//
-	//	def unselect(p: MapPoint) {
-	//		if (p != null)
-	//			contents(p).background = BACKGROUND_COLOR;
-	//	}
 }
