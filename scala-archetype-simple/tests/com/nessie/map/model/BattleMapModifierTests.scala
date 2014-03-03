@@ -14,13 +14,7 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with MockFacto
 	val emptyP = (0, 1)
 	val occupiedP = (1, 0)
 
-	var $: BattleMapModifier = BattleMapModifier(ArrayBattleMap(5, 10)).place(occupiedP, mockObject)
-
-	"Apply" should "throw an exception on empty apply" in {
-		evaluating {
-			$(emptyP)
-		} should produce[MapEmptyException]
-	}
+	var $: BattleMap = ArrayBattleMap(5, 10).place(occupiedP, o)
 
 	it should "also work with an (Int, Int) parameter)" in {
 		val (x, y) = emptyP
@@ -30,11 +24,6 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with MockFacto
 
 	"Update" should "place an object" in {
 		$.place(emptyP, o)(emptyP) should be === o
-	}
-
-	it should "throw an exception on non-empty" in {
-		$ = $.place(emptyP, o)
-		evaluating($.place(emptyP, o)) should produce[MapOccupiedException]
 	}
 
 	"IsOccupied" should "return false on empty slot" in {
@@ -65,8 +54,8 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with MockFacto
 
 	it should "move the object" in {
 		$ = $.remove(occupiedP).place(occupiedP, o).move(occupiedP).to(emptyP)
-		$(emptyP) should be === o
 		$.isOccupiedAt(occupiedP) should be === false
+		$(emptyP) should be === o
 	}
 }
 

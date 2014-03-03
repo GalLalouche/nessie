@@ -9,7 +9,7 @@ import com.nessie.map.exceptions.{MapOccupiedException, MapEmptyException}
  * Is immutable
  * @param map The map to wrap
  */
-class BattleMapModifier private(map: BattleMap) extends BattleMap(map.width, map.height) {
+class BattleMapModifier private(val map: BattleMap) {
 	require(map != null)
 
 	/**
@@ -59,8 +59,8 @@ class BattleMapModifier private(map: BattleMap) extends BattleMap(map.width, map
 			 * @return The modified controller
 			 * @throws MapOccupiedException If there's already an object at dst
 			 */
-			def to(dst: MapPoint): BattleMapModifier = {
-				remove(src).place(dst, o)
+			def to(dst: MapPoint): BattleMap = {
+				remove(src).place(dst, o).map
 			}
 		}
 	}
