@@ -10,7 +10,12 @@ import com.nessie.map.view.swing.MapPanel
 import scala.swing.SimpleSwingApplication
 import com.nessie.map.view.swing.SimpleSwingBuilder
 
-trait MapActor extends Actor {
+/**
+ * This actor represents a mediator between the controller and the view.
+ * It remembers some stuff about the view (e.g., which cell was last clicked) and notifies the view of any changes.
+ * If any changes need to be made to the model, it notifies the controller.
+ */
+class MapActor extends Actor {
 	import MapActor._
 	val v = new MapPanel(new SimpleSwingBuilder(), self)
 	def receive: Receive = {
@@ -19,11 +24,9 @@ trait MapActor extends Actor {
 			context become waitForFirstClick(m)
 	}
 
-	var currentlySelected: MapPoint = null
 	private def waitForFirstClick(m: BattleMap): Receive = {
 		case CellClicked(p) if (m isOccupiedAt p) =>
 			v select p
-			currentlySelected = p
 			context become waitForSecondClick(m, p)
 	}
 
@@ -31,6 +34,8 @@ trait MapActor extends Actor {
 		case CellClicked(p) => if (m isOccupiedAt p) () else {
 			v.unselect
 			context become waitForFirstClick(m)
+			println(context.parent)
+			context.parent ! SwingBattleMapController.Move(currentlySelect, p)
 		}
 	}
 
@@ -38,6 +43,4 @@ trait MapActor extends Actor {
 
 object MapActor {
 	case class GenerateMap(m: BattleMap)
-	case class Select(p: MapPoint)
-	case class Startup
 }

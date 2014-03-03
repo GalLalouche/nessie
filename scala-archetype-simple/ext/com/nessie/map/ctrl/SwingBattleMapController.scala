@@ -4,7 +4,7 @@ import scala.swing.Frame
 import scala.swing.SimpleSwingApplication
 import java.awt.Point
 import com.nessie.map.model.{ BattleMapModifier, BattleMap, MapPoint }
-import com.nessie.map.view.{ MapView, CellClicked }
+import com.nessie.map.view.{ MapActor, CellClicked }
 import akka.actor.Actor
 import akka.actor.ActorRef
 import scala.swing.Component
@@ -76,11 +76,14 @@ class SwingBattleMapController(m: BattleMap, mapView: ActorRef) extends SimpleSw
 					startup(null)
 					context unbecome
 			}
-			mapView ! MapView.GenerateMap(m)
+			mapView ! MapActor.GenerateMap(m)
 	}
 }
 
 object SwingBattleMapController {
 	case class Startup
 	case class Map(c: Component)
+	case class Move(from: MapPoint, to: MapPoint) {
+		def this(from: (Int, Int), to: (Int, Int)) = this (new MapPoint(from), new MapPoint(to))
+	}
 }
