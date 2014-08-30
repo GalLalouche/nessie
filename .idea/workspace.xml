@@ -2,37 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f8108609-f5a5-4c64-9041-40a6a1bda779" name="Default" comment="">
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\FooBar.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\ctrl\SwingBattleMapController.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\exceptions\MapEmptyException.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\exceptions\MapOccupiedException.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\model\ArrayBattleMap.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\model\BattleMap.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\model\BattleMapModifier.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\model\BattleMapViewer.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\model\MapPoint.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\objects\BattleMapObject.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\objects\CombatUnitObject.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\objects\EmptyMapObject.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\package.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\CellClicked.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\MapActor.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\MapView.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\StringBattleMapViewer.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\SwingBuilder.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\swing\MapPanel.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\map\view\swing\SimpleSwingBuilder.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\units\Attack.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\units\CombatUnit.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\units\HasHP.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\units\Skeleton.scala" afterPath="" />
-      <change type="DELETED" beforePath="C:\dev\git\nessie\ext\com\nessie\units\Warrior.scala" afterPath="" />
-      <change type="MOVED" beforePath="C:\dev\git\nessie\tests\tests\MockitoSyrup.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/tests/MockitoSyrup.scala" />
-      <change type="MOVED" beforePath="C:\dev\git\nessie\tests\tests\SwingSpecs.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/tests/SwingSpecs.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.classpath" afterPath="$PROJECT_DIR$/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/map/view/MapActorTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/map/view/MapActorTests.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/map/view/swing/MapPanelTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/map/view/swing/MapPanelTests.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/map/ctrl/SwingBattleMapControllerTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/map/ctrl/SwingBattleMapControllerTests.scala" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/com/nessie/events/model/EventQueueTests.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapModifierTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapModifierTests.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapTests.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/units/HasHPTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/units/HasHPTests.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/com/nessie/map/view/StringBattleMapViewerTests.scala" afterPath="$PROJECT_DIR$/tests/com/nessie/map/view/StringBattleMapViewerTests.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
     </list>
     <ignored path="nessie.iws" />
@@ -50,25 +25,16 @@
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
   </component>
+  <component name="ErrorTreeViewConfiguration">
+    <option name="hideWarnings" value="true" />
+    <option name="HIDE_WARNINGS" value="true" />
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
     <favorites_list name="nessie" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="SwingBattleMapController.scala" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.17377049" vertical-offset="200" max-vertical-offset="1122">
-              <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-              <folding>
-                <element signature="e#29#53#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -82,6 +48,18 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala" />
+        <option value="$PROJECT_DIR$/src/com/nessie/common/EventQueue.scala" />
+        <option value="$PROJECT_DIR$/src/com/nessie/model/events/EventQueue.scala" />
+        <option value="$PROJECT_DIR$/src/com/nessie/events/model/events/EventQueue.scala" />
+        <option value="$PROJECT_DIR$/src/com/nessie/events/events/EventQueue.scala" />
+        <option value="$PROJECT_DIR$/src/com/nessie/events/model/Event.scala" />
+        <option value="$PROJECT_DIR$/src/com/nessie/events/model/EventQueue.scala" />
+        <option value="$PROJECT_DIR$/tests/com/nessie/events/model/EventQueueTests.scala" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapModifierTests.scala" />
+        <option value="$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapTests.scala" />
+        <option value="$PROJECT_DIR$/tests/com/nessie/map/view/StringBattleMapViewerTests.scala" />
+        <option value="$PROJECT_DIR$/tests/com/nessie/units/HasHPTests.scala" />
       </list>
     </option>
   </component>
@@ -106,11 +84,11 @@
     <OptionsSetting value="true" id="Update" />
     <OptionsSetting value="true" id="Status" />
     <OptionsSetting value="true" id="Edit" />
-    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="1" id="Add" />
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="2" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -126,6 +104,7 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -144,27 +123,8 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nessie" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nessie" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="tests" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nessie" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -174,11 +134,11 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../lang/scala/lib/scala-swing.jar!/" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/ScalaCommon.jar!/" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.3047696" />
-    <property name="options.lastSelected" value="reference.projectsettings.compiler.javacompiler" />
+    <property name="options.lastSelected" value="preferences.sourceCode.XML" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
@@ -186,14 +146,21 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="recentsLimit" value="5" />
     <property name="dynamic.classpath" value="false" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/tests/com/nessie" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\dev\git\nessie\lib" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="com.nessie" />
+      <recent name="com.nessie.events.model" />
+      <recent name="com.nessie.events" />
+      <recent name="com.nessie.model.events" />
       <recent name="com.nessie.common" />
+      <recent name="com.nessie" />
     </key>
   </component>
-  <component name="RunManager" selected="ScalaTest.ScalaTests in 'nessie'">
+  <component name="RunManager" selected="ScalaTest.ScalaTests in 'tests'">
     <configuration default="false" name="ScalaTests in 'nessie'" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true">
       <module name="nessie" />
       <setting name="path" value="" />
@@ -209,12 +176,34 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
+    <configuration default="false" name="EventQueueTests.+ no delay should return a queue with the added element" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true">
+      <module name="nessie" />
+      <setting name="path" value="com.nessie.events.model.EventQueueTests" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="+ no delay should return a queue with the added element" />
+      <setting name="testKind" value="Test name" />
+      <setting name="showProgressMessages" value="true" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ScalaTests in 'tests'" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true">
+      <module name="nessie" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="All in package" />
+      <setting name="showProgressMessages" value="true" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
     <configuration default="true" type="Specs2RunConfiguration" factoryName="Specs2">
@@ -228,6 +217,14 @@
       <setting name="testName" value="" />
       <setting name="testKind" value="Class" />
       <setting name="showProgressMessages" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
       <method />
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -283,12 +280,16 @@
       <setting name="showProgressMessages" value="true" />
       <method />
     </configuration>
-    <list size="1">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="ScalaTest.ScalaTests in 'nessie'" />
+      <item index="1" class="java.lang.String" itemvalue="ScalaTest.EventQueueTests.+ no delay should return a queue with the added element" />
+      <item index="2" class="java.lang.String" itemvalue="ScalaTest.ScalaTests in 'tests'" />
     </list>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="ScalaTest.ScalaTests in 'nessie'" />
+      <list size="3">
+        <item index="0" class="java.lang.String" itemvalue="ScalaTest.ScalaTests in 'tests'" />
+        <item index="1" class="java.lang.String" itemvalue="ScalaTest.EventQueueTests.+ no delay should return a queue with the added element" />
+        <item index="2" class="java.lang.String" itemvalue="ScalaTest.ScalaTests in 'nessie'" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="JUnit" default="true" selected="false">
@@ -314,7 +315,7 @@
   <component name="ShelveChangesManager" show_recycled="false" />
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32911393" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -324,18 +325,18 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32911393" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32911393" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -364,21 +365,169 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="918" max-vertical-offset="1122">
-          <caret line="54" column="19" selection-start-line="54" selection-start-column="19" selection-end-line="54" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="408" max-vertical-offset="1122">
+          <caret line="24" column="56" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/events/model/EventQueue.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="85" max-vertical-offset="238">
+          <caret line="5" column="29" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/events/model/EventQueueTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="238" max-vertical-offset="442">
+          <caret line="14" column="15" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
           <folding>
-            <element signature="e#29#53#0" expanded="true" />
+            <element signature="e#33#55#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.17377049" vertical-offset="200" max-vertical-offset="1122">
-          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="408" max-vertical-offset="1122">
+          <caret line="24" column="56" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/events/model/EventQueue.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="102" max-vertical-offset="238">
+          <caret line="6" column="2" selection-start-line="6" selection-start-column="2" selection-end-line="6" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/events/model/EventQueueTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="340" max-vertical-offset="442">
+          <caret line="20" column="20" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
           <folding>
-            <element signature="e#29#53#0" expanded="true" />
+            <element signature="e#33#55#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1122">
+          <caret line="24" column="56" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/events/model/EventQueue.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="85" max-vertical-offset="221">
+          <caret line="5" column="7" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="918" max-vertical-offset="1122">
+          <caret line="54" column="19" selection-start-line="54" selection-start-column="19" selection-end-line="54" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/events/model/Event.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="187">
+          <caret line="2" column="5" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.0/scala-library-2.10.0.jar!/scala/collection/Seq.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09615385" vertical-offset="0" max-vertical-offset="884">
+          <caret line="5" column="56" selection-start-line="5" selection-start-column="55" selection-end-line="5" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.0/scala-library-2.10.0.jar!/scala/package.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.22630993" vertical-offset="239" max-vertical-offset="1326">
+          <caret line="26" column="35" selection-start-line="26" selection-start-column="35" selection-end-line="26" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/map/ctrl/SwingBattleMapController.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="408" max-vertical-offset="1122">
+          <caret line="24" column="55" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/nessie/events/model/EventQueue.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="238">
+          <caret line="5" column="29" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.26" vertical-offset="2885" max-vertical-offset="3757">
+          <caret line="194" column="38" selection-start-line="194" selection-start-column="34" selection-end-line="194" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/events/model/EventQueueTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33442622" vertical-offset="0" max-vertical-offset="610">
+          <caret line="12" column="6" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="6" />
+          <folding>
+            <element signature="e#33#55#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3327869" vertical-offset="205" max-vertical-offset="2074">
+          <caret line="24" column="120" selection-start-line="24" selection-start-column="120" selection-end-line="24" selection-end-column="120" />
+          <folding>
+            <element signature="e#30#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/map/model/BattleMapModifierTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.19508196" vertical-offset="17" max-vertical-offset="1139">
+          <caret line="8" column="108" selection-start-line="8" selection-start-column="108" selection-end-line="8" selection-end-column="108" />
+          <folding>
+            <element signature="e#30#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/units/HasHPTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.11147541" vertical-offset="0" max-vertical-offset="1632">
+          <caret line="7" column="53" selection-start-line="7" selection-start-column="53" selection-end-line="7" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/com/nessie/map/view/StringBattleMapViewerTests.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.11147541" vertical-offset="0" max-vertical-offset="610">
+          <caret line="9" column="69" selection-start-line="9" selection-start-column="69" selection-end-line="9" selection-end-column="69" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -391,7 +540,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.3047696" />
               </list>
             </option>
           </splitter-proportions>
@@ -399,11 +548,11 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>Scala (nessie)|Scala</last-edited>
+          <last-edited>Scala</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.3047696" />
               </list>
             </option>
           </splitter-proportions>
@@ -427,7 +576,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.3047696" />
               </list>
             </option>
           </splitter-proportions>
@@ -439,7 +588,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.3047696" />
               </list>
             </option>
           </splitter-proportions>
@@ -447,7 +596,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>Maven: org.scala-lang:scala-compiler:2.10.0</last-edited>
+          <last-edited>Maven: org.scala-lang:scala-reflect:2.10.0</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
