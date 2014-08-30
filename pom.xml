@@ -175,7 +175,7 @@
 
   <build>
 
-    <sourceDirectory>${basedir}/ext</sourceDirectory>
+    <sourceDirectory>${basedir}/src</sourceDirectory>
 
     <plugins>
       

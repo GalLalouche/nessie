@@ -10,7 +10,7 @@ import com.nessie.map.view.swing.MapPanel
 import akka.actor.ActorSystem
 import akka.testkit.ImplicitSender
 import akka.testkit.TestKitBase
-import tests.MockitoSyrup
+import com.nessie.tests.MockitoSyrup
 import akka.testkit.TestActorRef
 import com.nessie.map.model.BattleMap
 import com.nessie.map.ctrl.SwingBattleMapController

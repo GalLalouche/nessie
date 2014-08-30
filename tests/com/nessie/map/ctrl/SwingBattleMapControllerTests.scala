@@ -17,7 +17,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestActorRef
 import akka.testkit.TestKitBase
 import akka.testkit.TestProbe
-import tests.MockitoSyrup
+import com.nessie.tests.MockitoSyrup
 
 class SwingBattleMapControllerTests extends FlatSpec with ShouldMatchers with MockitoSyrup with OneInstancePerTest with BeforeAndAfter
 	with TestKitBase {

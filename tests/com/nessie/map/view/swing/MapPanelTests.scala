@@ -12,7 +12,7 @@ import akka.actor.ActorSystem
 import akka.testkit.ImplicitSender
 import akka.testkit.TestKitBase
 import akka.testkit.TestProbe
-import tests.MockitoSyrup
+import com.nessie.tests.MockitoSyrup
 import com.nessie.map.view.CellClicked
 
 class MapPanelTests extends FlatSpec with ShouldMatchers with MockitoSyrup with OneInstancePerTest with BeforeAndAfter

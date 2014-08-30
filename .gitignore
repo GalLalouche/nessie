@@ -1,7 +1,6 @@
 /target
 /project
 /src
-/.idea
 /.settings
 scala-archetype-simple/.cache
 ./.settings/*
@@ -18,7 +17,6 @@ scala-archetype-simple/.cache
 *.class
 *.dvi
 *.eml
-.idea
 *.iml
 *.log
 /.metadata/
