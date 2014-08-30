@@ -1,5 +1,0 @@
-\beamer@endinputifotherversion {3.31pt}
-\beamer@sectionintoc {1}{Player classes}{2}{0}{1}
-\beamer@subsectionintoc {1}{1}{Primary classes}{3}{0}{1}
-\beamer@subsectionintoc {1}{2}{First order}{4}{0}{1}
-\beamer@subsectionintoc {1}{3}{Second order derivatives}{8}{0}{1}
