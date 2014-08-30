@@ -1,7 +1,6 @@
 /.idea
 /target
 /project
-/src
 /.settings
 scala-archetype-simple/.cache
 ./.settings/*
