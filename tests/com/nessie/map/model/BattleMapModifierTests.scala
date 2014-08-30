@@ -1,12 +1,12 @@
 package com.nessie.map.model
 
-import org.scalamock.scalatest.MockFactory
+import org.scalatest.mock.MockitoSugar
 import org.scalatest.{OneInstancePerTest, FlatSpec}
 import org.scalatest.matchers.ShouldMatchers
 import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.map.exceptions.{MapOccupiedException, MapEmptyException}
 
-class BattleMapModifierTests extends FlatSpec with ShouldMatchers with MockFactory with OneInstancePerTest {
+class BattleMapModifierTests extends FlatSpec with ShouldMatchers with OneInstancePerTest with MockitoSugar {
 	private def mockObject = mock[BattleMapObject]
 
 	val o = mockObject

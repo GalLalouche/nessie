@@ -1,5 +1,7 @@
 package com.nessie.map.model
 
+import org.scalatest.mock.MockitoSugar
+
 import scala.collection.GenTraversable
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{ OneInstancePerTest, FlatSpec }
@@ -20,7 +22,7 @@ trait CustomMatchers extends ShouldMatchers {
 	}
 }
 
-class BattleMapTests extends FlatSpec with ShouldMatchers with MockFactory with CustomMatchers with OneInstancePerTest {
+class BattleMapTests extends FlatSpec with ShouldMatchers with CustomMatchers with OneInstancePerTest with MockitoSugar {
 	private def mockObject = mock[BattleMapObject]
 
 	val o = mockObject

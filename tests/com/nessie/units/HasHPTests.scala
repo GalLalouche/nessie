@@ -5,7 +5,7 @@ import org.scalatest.{OneInstancePerTest, FlatSpec}
 import org.scalatest.matchers._
 import scala.reflect.Manifest
 
-class HasHPTests extends FlatSpec with ShouldMatchers with MockFactory with OneInstancePerTest {
+class HasHPTests extends FlatSpec with ShouldMatchers with OneInstancePerTest {
 	protected def instanceOf[T](implicit manifest: Manifest[T]) =
 		new BePropertyMatcher[Any] {
 			def apply(left: Any) = {
