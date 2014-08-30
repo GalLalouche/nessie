@@ -1,0 +1,37 @@
+\newenvironment{PC} {%
+    % #1 - name of class
+    % #2 - subtitle
+    % #3 - short description of class
+    % #4 - main attribute
+    % #5 - secondary attribute
+    % #6 - defense mechanism
+    % #7 - resource type
+    % #8 - variants
+    \newcommand{\pcFrame}[8]{
+        \frame{
+            \label{PC:##1}
+            \frametitle{##1}
+            \framesubtitle{##2}
+            \begin{enumerate}
+                \item ##3
+                \item Its main attributes are
+                    \begin{itemize}
+                        \item ##4
+                        \item ##5
+                    \end{itemize}
+                \item It uses ##6 to defend itself 
+                \item Its main resource is ##7
+                \item Variants ##8
+            \end{enumerate}
+
+        }
+    }
+}  
+{}
+\begin{PC}
+    \subsection{First order}
+    \pcFrame{Martial}{Master of weapons}{The martial character uses weapons to damage enemies and protect itself and its allies}{Strength for melee weapons}{Dexterity for ranged weapons}{evasion(?) and damage mitigating armor}{Stamina}{are chosen by the weapon type}
+    \pcFrame{Engineer}{Master of science}{The engineer builds constructs to gain control the battlefield}{Intellect for something?}{Ingeniuty for something else?}{Armor that can get destroyed? yeah, that sounds kul}{Scavanged items!}{depened on the school of engineering}
+\pcFrame{Mage}{Master of the elements}{The mage controls the elements of the universe, to vanquish its foes}{Magicka for magic damage}{Something for mana}{replinashable shields}{mana}{magic type, e.g., fire, cold}
+\pcFrame{Priest}{Master of the divine}{The priest gets its powers from some deity}{Spirit for power of "spells"}{Something else, for number of spells it can remember?}{???}{A finite number of spells}{type of diety worshipped}
+\end{PC}

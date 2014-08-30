@@ -1,8 +1,0 @@
-/target
-/project
-/src
-
-scala-archetype-simple/.cache
-./.settings/*
-/.settings
-/*.cache

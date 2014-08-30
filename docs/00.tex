@@ -1,0 +1,39 @@
+\documentclass[mathserif,serif]{beamer}
+\title{Nessie}
+\subtitle{Design Specifications}
+\author{Gal Lalouche}
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Table of Contents}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
+\usetheme{PaloAlto}
+\begin{document}
+\frame{\titlepage}
+\section{Player classes}
+\subsection{Primary classes}
+\frame{
+    The following are the main player classes in the game:
+    \begin{enumerate}
+        \item \hyperlink{PC:Martial}{Martial (Strength)}
+        \item \hyperlink{PC:Engineer}{(Intellect)}
+        \item \hyperlink{PC:Mage}{Mage (Magicka)}
+        \item \hyperlink{PC:Priest}{Priest (Spirit)}
+    \end{enumerate}
+}
+\input{player_classes}
+\subsection{Second order derivatives}
+\frame{
+    These are the main combinations of two of the primary classes.
+    \begin{enumerate}
+        \item \hyperlink{PC:Rogue}{Rogue (Martial and Engineer)}
+        \item \hyperlink{PC:Battle-Mage}{Battle-Mage (Martial and Magicka)}
+        \item \hyperlink{PC:Paladin}{Paladin (Martial and Priest)}
+        \item \hyperlink{PC:Scientist}{Scientist (Engineer and Magicka)}
+        \item \hyperlink{PC:Cleric}{Cleric (Engineer and Priest)}
+        \item \hyperlink{PC:Shaman}{Shaman (Magicka and Spirit)}
+    \end{enumerate}
+}
+\end{document}
