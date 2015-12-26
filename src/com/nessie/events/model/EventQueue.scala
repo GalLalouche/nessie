@@ -1,57 +1,73 @@
 package com.nessie.events.model
 
-import common.rich.collections.RichSeq._
-import common.rich.RichT._
+/**
+	* A special priority queue, where each element has a "delay" added to it.
+	* Order between elements of the same type is undefined.
+	*/
+abstract class EventQueue[T <: AnyRef] extends Iterable[Event[T]] {
+	protected def _head: Event[T]
+	protected def _tail: EventQueue[T]
+	protected def _isEmpty: Boolean
 
-class EventQueue[T <: AnyRef] private(private val q: List[(T, Double)], currentDelay: Double, infinites: Map[T, Double]) extends Iterable[T] {
-	private implicit def qToEQ(eq: (List[(T, Double)], Double, Map[T, Double])) = new EventQueue[T](eq._1, eq._2, eq._3)
+	override def tail: EventQueue[T] = _tail
 
-	// this ensures by induction that there are no null events
-	require(q.isEmpty || q.head._1 != null)
-
-	def this() = this(List[(T, Double)](), 0.0, Map())
-	override def iterator = new Iterator[T] {
-		private var current = EventQueue.this
-		override def hasNext: Boolean = current.q.nonEmpty
-		override def next(): T = {
-			val $ = current.q.head._1
-			current = current.next
+	require(isEmpty || _head._1 != null)
+	def iterator = new Iterator[Event[T]] {
+		var q: EventQueue[T] = EventQueue.this
+		override def hasNext: Boolean = q._isEmpty == false
+		override def next(): Event[T] = {
+			val $ = q._head
+			q = q._tail
 			$
 		}
 	}
-
-	def +(e: T): EventQueue[T] = add(e, 0.0)
-	def add(e: T, withDelay: Double): EventQueue[T] = add((e, withDelay + currentDelay))
-	private def add(eventWithDelay: (T, Double), infinites: Map[T, Double] = this.infinites): EventQueue[T] =
-		(q
-			.findIndex(_._2 > eventWithDelay._2)
-			.map(i => q insert eventWithDelay at i)
-			.getOrElse((eventWithDelay :: q.reverse).reverse)
-			.toList, currentDelay, infinites)
-	def next: EventQueue[T] = {
-		val pop = q.head._1
-		qToEQ((q.tail, q.head._2, infinites))
-			.mapIf(e => infinites contains pop) // reappend head if is infinite
-			.to(_.repeat(pop).infinite.inIntervalsOf(infinites(pop)))
+	/** Takes all elements in the given window, starting from now */
+	def takeWindow(intervalSize: Double) = {
+		val now = head._2
+		iterator.takeWhile(_._2 < now + intervalSize)
 	}
+
+	/** returns an iterator without the time differences */
+	def plain: Iterator[T] = iterator.map(_._1)
+	/** adds a new element with zero delay */
+	def +(e: T): EventQueue[T] = this.+(e -> 0.0)
+	/** adds a new element with a delay */
+	def +(e: Event[T]): EventQueue[T] = add(e._1, e._2)
+	def add(e: T, delay: Double): EventQueue[T]
+
+	/**
+		* adds an infinite number of elements.
+		* @param e the element to add
+		* @param interval the length of time that must pass between instances of the same event
+		* @param delay amount of time that passes before the first occurrence
+		*/
+	def addInfinitely(e: T, interval: Double, delay: Double): EventQueue[T]
+
 	def repeat(e: T) = new {
 		def times(n: Int) = new {
 			require(n > 0, "The number of repeats must be a positive integer")
-			def inIntervalsOf(delay: Double) = new {
-				require(delay >= 0, "The intervals length must non-negative")
-				def withDefaultDelay = withDelay(delay)
+			def inIntervalsOf(intervalLength: Double) = new {
+				// since this is finite, it is okay to have 0 delay between events
+				require(intervalLength >= 0, "The interval length must non-negative")
+				def withDefaultDelay = withDelay(intervalLength)
 				def withoutDelay = withDelay(0)
 				def withDelay(startingDelay: Double): EventQueue[T] = {
 					require(startingDelay >= 0, "Starting delay must be non-negative")
-					(1 until n).foldLeft(add(e, startingDelay))((eq, i) => eq.add(e, startingDelay + delay * i))
+					(1 until n).foldLeft(add(e, startingDelay)) {
+						(eq, i) => eq + (e -> (startingDelay + intervalLength * i))
+					}
 				}
 			}
 		}
-		def infinite = new {
-			def inIntervalsOf(d: Double): EventQueue[T] = {
-				require(d > 0, "Infinite intervals must be positive")
-				val newMap = infinites + (e -> d)
-				add((e, d + currentDelay), newMap)
+		def forever = new {
+			def inIntervalsOf(intervalLength: Double) = new {
+				require(intervalLength > 0, "Interval length for infinite repeats must be positive")
+				def withDefaultDelay = withDelay(intervalLength)
+				def withoutDelay = withDelay(0)
+				def withDelay(startingDelay: Double): EventQueue[T] = {
+					require(startingDelay >= 0, "Starting delay must be non-negative")
+					addInfinitely(e, intervalLength, startingDelay)
+				}
 			}
 		}
 	}

@@ -1,12 +1,11 @@
 package com.nessie.map.model
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{OneInstancePerTest, FlatSpec}
-import org.scalatest.matchers.ShouldMatchers
+import com.nessie.map.exceptions.{MapEmptyException, MapOccupiedException}
 import com.nessie.model.map.objects.BattleMapObject
-import com.nessie.map.exceptions.{MapOccupiedException, MapEmptyException}
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.{FlatSpec, Matchers}
 
-class BattleMapModifierTests extends FlatSpec with ShouldMatchers with OneInstancePerTest with MockitoSugar {
+class BattleMapModifierTest extends FlatSpec with MockitoSugar with Matchers {
 	private def mockObject = mock[BattleMapObject]
 
 	val o = mockObject
@@ -15,12 +14,6 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with OneInstan
 	val occupiedP = (1, 0)
 
 	var $: BattleMap = ArrayBattleMap(5, 10).place(occupiedP, o)
-
-	it should "also work with an (Int, Int) parameter)" in {
-		val (x, y) = emptyP
-		$ = $.place(emptyP, o)
-		$(emptyP) should be === o
-	}
 
 	"Update" should "place an object" in {
 		$.place(emptyP, o)(emptyP) should be === o
@@ -35,21 +28,21 @@ class BattleMapModifierTests extends FlatSpec with ShouldMatchers with OneInstan
 	}
 
 	"Remove" should "throw exception on unoccupied cell" in {
-		evaluating {
+		a[MapEmptyException] should be thrownBy {
 			$.remove(emptyP)
-		} should produce[MapEmptyException]
+		}
 	}
 
 	"Move" should "throw exception on unoccupied source" in {
-		evaluating {
+		a[MapEmptyException] should be thrownBy {
 			$.move(emptyP).to(occupiedP)
-		} should produce[MapEmptyException]
+		}
 	}
 
 	it should "throw an exception on occupied destination" in {
-		evaluating {
+		a[MapOccupiedException] should be thrownBy {
 			$.place(emptyP, o).move(emptyP).to(occupiedP)
-		} should produce[MapOccupiedException]
+		}
 	}
 
 	it should "move the object" in {

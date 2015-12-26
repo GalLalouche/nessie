@@ -1,29 +1,12 @@
 package com.nessie.units
 
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{OneInstancePerTest, FlatSpec}
-import org.scalatest.matchers._
-import scala.reflect.Manifest
+import org.scalatest.{FlatSpec, Matchers}
 
-class HasHPTests extends FlatSpec with ShouldMatchers with OneInstancePerTest {
-	protected def instanceOf[T](implicit manifest: Manifest[T]) =
-		new BePropertyMatcher[Any] {
-			def apply(left: Any) = {
-				val clazz = manifest.runtimeClass.asInstanceOf[Class[T]]
-				new BePropertyMatchResult(left.getClass == clazz, "instance of " + clazz.getSimpleName)
-			}
-		}
-
+class HasHPTest extends FlatSpec with Matchers {
 	def $: HasHP = new HasHP(10)
 
-	"Constructor" should "return the correct maxHP" in {
-		new HasHP(10).maxHp should be === 10
-	}
-
 	it should "throw IllegalArgumentException on zero hp" in {
-		evaluating {
-			new HasHP(0)
-		} should produce[IllegalArgumentException]
+		an[IllegalArgumentException] should be thrownBy {new HasHP(0)}
 	}
 
 	it should "have the same max hp and current hp" in {
