@@ -1,11 +1,11 @@
 package com.nessie.events.model
 
 import common.AuxSpecs
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, ShouldMatchers}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 
-class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar {
+class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar with ShouldMatchers {
 	val eq = new EventQueue[Event]
 	val e = mock[Event]
 	when(e.toString).thenReturn("e")
