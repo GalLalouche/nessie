@@ -17,30 +17,29 @@ class MapPanel(builder: SwingBuilder, owner: ActorRef) extends MapView {
 	require(builder != null)
 	require(owner != null)
 	override def toString = "MapPanel of " + v
-	private var v: GridPanel = null
+	private var v: GridPanel = _
 	private var width: Int = -1
 	private val BACKGROUND_COLOR: Color = new ColorUIResource(238, 238, 238)
 	protected def createGridPanel(m: BattleMap): GridPanel = new GridPanel(m.width, m.height)
 	override def generateMap(m: BattleMap): GridPanel = {
 		v = createGridPanel(m)
-		v.contents ++= m map ({
-			case (point, o) => {
+		v.contents ++= m.points map {
+			case (point, o) =>
 				val b = builder(o)
 				v.listenTo(b)
 				v.reactions += {
-					case y: ActionEvent if (y.source == b) => owner ! CellClicked(point)
+					case y: ActionEvent if y.source == b => owner ! CellClicked(point)
 				}
 				b
-			}
-		})
+		}
 		unselect
 		width = m.width
 		v
 	}
-	private implicit def pointToIndex(p: MapPoint) = p.y * width + p.x;
+	private def pointToIndex(p: MapPoint) = p.y * width + p.x
 	def select(p: MapPoint) {
 		require(p != null)
-		v.contents(p).background = java.awt.Color.RED;
+		v.contents(pointToIndex(p)).background = java.awt.Color.RED
 	}
 	def unselect = v.contents.foreach(_.background = BACKGROUND_COLOR)
 }

@@ -1,6 +1,6 @@
 package com.nessie.map.model
 
-import com.nessie.model.map.objects.{BattleMapObject, EmptyMapObject}
+import com.nessie.map.{BattleMapObject, EmptyMapObject}
 
 /**
  * Implements a map as a Vector[Vector] matrix
@@ -9,7 +9,7 @@ import com.nessie.model.map.objects.{BattleMapObject, EmptyMapObject}
 class ArrayBattleMap private(list: Vector[Vector[BattleMapObject]]) extends BattleMap(list.length, list(0).length) {
 	override def apply(p: MapPoint) = list(p.x)(p.y)
 
-	override def _place(p: MapPoint, o: BattleMapObject) = new ArrayBattleMap(list.updated(p.x, list(p.x).updated(p.y, o)))
+	override def forcePlace(p: MapPoint, o: BattleMapObject) = new ArrayBattleMap(list.updated(p.x, list(p.x).updated(p.y, o)))
 }
 
 object ArrayBattleMap {

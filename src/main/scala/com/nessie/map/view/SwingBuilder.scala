@@ -1,6 +1,7 @@
 package com.nessie.map.view
 
-import com.nessie.model.map.objects.BattleMapObject
+import com.nessie.map.BattleMapObject
+
 import scala.swing.Component
 
 trait SwingBuilder {

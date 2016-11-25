@@ -1,14 +1,9 @@
 package com.nessie.map.view
 
-import scala.swing.{ Component, Publisher }
-import com.nessie.map.model.{ MapPoint, BattleMap }
 import akka.actor.Actor
-import com.nessie.map.model.MapPoint
 import com.nessie.map.ctrl.SwingBattleMapController
-import com.nessie.map.model.BattleMapModifier._
-import com.nessie.map.view.swing.MapPanel
-import scala.swing.SimpleSwingApplication
-import com.nessie.map.view.swing.SimpleSwingBuilder
+import com.nessie.map.model.{BattleMap, MapPoint}
+import com.nessie.map.view.swing.{MapPanel, SimpleSwingBuilder}
 
 /**
  * This actor represents a mediator between the controller and the view.
@@ -38,7 +33,6 @@ class MapActor extends Actor {
 			context.parent ! SwingBattleMapController.Move(currentlySelect, p)
 		}
 	}
-
 }
 
 object MapActor {

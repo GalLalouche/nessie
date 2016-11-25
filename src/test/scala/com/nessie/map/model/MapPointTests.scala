@@ -1,11 +1,11 @@
 package com.nessie.map.model
 
+import com.nessie.map.{BattleMapObject, EmptyMapObject}
+
 import scala.collection.GenTraversable
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{ OneInstancePerTest, FlatSpec }
+import org.scalatest.{FlatSpec, OneInstancePerTest}
 import org.scalatest.matchers._
-import com.nessie.model.map.objects.BattleMapObject
-import com.nessie.model.map.objects.EmptyMapObject
 
 class MapPointTests extends FlatSpec with ShouldMatchers {
 	"equals" should "return true when x and y are equal" in {

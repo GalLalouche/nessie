@@ -6,6 +6,7 @@ import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 
 class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar with ShouldMatchers {
+	class Event {}
 	val eq = new EventQueue[Event]
 	val e = mock[Event]
 	when(e.toString).thenReturn("e")
@@ -25,7 +26,7 @@ class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar with Shou
 			"first without delay, then with should return e then e2" in {(eq + e add(e2, 0.5)).toSeq shouldReturn List(e, e2)}
 		}
 		"in between" in {(eq.add(e, 0).add(e3, 0.5).add(e2, 0.3)).toSeq shouldReturn List(e, e2, e3)}
-		"after next" in {eq.add(e, 0.5).add(e3, 1.5).next.add(e2, 1.1).toSeq shouldReturn List(e3, e2)}
+		"after next" in {eq.add(e, 0.5).add(e3, 1.5).tail.add(e2, 1.1).toSeq shouldReturn List(e3, e2)}
 	}
 	"adding with repeats" - {
 		"finite" - {

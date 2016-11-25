@@ -1,22 +1,13 @@
 package com.nessie.map.ctrl
 
-import scala.swing.Frame
-import scala.swing.SimpleSwingApplication
-import java.awt.Point
-import com.nessie.map.model.{ BattleMapModifier, BattleMap, MapPoint }
-import com.nessie.map.view.{ MapActor, CellClicked }
-import akka.actor.Actor
-import akka.actor.ActorRef
-import scala.swing.Component
-import scala.swing.Button
-import scala.swing.MainFrame
-import com.nessie.map.view.MapView
-import akka.actor.Props
+import akka.actor.{Actor, Props}
+import com.nessie.map.model.{BattleMap, MapPoint}
+import com.nessie.map.view.MapActor
+
+import scala.swing.{Button, Component, Frame, MainFrame, SimpleSwingApplication}
 
 class SwingBattleMapController(startingMap: BattleMap) extends SimpleSwingApplication with Actor {
 	require(startingMap != null)
-
-	import com.nessie.map._
 
 	var view: Frame = new MainFrame {
 		contents = new Button("foobar")
