@@ -1,7 +1,7 @@
 package com.nessie.map.view.string
 
-import com.nessie.gm.{GameState, View, ViewFactory}
+import com.nessie.gm.{View, ViewFactory}
 
 object StringViewFactory extends ViewFactory {
-  override def apply(state: GameState): View = new StringBattleMapViewer(state.map)
+  override def create(): View = new StringBattleMapViewer
 }

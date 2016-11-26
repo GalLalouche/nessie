@@ -6,7 +6,7 @@ import com.nessie.map.view.string.StringViewFactory
 import com.nessie.units.{Skeleton, Warrior}
 
 object GameLoop {
-  lazy val guiFactory: ViewFactory = StringViewFactory
+  lazy val guiFactory: ViewFactory = ScalaFxViewFactory
 
   def createInitialState: GameState = {
     val map = ArrayBattleMap(5, 5)
@@ -17,10 +17,10 @@ object GameLoop {
 
   val gameMaster: Iterator[GameState] = GameMaster.initiate(createInitialState)
   def main(args: Array[String]): Unit = {
+    val view = guiFactory.create()
     while (true) {
       val nextState = gameMaster.next()
-      val nextView = guiFactory(nextState)
-      nextView.display()
+      view.updateState(nextState)
     }
   }
 }
