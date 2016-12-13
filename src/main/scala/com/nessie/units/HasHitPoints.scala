@@ -1,5 +1,7 @@
 package com.nessie.units
 
+import com.nessie.units.abilities.Attack
+
 trait HasHitPoints {
   type T <: HasHitPoints
   val currentHp: Int
