@@ -6,8 +6,6 @@ import com.nessie.map.CombatUnitObject
 import com.nessie.map.model.BattleMap
 import com.nessie.units.CombatUnit
 import common.rich.RichT._
-import common.rich.func.MoreMonadPlus._
-import common.rich.func.RichMonadPlus._
 import monocle.macros.Lenses
 import monocle.{Lens, Setter}
 
@@ -17,7 +15,7 @@ import scalaz.std.OptionInstances
 case class GameState(map: BattleMap, eq: EventQueue[Event]) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
-    val noneIfDead = Some(replacer(original)).filterNot(_.isDead)
+    val noneIfDead = replacer(original).opt.filterNot(_.isDead)
     val mapLens: Lens[BattleMap, Option[CombatUnit]] =
       CombatUnitObject.lens(original).^|->(MonocleUtils.lift(CombatUnitObject.unit)(optionInstance))
     val queueLens = Setter[EventQueue[Event], Option[CombatUnit]](GameState.updateEq(original))
@@ -28,7 +26,7 @@ case class GameState(map: BattleMap, eq: EventQueue[Event]) extends OptionInstan
 }
 object GameState {
   private def updateEq(original: CombatUnit)(mod: Option[CombatUnit] => Option[CombatUnit])(eq: EventQueue[Event]): EventQueue[Event] = {
-    mod(Some(original)) match {
+    mod(original.opt) match {
       case None => eq.remove {
         case UnitTurn(u) if u == original => true
       }
@@ -37,16 +35,8 @@ object GameState {
       }
     }
   }
-  //
-  //  }
-  //    eq.map[Event] {
-  //      case UnitTurn(u) if u == original =>
-  //        val replacement = mod(Some(u))
-  //        replacement
-  //      case e => e
-  //    }
   def fromMap(map: BattleMap): GameState = {
-    val units = map.points.map(_._2).toTraversable.select[CombatUnitObject].map(_.unit)
+    val units = map.points.map(_._2).flatMap(_.safeCast[CombatUnitObject]).map(_.unit)
     val eq = units.foldLeft(new EventQueue[Event]) {
       (agg, next) => agg.repeat(UnitTurn(next)).infinite.inIntervalsOf(1.0)
     }

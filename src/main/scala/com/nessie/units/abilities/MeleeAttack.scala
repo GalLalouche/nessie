@@ -1,3 +1,3 @@
 package com.nessie.units.abilities
 
-case class MeleeAttack(amount: Int) extends MeleeAbility with DamageAbility with UnitAbility
+case class MeleeAttack(amount: Int) extends DamageAbility(amount) with MeleeAbility with UnitAbility

@@ -1,13 +1,12 @@
 package com.nessie.gm
 
-import com.nessie.common.MonocleUtils.castingIso
-import com.nessie.map.model.{BattleMap, MapPoint}
-import com.nessie.map.{BattleMapObject, CombatUnitObject}
+import com.nessie.map.CombatUnitObject
+import com.nessie.map.model.MapPoint
 import com.nessie.units.abilities.DamageAbility
 import com.nessie.units.{CombatUnit, Owner}
 import common.rich.collections.RichTraversableOnce._
-import common.rich.func.RichMonadPlus._
 import common.rich.func.MoreMonadPlus._
+import common.rich.func.RichMonadPlus._
 
 private class CatcherAI {
   def apply(u: CombatUnit)(gs: GameState): GameState = {

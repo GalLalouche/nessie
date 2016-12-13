@@ -4,10 +4,13 @@ import com.nessie.gm.GameState
 import com.nessie.map.model.{BattleMap, MapPoint}
 import common.rich.RichT._
 
+import scala.collection.mutable.ListBuffer
+
 trait UnitAbility {
-  private lazy val constraints: CanBeUsed = CanBeUsed extract this
+  private val constraints = new ListBuffer[CanBeUsed]
+  private[abilities] def addConstraint(canBeUsed: CanBeUsed) = constraints += canBeUsed
   def name: String = this.simpleName
   def applyTo(source: MapPoint, destination: MapPoint): GameState => GameState
   def canBeUsed(battleMap: BattleMap, source: MapPoint, destination: MapPoint): Boolean =
-    constraints(battleMap, source, destination)
+    constraints.forall(_(battleMap, source, destination))
 }
