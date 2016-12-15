@@ -1,32 +1,34 @@
 package com.nessie.gm
 
-import com.nessie.map.CombatUnitObject
-import com.nessie.map.model.MapPoint
-import com.nessie.units.abilities.DamageAbility
-import com.nessie.units.{CombatUnit, Owner}
-import common.rich.collections.RichTraversableOnce._
-import common.rich.func.MoreMonadPlus._
-import common.rich.func.RichMonadPlus._
+import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
+import com.nessie.model.units.{CombatUnit, Owner}
+import common.rich.RichT._
 
 private class CatcherAI {
+  //TODO cache
+  private def distanceToPlayer(map: BattleMap, point: MapPoint): Int = map.points
+      .flatMap(e => e._2.safeCast[CombatUnitObject].map(e._1 -> _))
+      .filter(_._2.unit.owner == Owner.Player)
+      .map(_._1.manhattanDistanceTo(point))
+      .min
   def apply(u: CombatUnit)(gs: GameState): GameState = {
     val map = gs.map
-    val unitLocation: MapPoint = CombatUnitObject.findIn(u, map).get
-    val playerLocation = map.points.collect {
-      case (p, CombatUnitObject(unit)) if unit.owner == Owner.Player => p
-    }.single
-    val f: GameState => GameState = if (playerLocation.manhattanDistanceTo(unitLocation) == 1) {
-      u.abilities.select[DamageAbility].head.applyTo(unitLocation, playerLocation)
-    } else {
-      def newLocation: MapPoint = {
-        if (playerLocation.y != unitLocation.y)
-          unitLocation.copy(y = unitLocation.y + (if (playerLocation.y > unitLocation.y) 1 else -1))
-        else
-          unitLocation.copy(x = unitLocation.x + (if (playerLocation.x > unitLocation.x) 1 else -1))
-      }
-      GameState.map.modify(_.move(unitLocation).to(newLocation))
+    val unitLocation = CombatUnitObject.findIn(u, map).get
+    val attack: Option[GameState => GameState] = {
+      val attackAbility = u.attackAbility
+      map.points
+          .map(_._1)
+          .find(attackAbility.canBeUsed(map, unitLocation, _))
+          .map(attackAbility.applyTo(unitLocation, _))
     }
-    f(gs)
+    lazy val move: GameState => GameState = {
+      val moveAbility = u.moveAbility
+      map.points.map(_._1)
+          .filter(moveAbility.canBeUsed(map, unitLocation, _))
+          .minBy(distanceToPlayer(map, _))
+          .mapTo(moveAbility.applyTo(unitLocation, _))
+    }
+    attack.getOrElse(move)(gs)
   }
 }
 

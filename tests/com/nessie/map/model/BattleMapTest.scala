@@ -1,9 +1,10 @@
-package com.nessie.map.model
+package com.nessie.model.map.model
 
+import com.nessie.model.map._
 import org.scalatest.mock.MockitoSugar
 
 import scala.collection.GenTraversable
-import org.scalatest.{OneInstancePerTest, FlatSpec}
+import org.scalatest.{FlatSpec, OneInstancePerTest}
 import org.scalatest.matchers._
 import com.nessie.model.map.objects.BattleMapObject
 import com.nessie.model.map.objects.EmptyMapObject

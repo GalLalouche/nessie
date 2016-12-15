@@ -1,5 +1,6 @@
 package com.nessie.events.model
 
+import com.nessie.model.eq.EventQueue
 import org.scalatest.{FreeSpec, Matchers}
 
 class EventQueueTest extends FreeSpec with Matchers {

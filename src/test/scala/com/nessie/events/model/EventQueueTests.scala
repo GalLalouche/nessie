@@ -1,5 +1,6 @@
 package com.nessie.events.model
 
+import com.nessie.model.eq.EventQueue
 import common.AuxSpecs
 import org.scalatest.{FreeSpec, ShouldMatchers}
 import org.scalatest.mock.MockitoSugar

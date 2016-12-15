@@ -1,6 +1,7 @@
-package com.nessie.map.model
+package com.nessie.model.map.model
 
 import com.nessie.map.exceptions.{MapEmptyException, MapOccupiedException}
+import com.nessie.model.map._
 import com.nessie.model.map.objects.BattleMapObject
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FlatSpec, Matchers}

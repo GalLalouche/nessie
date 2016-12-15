@@ -1,6 +1,6 @@
 package com.nessie.gm
 
-import com.nessie.units.CombatUnit
+import com.nessie.model.units.CombatUnit
 import monocle.macros.Lenses
 
 sealed trait Event

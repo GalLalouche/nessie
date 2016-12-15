@@ -1,10 +1,9 @@
 package com.nessie.gm
 
 import com.nessie.common.MonocleUtils
-import com.nessie.events.model.EventQueue
-import com.nessie.map.CombatUnitObject
-import com.nessie.map.model.BattleMap
-import com.nessie.units.CombatUnit
+import com.nessie.model.eq.EventQueue
+import com.nessie.model.map.{BattleMap, CombatUnitObject}
+import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
 import monocle.macros.Lenses
 import monocle.{Lens, Setter}

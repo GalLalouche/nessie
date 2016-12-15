@@ -1,6 +1,6 @@
-package com.nessie.units
+package com.nessie.model.units
 
-import com.nessie.units.abilities.Attack
+import com.nessie.model.units.abilities.Attack
 import org.scalatest.{FlatSpec, Matchers}
 
 class HasHPTest extends FlatSpec with Matchers {

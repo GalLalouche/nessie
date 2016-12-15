@@ -1,15 +1,16 @@
 package com.nessie.gm
 
-import com.nessie.map.CombatUnitObject
-import com.nessie.map.model.{ArrayBattleMap, MapPoint}
-import com.nessie.map.view.sfx.ScalaFxViewFactory
-import com.nessie.units.{Skeleton, Warrior}
+import com.nessie.model.map.{ArrayBattleMap, CombatUnitObject, MapPoint}
+import com.nessie.model.units.{Archer, Skeleton, Warrior, Zombie}
+import com.nessie.view.sfx.ScalaFxViewFactory
 
 private object GameLoop {
   def createInitialState: GameState = {
-    val map = ArrayBattleMap(5, 5)
+    val map = ArrayBattleMap(10, 10)
         .place(MapPoint(0, 0), CombatUnitObject(new Warrior))
-        .place(MapPoint(4, 4), CombatUnitObject(new Skeleton))
+        .place(MapPoint(0, 1), CombatUnitObject(new Archer))
+        .place(MapPoint(9, 8), CombatUnitObject(new Skeleton))
+        .place(MapPoint(9, 9), CombatUnitObject(new Zombie))
     GameState fromMap map
   }
 

@@ -1,6 +1,6 @@
 package com.nessie.gm
 
-import com.nessie.units.Owner._
+import com.nessie.model.units.Owner._
 import common.rich.RichFuture._
 
 import scala.concurrent.ExecutionContext.Implicits.global
