@@ -1,6 +1,13 @@
 package com.nessie.model.map
 
+import common.rich.RichT._
+import common.rich.func.MoreMonadPlus._
 import monocle.Lens
+
+import scala.util.Try
+import scalax.collection.GraphEdge.UnDiEdge
+import scalax.collection.immutable.Graph
+import scalaz.syntax.ToFunctorOps
 
 /**
  * A map of a given level.
@@ -8,63 +15,61 @@ import monocle.Lens
  * @param width  The map's width
  * @param height The map's height
  */
-abstract class BattleMap(val width: Int, val height: Int) {
+abstract class BattleMap(val width: Int, val height: Int)
+    extends ToFunctorOps {
   require(width > 0)
   require(height > 0)
 
+  def size = width * height
   def replace(unitLocation: MapPoint, o: BattleMapObject): BattleMap =
     remove(unitLocation).place(unitLocation, o)
 
-  def points: Iterable[(MapPoint, BattleMapObject)] = {
-    for (
-      y <- 0 until height;
-      x <- 0 until width
-    ) yield {
-      val p = MapPoint(x, y)
-      p -> this (p)
-    }
+  def points: Iterable[(MapPoint, BattleMapObject)] =
+    for (y <- 0 until height; x <- 0 until width) yield
+      MapPoint(x, y).mapTo(p => p -> apply(p))
+
+  def isInBounds(p: MapPoint): Boolean =
+    p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
+
+  def apply(p: MapPoint): BattleMapObject
+  def apply(pd: DirectionalMapPoint): BetweenMapObject
+
+  private def checkBounds(p: MapPoint) {
+    if (p.x >= width || p.y >= height)
+      throw new IndexOutOfBoundsException(s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
+  }
+  def place(p: MapPoint, o: BattleMapObject): BattleMap = {
+    require(o != EmptyMapObject, "Don't place empty objects. Use remove instead.")
+    checkBounds(p)
+    if (isOccupiedAt(p))
+      throw new MapOccupiedException(p)
+    else
+      internalPlace(p, o)
+  }
+  def place(pd: DirectionalMapPoint, o: BetweenMapObject): BattleMap = {
+    checkBounds(pd.toPoint)
+    require(o != EmptyBetweenMapObject, "Don't place empty objects. Use remove instead.")
+    if (isOccupiedAt(pd))
+      throw new MapOccupiedException(pd)
+    else
+      internalPlace(pd, o)
   }
 
-  def nonEmpty: Iterable[(MapPoint, BattleMapObject)] = points.filterNot(_._2 == EmptyMapObject)
-
-  /**
-   * @param p The point to look at
-   * @return The object at point p
-   */
-  def apply(p: MapPoint): BattleMapObject
-
-  /**
-   * @param p The point to place at
-   * @param o The object to place
-   * @return A modified map, with o at p
-   */
-  protected def forcePlace(p: MapPoint, o: BattleMapObject): BattleMap
-
-  /**
-   * Places an object on the map
-   * @param p The point to place at
-   * @param o The object to place
-   * @return A new controller, with the modified map
-   * @throws MapOccupiedException if the map already has an object at p.
-   *                              use { @link BattleMapModifier#remove(MapPoint)} first.
-   */
-  def place(p: MapPoint, o: BattleMapObject): BattleMap =
-    if (isOccupiedAt(p)) throw new MapOccupiedException(p) else forcePlace(p, o)
-
   def isOccupiedAt(p: MapPoint): Boolean = !isEmptyAt(p)
-  def isEmptyAt(p: MapPoint): Boolean = this(p) == EmptyMapObject
+  def isOccupiedAt(pd: DirectionalMapPoint): Boolean = !isEmptyAt(pd)
+  def isEmptyAt(p: MapPoint): Boolean = apply(p) == EmptyMapObject
+  def isEmptyAt(pd: DirectionalMapPoint): Boolean = apply(pd) == EmptyBetweenMapObject
 
-  /**
-   * Removes an object from the map
-   * @param p The point to remove from
-   * @return The modified controller, with the modified map
-   * @throws MapEmptyException if there is no object at p
-   */
   def remove(p: MapPoint): BattleMap =
     if (isOccupiedAt(p))
-      this.forcePlace(p, EmptyMapObject)
+      this.internalPlace(p, EmptyMapObject)
     else
       throw new MapEmptyException(p)
+  def remove(pd: DirectionalMapPoint): BattleMap =
+    if (isOccupiedAt(pd))
+      this.internalPlace(pd, EmptyBetweenMapObject)
+    else
+      throw new MapEmptyException(pd)
 
   /**
    * Moves an object from one location to another
@@ -72,7 +77,7 @@ abstract class BattleMap(val width: Int, val height: Int) {
    * @throws MapEmptyException If the map empty at src
    */
   def move(src: MapPoint) = {
-    val o = this(src)
+    val o = this (src)
     new {
       /**
        * Moves an object to the location
@@ -85,8 +90,28 @@ abstract class BattleMap(val width: Int, val height: Int) {
       }
     }
   }
+
+  def betweens: Iterable[(DirectionalMapPoint, BetweenMapObject)] = points.map(_._1)
+      .flatMap(p => Direction.values().map(DirectionalMapPoint(p, _))).toSet.fproduct(apply)
+
+  protected def internalPlace(pd: DirectionalMapPoint, o: BetweenMapObject): BattleMap
+  protected def internalPlace(p: MapPoint, o: BattleMapObject): BattleMap
+
+  lazy val toGraph: Graph[MapPoint, UnDiEdge] = {
+    val vertices = points.map(_._1).toSet
+    val edges = betweens.filter {
+      case (_, Wall) => false
+      case (_, EmptyBetweenMapObject) => true
+    }.map(_._1).flatMap { pd =>
+      Try(pd.toPoint.go(pd.direction))
+          .filter(vertices)
+          .map(UnDiEdge(pd.toPoint, _))
+          .toOption
+    }
+    Graph.from(vertices, edges)
+  }
 }
 
 object BattleMap {
-  def pointLens(p: MapPoint) = Lens[BattleMap, BattleMapObject](_.apply(p))(o => m => m.forcePlace(p, o))
+  def pointLens(p: MapPoint) = Lens[BattleMap, BattleMapObject](_.apply(p))(o => m => m.internalPlace(p, o))
 }

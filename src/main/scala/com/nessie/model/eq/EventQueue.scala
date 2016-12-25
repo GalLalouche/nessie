@@ -46,7 +46,7 @@ class EventQueue[T <: AnyRef] private(private val q: List[(T, Double)], currentD
   override def tail: EventQueue[T] = {
     val pop = q.head._1
     qToEQ((q.tail, q.head._2, infinites))
-        .mapIf(e => infinites contains pop) // reappend head if is infinite
+        .mapIf(_ => infinites contains pop) // re-append head if is infinite
         .to(_.repeat(pop).infinite.inIntervalsOf(infinites(pop)))
   }
   def repeat(e: T) = new {

@@ -11,21 +11,21 @@ import scalafx.scene.control.MenuItem._
 import scalafx.scene.control.{ContextMenu, MenuItem}
 
 private class ActionMenuFactory(source: MapPoint, gs: GameState, pubSubManager: Observer[GameState]) {
-  private val map = gs.map
   def apply(destination: MapPoint): ContextMenu = {
-    val menu = new ContextMenu()
+    val $ = new ContextMenu()
     def toItem(unitAbility: UnitAbility): MenuItem =
       new MenuItem(unitAbility.name) {
         disable = !unitAbility.canBeUsed(gs.map, source, destination)
-        onAction = (e: ActionEvent) => {
-          menu.hide()
+        onAction = (_: ActionEvent) => {
+          $.hide()
           pubSubManager onNext unitAbility.applyTo(source, destination)(gs)
         }
       }
-    map(source).asInstanceOf[CombatUnitObject].unit.abilities
+    gs.map(source).asInstanceOf[CombatUnitObject].unit.abilities
         .map(toItem)
-        .foreach(menu.items.+=(_))
-    menu.items += new MenuItem("Cancel") { onAction = (e: ActionEvent) => menu.hide() }
-    menu
+        .foreach($.items.+=(_))
+    $.items += new MenuItem("Cancel") { onAction = (_: ActionEvent) => $.hide() }
+    $.style = "-fx-base: white"
+    $
   }
 }

@@ -11,6 +11,7 @@ trait UnitAbility {
   private[abilities] def addConstraint(canBeUsed: CanBeUsed) = constraints += canBeUsed
   def name: String = this.simpleName
   def applyTo(source: MapPoint, destination: MapPoint): GameState => GameState
+  def canBeApplied(m: BattleMap, source: MapPoint): Map[MapPoint, Boolean]
   def canBeUsed(battleMap: BattleMap, source: MapPoint, destination: MapPoint): Boolean =
-    constraints.forall(_(battleMap, source, destination))
+    constraints.forall(_(battleMap, source, destination)) && canBeApplied(battleMap, source)(destination)
 }

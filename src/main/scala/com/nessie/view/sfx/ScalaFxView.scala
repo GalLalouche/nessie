@@ -1,9 +1,14 @@
 package com.nessie.view.sfx
 
+import java.io.IOException
+import javafx.event.EventHandler
+import javafx.stage.WindowEvent
+
 import com.nessie.gm.{GameState, View}
 import com.nessie.model.units.CombatUnit
+import common.rich.RichT._
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.Scene
@@ -12,15 +17,23 @@ import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
 
 private class ScalaFxView extends View {
-  var stage: Stage = _
-  var mapGrid: MapGrid = _
-  Platform.runLater {
+  private var stage: Stage = _
+  private var mapGrid: MapGrid = _
+  private var hasClosed = false
+  Platform.runLater{
     stage = new Stage {
       scene = new Scene(800, 800)
+      onCloseRequest = new EventHandler[WindowEvent] {
+        override def handle(event: WindowEvent) = {
+          hasClosed = true
+          latestPromise.opt.foreach(_.failure(new IOException("User closed the GUI")))
+          Platform.runLater(Platform.exit())
+        }
+      }
     }
   }
   override def updateState(gs: GameState): Unit = {
-    mapGrid = new MapGrid(gs)
+    mapGrid = new MapGrid(gs.map)
     val properties = new PropertiesPane(gs)
     mapGrid.mouseEvents.filter(_._1.eventType == MouseEvent.MouseEntered)
         .map(_._2)
@@ -28,7 +41,7 @@ private class ScalaFxView extends View {
 
     val eqBar = new EventQueueBar(gs)
 
-    Platform.runLater {
+    Platform.runLater{
       stage.scene.get.content = new BorderPane {
         top = eqBar.node
         center = mapGrid.node
@@ -38,5 +51,13 @@ private class ScalaFxView extends View {
         stage.show()
     }
   }
-  override def nextState(u: CombatUnit)(gs: GameState): Future[GameState] = mapGrid.nextState(u)(gs)
+
+  private var latestPromise: Promise[GameState] = _
+
+  override def nextState(u: CombatUnit)(gs: GameState): Future[GameState] = {
+    if (hasClosed)
+      throw new IllegalStateException("The gui has been closed")
+    latestPromise = mapGrid.nextState(u)(gs)
+    latestPromise.future
+  }
 }

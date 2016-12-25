@@ -24,7 +24,8 @@ lazy val nessie = (project in file("."))
         "org.scalamock" %% "scalamock-core" % "3.2.2" % "test",
         "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % "test",
         "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-        "org.scalaz" %% "scalaz-core" % "7.2.4"
+        "org.scalaz" %% "scalaz-core" % "7.2.4",
+        "org.scala-graph" % "graph-core_2.11" % "1.11.3"
       ))
 
 addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)

@@ -26,7 +26,7 @@ class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar with Shou
 			"first with delay, then without should return e2 before e" in {(eq.add(e, 0.5) + e2).toSeq shouldReturn List(e2, e)}
 			"first without delay, then with should return e then e2" in {(eq + e add(e2, 0.5)).toSeq shouldReturn List(e, e2)}
 		}
-		"in between" in {(eq.add(e, 0).add(e3, 0.5).add(e2, 0.3)).toSeq shouldReturn List(e, e2, e3)}
+		"in between" in { eq.add(e, 0).add(e3, 0.5).add(e2, 0.3).toSeq shouldReturn List(e, e2, e3)}
 		"after next" in {eq.add(e, 0.5).add(e3, 1.5).tail.add(e2, 1.1).toSeq shouldReturn List(e3, e2)}
 	}
 	"adding with repeats" - {

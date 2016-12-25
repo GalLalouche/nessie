@@ -14,7 +14,7 @@ class BattleMapModifierTest extends FlatSpec with MockitoSugar with Matchers {
 	val emptyP = (0, 1)
 	val occupiedP = (1, 0)
 
-	var $: BattleMap = ArrayBattleMap(5, 10).place(occupiedP, o)
+	var $: BattleMap = DictBattleMap(5, 10).place(occupiedP, o)
 
 	"Update" should "place an object" in {
 		$.place(emptyP, o)(emptyP) should be === o

@@ -1,0 +1,64 @@
+package com.nessie.common.graph
+
+import common.AuxSpecs
+import org.scalatest.concurrent.{Interruptor, TimeLimitedTests}
+import common.rich.collections.RichTraversableOnce._
+import org.scalatest.time.Span
+import org.scalatest.{FreeSpec, OneInstancePerTest}
+
+import scala.concurrent.duration.DurationInt
+import scalax.collection.GraphEdge.UnDiEdge
+import scalax.collection.GraphPredef._
+import scalax.collection.immutable.Graph
+class RichUndirectedTest extends FreeSpec with AuxSpecs with TimeLimitedTests with OneInstancePerTest {
+  override def timeLimit = Span.convertDurationToSpan(1.second)
+  override val defaultTestInterruptor = Interruptor(_.stop())
+  private implicit def rich[T](g: Graph[T, UnDiEdge]): RichUndirected[T] = new RichUndirected(g)
+  "distance" - {
+    "Throws exception if missing source" in {
+      an[IllegalArgumentException] should be thrownBy Graph[Int, UnDiEdge](1, 2, 3).distance(1, 4)
+      an[IllegalArgumentException] should be thrownBy Graph[Int, UnDiEdge](1, 2, 3).distance(4, 1)
+    }
+    "source is equal to destination" in {
+      Graph[Int, UnDiEdge](1).distance(1, 1).get shouldReturn 0
+    }
+    "No path" in {
+      Graph[Int, UnDiEdge](1, 2).distance(1, 2) shouldReturn None
+    }
+    "Simplest" in {
+      Graph[Int, UnDiEdge](1, 2, 1 ~ 2).distance(1, 2).get shouldReturn 1
+    }
+    "Simpler" in {
+      Graph[Int, UnDiEdge](1, 2, 1 ~ 2, 2 ~ 3).distance(1, 3).get shouldReturn 2
+    }
+    "Diamond" in {
+      Graph[Int, UnDiEdge](1, 2, 3, 4, 1 ~ 2, 1 ~ 3, 2 ~ 4, 3 ~ 4).distance(1, 4).get shouldReturn 2
+    }
+    "Cycles" - {
+      "Self" - {
+        "Distance to self is still 0" in {
+          Graph[Int, UnDiEdge](1, 1 ~ 1).distance(1, 1).get shouldReturn 0
+        }
+        "Distance to other is correct" in {
+          Graph[Int, UnDiEdge](1, 1 ~ 1, 2, 3, 1 ~ 2, 2 ~ 2, 2 ~ 3, 3 ~ 3)
+              .distance(1, 3).get shouldReturn 2
+        }
+      }
+      "Other" - {
+        "1" in {
+          Graph[Int, UnDiEdge](1, 2, 3, 4, 5, 1 ~ 2, 2 ~ 3, 3 ~ 4, 4 ~ 2, 4 ~ 5)
+              .distance(1, 5).get shouldReturn 3
+        }
+        "2" in {
+          Graph[Int, UnDiEdge](1, 2, 3, 1 ~ 2, 2 ~ 3, 3 ~ 1).distances(1) shouldReturn
+              Map(2 -> 1, 3 -> 1, 1 -> 0)
+        }
+        "3" in {
+          val vertices = 1 to 100
+          val edges = vertices.unorderedPairs.map(e => e._1 ~ e._2).toList
+          Graph.from(vertices, edges).distances(1) shouldReturn (Map(1 -> 0) ++ (2 to 100).map(_ -> 1).toMap)
+        }
+      }
+    }
+  }
+}
