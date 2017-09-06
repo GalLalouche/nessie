@@ -1,7 +1,7 @@
 package com.nessie.model.map
 
 import common.rich.RichT._
-import common.rich.func.MoreMonadPlus._
+import common.rich.func.MoreSetInstances
 import monocle.Lens
 
 import scala.util.Try
@@ -16,7 +16,7 @@ import scalaz.syntax.ToFunctorOps
  * @param height The map's height
  */
 abstract class BattleMap(val width: Int, val height: Int)
-    extends ToFunctorOps {
+    extends ToFunctorOps with MoreSetInstances {
   require(width > 0)
   require(height > 0)
 
@@ -36,7 +36,8 @@ abstract class BattleMap(val width: Int, val height: Int)
 
   private def checkBounds(p: MapPoint) {
     if (p.x >= width || p.y >= height)
-      throw new IndexOutOfBoundsException(s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
+      throw new IndexOutOfBoundsException(
+        s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
   }
   def place(p: MapPoint, o: BattleMapObject): BattleMap = {
     require(o != EmptyMapObject, "Don't place empty objects. Use remove instead.")
@@ -113,5 +114,6 @@ abstract class BattleMap(val width: Int, val height: Int)
 }
 
 object BattleMap {
-  def pointLens(p: MapPoint) = Lens[BattleMap, BattleMapObject](_.apply(p))(o => m => m.internalPlace(p, o))
+  def pointLens(p: MapPoint) =
+    Lens[BattleMap, BattleMapObject](_.apply(p))(o => m => m.internalPlace(p, o))
 }
