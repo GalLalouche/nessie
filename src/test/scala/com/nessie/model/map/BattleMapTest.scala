@@ -2,7 +2,6 @@ package com.nessie.model.map
 
 import common.AuxSpecs
 import org.scalatest.FreeSpec
-import org.scalatest.exceptions.TestFailedException
 
 import scalax.collection.GraphEdge.UnDiEdge
 
@@ -25,8 +24,8 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
   "Exceptions" - {
     val objectPoint = MapPoint(0, 0)
     val emptyPoint = MapPoint(1, 1)
-    val betweenPoints = DirectionalMapPoint(objectPoint, Direction.LEFT)
-    val emptyBetween = DirectionalMapPoint(1, 1, Direction.UP)
+    val betweenPoints = DirectionalMapPoint(objectPoint, Direction.Left)
+    val emptyBetween = DirectionalMapPoint(1, 1, Direction.Up)
     val $ = createBattleMap(2, 2)
         .place(objectPoint, NonEmptyBattleMapObject)
         .place(betweenPoints, NonEmptyBetweenMapObject)
@@ -36,8 +35,8 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
         an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(1, 2), NonEmptyBattleMapObject)
       }
       "Between" in {
-        an[IndexOutOfBoundsException] should be thrownBy $.place(DirectionalMapPoint(2, 1, Direction.DOWN), NonEmptyBetweenMapObject)
-        an[IndexOutOfBoundsException] should be thrownBy $.place(DirectionalMapPoint(1, 2, Direction.DOWN), NonEmptyBetweenMapObject)
+        an[IndexOutOfBoundsException] should be thrownBy $.place(DirectionalMapPoint(2, 1, Direction.Down), NonEmptyBetweenMapObject)
+        an[IndexOutOfBoundsException] should be thrownBy $.place(DirectionalMapPoint(1, 2, Direction.Down), NonEmptyBetweenMapObject)
       }
     }
     "Place on non-empty" - {
@@ -50,7 +49,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
     }
     "Remove empty" - {
       "Object" in { an[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1)) }
-      "Between" in { an[MapEmptyException] should be thrownBy $.remove(DirectionalMapPoint(0, 0, Direction.DOWN)) }
+      "Between" in { an[MapEmptyException] should be thrownBy $.remove(DirectionalMapPoint(0, 0, Direction.Down)) }
     }
   }
   "Foreach" - {
@@ -68,21 +67,21 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
       }
       "Set should be correct" in {
         createBattleMap(1, 1).betweens shouldSetEqual
-            Direction.values().map(DirectionalMapPoint(0, 0, _)).map(e => e -> EmptyBetweenMapObject)
+            Direction.values.map(DirectionalMapPoint(0, 0, _)).map(e => e -> EmptyBetweenMapObject)
         createBattleMap(2, 2).betweens shouldSetEqual
             Set(
-              DirectionalMapPoint(0, 0, Direction.UP),
-              DirectionalMapPoint(0, 0, Direction.RIGHT),
-              DirectionalMapPoint(0, 0, Direction.DOWN),
-              DirectionalMapPoint(0, 0, Direction.LEFT),
-              DirectionalMapPoint(1, 0, Direction.DOWN),
-              DirectionalMapPoint(1, 0, Direction.RIGHT),
-              DirectionalMapPoint(1, 0, Direction.UP),
-              DirectionalMapPoint(0, 1, Direction.DOWN),
-              DirectionalMapPoint(0, 1, Direction.LEFT),
-              DirectionalMapPoint(0, 1, Direction.RIGHT),
-              DirectionalMapPoint(1, 1, Direction.DOWN),
-              DirectionalMapPoint(1, 1, Direction.RIGHT)
+              DirectionalMapPoint(0, 0, Direction.Up),
+              DirectionalMapPoint(0, 0, Direction.Right),
+              DirectionalMapPoint(0, 0, Direction.Down),
+              DirectionalMapPoint(0, 0, Direction.Left),
+              DirectionalMapPoint(1, 0, Direction.Down),
+              DirectionalMapPoint(1, 0, Direction.Right),
+              DirectionalMapPoint(1, 0, Direction.Up),
+              DirectionalMapPoint(0, 1, Direction.Down),
+              DirectionalMapPoint(0, 1, Direction.Left),
+              DirectionalMapPoint(0, 1, Direction.Right),
+              DirectionalMapPoint(1, 1, Direction.Down),
+              DirectionalMapPoint(1, 1, Direction.Right)
             ).map(e => e -> EmptyBetweenMapObject)
       }
     }
@@ -90,13 +89,13 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
   "Place" - {
 //    "Object" in { ??? }
     "Between" in {
-      val pd = DirectionalMapPoint(0, 0, Direction.DOWN)
+      val pd = DirectionalMapPoint(0, 0, Direction.Down)
       createBattleMap(1, 2).place(pd, Wall)(pd) shouldReturn Wall
     }
   }
   "toGraph" - {
     "With Walls" in {
-      val place = createBattleMap(1, 2).place(DirectionalMapPoint(0, 0, Direction.DOWN), Wall)
+      val place = createBattleMap(1, 2).place(DirectionalMapPoint(0, 0, Direction.Down), Wall)
       place.toGraph.find(UnDiEdge(MapPoint(0, 0), MapPoint(0, 1))) shouldReturn None
     }
 //    "Foo" in {

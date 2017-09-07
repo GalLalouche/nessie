@@ -93,7 +93,7 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
 
   def betweens: Iterable[(DirectionalMapPoint, BetweenMapObject)] = points.map(_._1)
-      .flatMap(p => Direction.values().map(DirectionalMapPoint(p, _))).toSet.fproduct(apply)
+      .flatMap(p => Direction.values.map(DirectionalMapPoint(p, _))).toSet.fproduct(apply)
 
   protected def internalPlace(pd: DirectionalMapPoint, o: BetweenMapObject): BattleMap
   protected def internalPlace(p: MapPoint, o: BattleMapObject): BattleMap
@@ -103,7 +103,7 @@ abstract class BattleMap(val width: Int, val height: Int)
     val edges = betweens.filter {
       case (_, Wall) => false
       case (_, EmptyBetweenMapObject) => true
-    }.map(_._1).flatMap { pd =>
+    }.map(_._1).flatMap {pd =>
       Try(pd.toPoint.go(pd.direction))
           .filter(vertices)
           .map(UnDiEdge(pd.toPoint, _))

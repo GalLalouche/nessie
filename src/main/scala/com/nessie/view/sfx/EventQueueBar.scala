@@ -1,17 +1,22 @@
 package com.nessie.view.sfx
 
-import com.nessie.gm.{Event, GameState, UnitTurn}
-import common.rich.RichT._
+import com.nessie.gm.{GameState, UnitTurn}
+import com.nessie.model.units.CombatUnit
+import common.rich.func.MoreMonadPlus._
+import rx.lang.scala.Observable
 
-import scalafx.scene.Node
 import scalafx.scene.control.Label
+import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.HBox
+import scalaz.syntax.ToFunctorOps
 
-private class EventQueueBar(gameState: GameState) extends NodeWrapper {
-  private def toItem(e: Event): Node = e match {
-    case UnitTurn(u) => Label(s"${u.simpleName}'s turn")
-  }
+private class EventQueueBar(gameState: GameState) extends NodeWrapper with Highlighter[CombatUnit]
+    with ToFunctorOps {
+  private val labels = gameState.eq.take(10).map(_.asInstanceOf[UnitTurn].u).fproduct(e => Label(NodeWrapper.shortName(e)))
+  val mouseEvents: Observable[(MouseEvent, CombatUnit)] = NodeWrapper mouseEvents labels
+  override def highlight(u: CombatUnit): Unit = labels.filter(_._1 == u).map(_._2).foreach(NodeWrapper.setBackgroundColor("teal"))
+  override def disableHighlighting(u: CombatUnit) = labels.map(_._2).foreach(NodeWrapper.setBackgroundColor("white"))
   val node = new HBox(10) {
-    children = gameState.eq.take(10).map(toItem)
+    children = labels.map(_._2)
   }
 }

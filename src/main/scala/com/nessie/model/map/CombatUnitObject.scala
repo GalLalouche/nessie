@@ -6,6 +6,7 @@ import monocle.macros.Lenses
 
 @Lenses
 case class CombatUnitObject(unit: CombatUnit) extends BattleMapObject
+
 object CombatUnitObject {
   def findIn(u: CombatUnit, map: BattleMap): Option[MapPoint] = map.points.collect {
     case (p, CombatUnitObject(unit)) if unit == u => p

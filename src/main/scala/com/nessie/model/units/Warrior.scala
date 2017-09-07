@@ -1,6 +1,6 @@
 package com.nessie.model.units
 
-class Warrior private(val currentHp: Int) extends CombatUnit {
+class Warrior private(val currentHp: Int) extends PlayerUnit {
   def this() = this(Warrior.maxHp)
   override type T = Warrior
   override protected def withHp(amount: Int): Warrior = new Warrior(amount)

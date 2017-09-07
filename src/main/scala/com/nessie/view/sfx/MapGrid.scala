@@ -21,28 +21,20 @@ import scalafx.scene.control.Button
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
-private class MapGrid(map: BattleMap) extends NodeWrapper {
+private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[CombatUnit] {
   import MapGrid._
   import NodeWrapper._
-  private val mouseSubjects = PublishSubject[(MouseEvent, MapPoint)]()
-  val mouseEvents: Observable[(MouseEvent, MapPoint)] = mouseSubjects
-  private val cells: Map[MapPoint, BorderPane] = {
-    map.points.map { case (p, o) =>
-      val $ = MapGrid.createCell(o)
-      GridPane.setConstraints($, p.x, p.y)
-      // TODO unsubscribe on destruction
-      toObserver(MouseEvent.Any, $.center.get)
-          .map(new MouseEvent(_)) // piece of shit framework :\
-          // TODO fproduct
-          .map(e => e -> p) subscribe mouseSubjects
-      $
-    }.mapBy(toPoint)
-  }
+
+  private val cells: Map[MapPoint, BorderPane] = map.points
+      .map { case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y)) }
+      .mapBy(toPoint)
+
+  val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeWrapper mouseEvents cells
 
   for ((pd, bo) <- map.betweens) {
     val d = pd.direction
     val (wallWidth, wallHeight) = (CELL_SIDE, WALL_WIDTH)
-        .mapIf(_ => d == Direction.LEFT || d == Direction.RIGHT).to(_.swap)
+        .mapIf(_ => d == Direction.Left || d == Direction.Right).to(_.swap)
     borderPaneIndex.index(d).set(new Pane {
       prefWidth = wallWidth
       prefHeight = wallHeight
@@ -54,11 +46,10 @@ private class MapGrid(map: BattleMap) extends NodeWrapper {
     children = cells.values
   }
   private def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
-    def color(bp: BorderPane, color: String) = bp.center.get.style = "-fx-base: " + color
     moveAbility.canBeApplied(map, location)
         .filter(_._2)
-        .foreach(e => color(cells(e._1), "green"))
-    color(cells(location), "blue")
+        .foreach(e => setBaseColor("green")(cells(e._1)))
+    setBaseColor("blue")(cells(location))
   }
 
   private def getMove(source: MapPoint, gs: GameState): Promise[GameState] = {
@@ -81,6 +72,11 @@ private class MapGrid(map: BattleMap) extends NodeWrapper {
     highlight(unitLocation, u.moveAbility)
     getMove(unitLocation, gs)
   }
+
+  private def setFontWeight(u: CombatUnit, style: String): Unit =
+    CombatUnitObject.findIn(u, map).map(cells).get.center.get.setStyle(s"-fx-font-weight: $style;")
+  override def highlight(u: CombatUnit) = setFontWeight(u, "900")
+  override def disableHighlighting(u: CombatUnit) = setFontWeight(u, "normal")
 }
 
 private object MapGrid {
@@ -104,16 +100,16 @@ private object MapGrid {
     private implicit def toOpt[T](objectProperty: ObjectProperty[jfxs.Node]): Option[Node] =
       objectProperty.value.opt.map(NodeWrapper.jfx2sfx)
     override def index(d: Direction): Optional[BorderPane, Node] = Optional[BorderPane, Node](bp => d match {
-      case Direction.UP => bp.top
-      case Direction.DOWN => bp.bottom
-      case Direction.LEFT => bp.left
-      case Direction.RIGHT => bp.right
+      case Direction.Up => bp.top
+      case Direction.Down => bp.bottom
+      case Direction.Left => bp.left
+      case Direction.Right => bp.right
     })(node => bp => {
       val setter: (Node => Unit) = d match {
-        case Direction.UP => bp.top_=
-        case Direction.DOWN => bp.bottom_=
-        case Direction.LEFT => bp.left_=
-        case Direction.RIGHT => bp.right_=
+        case Direction.Up => bp.top_=
+        case Direction.Down => bp.bottom_=
+        case Direction.Left => bp.left_=
+        case Direction.Right => bp.right_=
       }
       setter(node)
       bp

@@ -5,22 +5,26 @@ import javafx.event.EventHandler
 import javafx.stage.WindowEvent
 
 import com.nessie.gm.{GameState, View}
+import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
+import common.rich.func.MoreMonadPlus._
+import common.rich.func.RichMonadPlus._
 
 import scala.concurrent.{Future, Promise}
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.Scene
-import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
 
 private class ScalaFxView extends View {
   private var stage: Stage = _
   private var mapGrid: MapGrid = _
+  private var eqBar: EventQueueBar = _
+  private var propPane: PropertiesPane = _
   private var hasClosed = false
-  Platform.runLater{
+  Platform.runLater {
     stage = new Stage {
       scene = new Scene(800, 800)
       onCloseRequest = new EventHandler[WindowEvent] {
@@ -32,20 +36,22 @@ private class ScalaFxView extends View {
       }
     }
   }
+
   override def updateState(gs: GameState): Unit = {
     mapGrid = new MapGrid(gs.map)
-    val properties = new PropertiesPane(gs)
-    mapGrid.mouseEvents.filter(_._1.eventType == MouseEvent.MouseEntered)
-        .map(_._2)
-        .subscribe(properties.display(_))
-
-    val eqBar = new EventQueueBar(gs)
-
-    Platform.runLater{
+    propPane = new PropertiesPane(gs)
+    eqBar = new EventQueueBar(gs)
+    val highlighters = Highlighter.composite(mapGrid, propPane, eqBar)
+    val obs = highlighters.observer
+    mapGrid.mouseEvents
+        .oMap(e => gs.map(e._2).safeCast[CombatUnitObject].map(_.unit).map(e._1 -> _))
+        .subscribe(obs)
+    eqBar.mouseEvents.subscribe(obs)
+    Platform.runLater {
       stage.scene.get.content = new BorderPane {
         top = eqBar.node
         center = mapGrid.node
-        bottom = properties.node
+        bottom = propPane.node
       }
       if (!stage.isShowing)
         stage.show()
