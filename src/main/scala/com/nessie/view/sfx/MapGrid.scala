@@ -12,6 +12,7 @@ import monocle.Optional
 import monocle.function.Index
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
+import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Side
 import scalafx.scene.Node
@@ -45,13 +46,6 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
   override val node = new GridPane() {
     children = cells.values
   }
-  private def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
-    moveAbility.canBeApplied(map, location)
-        .filter(_._2)
-        .map(cells apply _._1)
-        .foreach(setBaseColor("green"))
-    setBaseColor("blue")(cells(location))
-  }
 
   private def getMove(source: MapPoint, gs: GameState): Promise[GameState] = {
     val $ = Promise[GameState]()
@@ -72,13 +66,20 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
   }
 
   def nextState(u: CombatUnit)(gs: GameState): Promise[GameState] = {
+    def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
+      moveAbility.canBeApplied(map, location)
+          .filter(_._2)
+          .map(cells apply _._1)
+          .foreach(setBaseColor("green"))
+      setBaseColor("blue")(cells(location))
+    }
     val unitLocation = CombatUnitObject.findIn(u, gs.map).get
     highlight(unitLocation, u.moveAbility)
     getMove(unitLocation, gs)
   }
 
-  private def setFontWeight(u: CombatUnit, style: String): Unit =
-    CombatUnitObject.findIn(u, map).map(cells).get.center.get.setStyle(s"-fx-font-weight: $style;")
+  private def setFontWeight(u: CombatUnit, style: String): Unit = Platform.runLater(
+    CombatUnitObject.findIn(u, map).map(cells).get.center.get.setStyle(s"-fx-font-weight: $style;"))
   val highlighter = new Highlighter[CombatUnit] {
     override def highlight(u: CombatUnit) = setFontWeight(u, "900")
     override def disableHighlighting(u: CombatUnit) = setFontWeight(u, "normal")
