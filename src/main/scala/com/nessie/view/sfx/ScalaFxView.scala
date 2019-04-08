@@ -2,7 +2,7 @@ package com.nessie.view.sfx
 
 import java.io.IOException
 
-import com.nessie.gm.{GameState, View}
+import com.nessie.gm.{GameState, PlayerInput, View}
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
@@ -57,10 +57,12 @@ private class ScalaFxView extends View
 
   private var latestPromise: Promise[GameState] = _
 
-  override def nextState(u: CombatUnit)(gs: GameState): Future[GameState] = {
-    if (hasClosed)
-      throw new IllegalStateException("The gui has been closed")
-    latestPromise = mapGrid.nextState(u)(gs)
-    latestPromise.future
+  val playerInput = new PlayerInput {
+    override def nextState(u: CombatUnit)(gs: GameState): Future[GameState] = {
+      if (hasClosed)
+        throw new IllegalStateException("The gui has been closed")
+      latestPromise = mapGrid.nextState(u)(gs)
+      latestPromise.future
+    }
   }
 }

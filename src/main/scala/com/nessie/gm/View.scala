@@ -1,7 +1,6 @@
 package com.nessie.gm
 
-import rx.lang.scala.Observable
-
-trait View extends PlayerInput {
+trait View {
   def updateState(state: GameState): Unit
+  def playerInput: PlayerInput
 }

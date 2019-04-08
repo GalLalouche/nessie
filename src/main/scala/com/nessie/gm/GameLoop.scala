@@ -18,7 +18,7 @@ private object GameLoop {
   def main(args: Array[String]): Unit = {
     val guiFactory: ViewFactory = ScalaFxViewFactory
     val view = guiFactory.create()
-    val gameMaster: Iterator[GameState] = GameMaster.initiate(createInitialState, view)
+    val gameMaster: Iterator[GameState] = GameMaster.initiate(createInitialState, view.playerInput)
     while (true) {
       val nextState = gameMaster.next()
       view.updateState(nextState)
