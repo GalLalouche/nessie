@@ -21,8 +21,7 @@ import scalafx.scene.layout._
 
 import scala.concurrent.Promise
 
-private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[CombatUnit]
-    with ToMoreFunctorOps with MoreObservableInstances {
+private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps with MoreObservableInstances {
   import MapGrid._
   import NodeWrapper.{jfx2sfx, setBaseColor}
 
@@ -80,8 +79,10 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[Comba
 
   private def setFontWeight(u: CombatUnit, style: String): Unit =
     CombatUnitObject.findIn(u, map).map(cells).get.center.get.setStyle(s"-fx-font-weight: $style;")
-  override def highlight(u: CombatUnit) = setFontWeight(u, "900")
-  override def disableHighlighting(u: CombatUnit) = setFontWeight(u, "normal")
+  val highlighter = new Highlighter[CombatUnit] {
+    override def highlight(u: CombatUnit) = setFontWeight(u, "900")
+    override def disableHighlighting(u: CombatUnit) = setFontWeight(u, "normal")
+  }
 }
 
 private object MapGrid {

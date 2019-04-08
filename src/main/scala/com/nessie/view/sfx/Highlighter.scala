@@ -20,7 +20,7 @@ private trait Highlighter[T] {
 }
 
 private object Highlighter {
-  def composite[T](hs: Highlighter[T]*): Highlighter[T] = new Highlighter[T] {
+  def composite[T](hs: Highlighter[T]*) = new Highlighter[T] {
     override def highlight(t: T) = hs.foreach(_ highlight t)
     override def disableHighlighting(t: T) = hs.foreach(_ disableHighlighting t)
   }
