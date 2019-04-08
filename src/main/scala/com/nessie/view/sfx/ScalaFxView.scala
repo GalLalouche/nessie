@@ -7,7 +7,6 @@ import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
-import javafx.event.EventHandler
 import javafx.stage.WindowEvent
 import scalafx.Includes._
 import scalafx.application.Platform

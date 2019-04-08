@@ -1,19 +1,17 @@
 package com.nessie.view.sfx
 
-import javafx.{scene => jfxs}
-
 import com.nessie.gm.GameState
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.MoveAbility
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
+import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
+import javafx.{scene => jfxs}
 import monocle.Optional
 import monocle.function.Index
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
-
-import scala.concurrent.Promise
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Side
 import scalafx.scene.Node
@@ -21,12 +19,15 @@ import scalafx.scene.control.Button
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
-private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[CombatUnit] {
+import scala.concurrent.Promise
+
+private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[CombatUnit]
+    with ToMoreFunctorOps with MoreObservableInstances {
   import MapGrid._
-  import NodeWrapper._
+  import NodeWrapper.{jfx2sfx, setBaseColor}
 
   private val cells: Map[MapPoint, BorderPane] = map.points
-      .map { case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y)) }
+      .map {case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
       .mapBy(toPoint)
 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeWrapper.mouseEvents(cells.mapValues(_.center.get))
@@ -38,7 +39,7 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[Comba
     borderPaneIndex.index(d).set(new Pane {
       prefWidth = wallWidth
       prefHeight = wallHeight
-      style = s"-fx-background-color: ${if (bo == Wall) "black" else "grey" }"
+      style = s"-fx-background-color: ${if (bo == Wall) "black" else "grey"}"
     })(cells(pd.toPoint))
   }
 
@@ -48,18 +49,22 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[Comba
   private def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
     moveAbility.canBeApplied(map, location)
         .filter(_._2)
-        .foreach(e => setBaseColor("green")(cells(e._1)))
+        .map(cells apply _._1)
+        .foreach(setBaseColor("green"))
     setBaseColor("blue")(cells(location))
   }
 
   private def getMove(source: MapPoint, gs: GameState): Promise[GameState] = {
-    val $ = Promise[GameState]
+    val $ = Promise[GameState]()
     val menuEvents = PublishSubject[GameState]()
     val menuFactory = new ActionMenuFactory(source, gs, menuEvents)
     def createMenu(node: Node, destination: MapPoint): Unit =
       menuFactory(destination).show(node, Side.Bottom, 0, 0)
-    val subscription = mouseEvents.filter(_._1.eventType == MouseEvent.MouseClicked)
-        .map(e => jfx2sfx(e._1.source.asInstanceOf[jfxs.Node]) -> e._2) subscribe (e => createMenu(e._1, e._2))
+    val subscription = mouseEvents
+        .filter(_._1.eventType == MouseEvent.MouseClicked)
+        .map(TuplePLenses.tuple2First.modify(e => jfx2sfx(e.source.asInstanceOf[jfxs.Node])))
+        .subscribe((createMenu _).tupled)
+
     menuEvents.subscribe(e => {
       subscription.unsubscribe
       $ success e
@@ -97,15 +102,15 @@ private object MapGrid {
   }
 
   private val borderPaneIndex: Index[BorderPane, Direction, Node] = new Index[BorderPane, Direction, Node] {
-    private implicit def toOpt[T](objectProperty: ObjectProperty[jfxs.Node]): Option[Node] =
+    private def toOpt[T](objectProperty: ObjectProperty[jfxs.Node]): Option[Node] =
       objectProperty.value.opt.map(NodeWrapper.jfx2sfx)
     override def index(d: Direction): Optional[BorderPane, Node] = Optional[BorderPane, Node](bp => d match {
-      case Direction.Up => bp.top
-      case Direction.Down => bp.bottom
-      case Direction.Left => bp.left
-      case Direction.Right => bp.right
+      case Direction.Up => toOpt(bp.top)
+      case Direction.Down => toOpt(bp.bottom)
+      case Direction.Left => toOpt(bp.left)
+      case Direction.Right => toOpt(bp.right)
     })(node => bp => {
-      val setter: (Node => Unit) = d match {
+      val setter: Node => Unit = d match {
         case Direction.Up => bp.top_=
         case Direction.Down => bp.bottom_=
         case Direction.Left => bp.left_=
