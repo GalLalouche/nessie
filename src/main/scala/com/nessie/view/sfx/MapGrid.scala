@@ -5,7 +5,8 @@ import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.MoveAbility
 import com.nessie.view.sfx.MapGrid._
-import com.nessie.view.sfx.NodeWrapper.{jfx2sfx, setBaseColor, setFontWeight}
+import com.nessie.view.sfx.NodeWrapper.jfx2sfx
+import com.nessie.view.sfx.RichNode._
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
@@ -14,7 +15,6 @@ import monocle.Optional
 import monocle.function.Index
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
-import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Side
 import scalafx.scene.Node
@@ -73,8 +73,8 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
       moveAbility.canBeApplied(map, location)
           .filter(_._2)
           .map(cells apply _._1)
-          .foreach(setBaseColor("green"))
-      setBaseColor("blue")(cells(location))
+          .foreach(_.setBaseColor("green"))
+      cells(location).setBaseColor("blue")
     }
     val unitLocation = CombatUnitObject.findIn(u, gs.map).get
     highlight(unitLocation, u.moveAbility)
@@ -82,8 +82,8 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
   }
 
   val highlighter: Highlighter[CombatUnit] = new Highlighter[CombatUnit] {
-    private def changeWeight(u: CombatUnit, style: String): Unit = setFontWeight(style)(
-      jfx2sfx(CombatUnitObject.findIn(u, map).map(cells).get.center.get))
+    private def changeWeight(u: CombatUnit, style: String): Unit =
+      CombatUnitObject.findIn(u, map).map(cells).get.center.get.setFontWeight(style)
     override def highlight(u: CombatUnit) = changeWeight(u, "900")
     override def disableHighlighting(u: CombatUnit) = changeWeight(u, "normal")
   }

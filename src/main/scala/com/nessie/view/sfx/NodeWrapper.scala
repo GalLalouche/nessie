@@ -1,13 +1,12 @@
 package com.nessie.view.sfx
 
-import javafx.event._
-import javafx.scene.{control => jfxsc, layout => jfxl}
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
 import common.rich.func.MoreObservableInstances
+import javafx.event._
+import javafx.scene.{control => jfxsc, layout => jfxl}
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
-import scalafx.application.Platform
 import scalafx.scene.Node
 import scalafx.scene.control.{Button, Label}
 import scalafx.scene.input.MouseEvent
@@ -37,9 +36,4 @@ private object NodeWrapper
     case (key, node) => mouseEvents(node).strengthR(key)
   }.reduce(_ merge _)
   def shortName(u: CombatUnit): String = u.simpleName.take(2)
-
-  def setBackgroundColor(color: String)(n: Node): Unit =
-    Platform.runLater(n.setStyle(Styles.backgroundColor(color)))
-  def setBaseColor(color: String)(n: Node): Unit = Platform.runLater(n.setStyle(Styles.baseColor(color)))
-  def setFontWeight(style: String)(n: Node): Unit = Platform.runLater(n.setStyle(Styles.fontWeight(style)))
 }
