@@ -47,3 +47,5 @@ tin
 *.vim
 ScalaCommon.jar
 lib/*
+*QuickMain*
+*QuickJava*

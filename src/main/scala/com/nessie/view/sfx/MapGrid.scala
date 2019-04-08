@@ -5,7 +5,7 @@ import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.MoveAbility
 import com.nessie.view.sfx.MapGrid._
-import com.nessie.view.sfx.NodeWrapper.{jfx2sfx, setBaseColor}
+import com.nessie.view.sfx.NodeWrapper.{jfx2sfx, setBaseColor, setFontWeight}
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
@@ -33,14 +33,16 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] =
     NodeWrapper.mouseEvents(cells.mapValues(_.center.get).mapValues(jfx2sfx))
 
+  // Color walls.
+  // We use black border between grid elements if there is a wall between the two map points, grey otherwise.
   for ((pd, bo) <- map.betweens) {
     val d = pd.direction
-    val (wallWidth, wallHeight) = (CELL_SIDE, WALL_WIDTH)
-        .mapIf(_ => d == Direction.Left || d == Direction.Right).to(_.swap)
+    val (wallWidth, wallHeight) =
+      if (d == Direction.Left || d == Direction.Right) WallWidth -> CellSide else CellSide -> WallWidth
     borderPaneIndex.index(d).set(new Pane {
       prefWidth = wallWidth
       prefHeight = wallHeight
-      style = s"-fx-background-color: ${if (bo == Wall) "black" else "grey"}"
+      style = Styles.backgroundColor(if (bo == Wall) "black" else "grey")
     })(cells(pd.toPoint))
   }
 
@@ -79,17 +81,17 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
     getMove(unitLocation, gs)
   }
 
-  private def setFontWeight(u: CombatUnit, style: String): Unit = Platform.runLater(
-    CombatUnitObject.findIn(u, map).map(cells).get.center.get.setStyle(s"-fx-font-weight: $style;"))
-  val highlighter = new Highlighter[CombatUnit] {
-    override def highlight(u: CombatUnit) = setFontWeight(u, "900")
-    override def disableHighlighting(u: CombatUnit) = setFontWeight(u, "normal")
+  val highlighter: Highlighter[CombatUnit] = new Highlighter[CombatUnit] {
+    private def changeWeight(u: CombatUnit, style: String): Unit = setFontWeight(style)(
+      jfx2sfx(CombatUnitObject.findIn(u, map).map(cells).get.center.get))
+    override def highlight(u: CombatUnit) = changeWeight(u, "900")
+    override def disableHighlighting(u: CombatUnit) = changeWeight(u, "normal")
   }
 }
 
 private object MapGrid {
-  private val CELL_SIDE = 40
-  private val WALL_WIDTH = 5
+  private val CellSide = 40
+  private val WallWidth = 5
 
   private def createCell(o: BattleMapObject): BorderPane = {
     def text(o: BattleMapObject): String = o match {
@@ -98,8 +100,8 @@ private object MapGrid {
     }
     new BorderPane() {
       center = new Button(text(o)) {
-        prefHeight = CELL_SIDE
-        prefWidth = CELL_SIDE
+        prefHeight = CellSide
+        prefWidth = CellSide
       }
     }
   }

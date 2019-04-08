@@ -25,7 +25,7 @@ private class ActionMenuFactory(source: MapPoint, gs: GameState, pubSubManager: 
         .map(toItem)
         .foreach($.items.+=(_))
     $.items += new MenuItem("Cancel") { onAction = (_: ActionEvent) => $.hide() }
-    $.style = "-fx-base: white"
+    $.style = Styles.baseColor("white")
     $
   }
 }

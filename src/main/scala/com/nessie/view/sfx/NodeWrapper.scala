@@ -39,6 +39,7 @@ private object NodeWrapper
   def shortName(u: CombatUnit): String = u.simpleName.take(2)
 
   def setBackgroundColor(color: String)(n: Node): Unit =
-    Platform.runLater(n.setStyle("-fx-background-color: " + color))
-  def setBaseColor(color: String)(n: Node): Unit = Platform.runLater(n.setStyle("-fx-base: " + color))
+    Platform.runLater(n.setStyle(Styles.backgroundColor(color)))
+  def setBaseColor(color: String)(n: Node): Unit = Platform.runLater(n.setStyle(Styles.baseColor(color)))
+  def setFontWeight(style: String)(n: Node): Unit = Platform.runLater(n.setStyle(Styles.fontWeight(style)))
 }
