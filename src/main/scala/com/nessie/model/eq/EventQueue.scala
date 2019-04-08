@@ -4,7 +4,11 @@ import common.rich.RichT._
 import common.rich.collections.RichSeq._
 import monocle.syntax.{ApplySyntax, FieldsSyntax}
 
-class EventQueue[T <: AnyRef] private(private val q: List[(T, Double)], currentDelay: Double, infinites: Map[T, Double]) extends Iterable[T]
+class EventQueue[T <: AnyRef] private(
+    private val q: List[(T, Double)],
+    currentDelay: Double,
+    infinites: Map[T, Double],
+) extends Iterable[T]
     with ApplySyntax with FieldsSyntax {
   private def qToEQ(eq: (List[(T, Double)], Double, Map[T, Double])) = new EventQueue[T](eq._1, eq._2, eq._3)
 
@@ -47,11 +51,12 @@ class EventQueue[T <: AnyRef] private(private val q: List[(T, Double)], currentD
     val pop = q.head._1
     qToEQ((q.tail, q.head._2, infinites))
         .mapIf(_ => infinites contains pop) // re-append head if is infinite
-        .to(_.repeat(pop).infinite.inIntervalsOf(infinites(pop)))
+        .to(_.repeat(pop).infinitely.inIntervalsOf(infinites(pop)))
   }
   def repeat(e: T) = new {
     def times(n: Int) = new {
       require(n > 0, "The number of repeats must be a positive integer")
+      // TODO extract in Intervals of trait
       def inIntervalsOf(delay: Double) = new {
         require(delay >= 0, "The intervals length must non-negative")
         def withDefaultDelay = withDelay(delay)
@@ -62,7 +67,7 @@ class EventQueue[T <: AnyRef] private(private val q: List[(T, Double)], currentD
         }
       }
     }
-    def infinite = new {
+    def infinitely = new {
       def inIntervalsOf(d: Double): EventQueue[T] = {
         require(d > 0, "Infinite intervals must be positive")
         val newMap = infinites + (e -> d)

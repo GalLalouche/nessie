@@ -1,24 +1,24 @@
 package com.nessie.view.sfx
 
 import java.io.IOException
-import javafx.event.EventHandler
-import javafx.stage.WindowEvent
 
 import com.nessie.gm.{GameState, View}
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
-import common.rich.func.MoreMonadPlus._
-import common.rich.func.RichMonadPlus._
-
-import scala.concurrent.{Future, Promise}
+import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
+import javafx.event.EventHandler
+import javafx.stage.WindowEvent
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.Scene
 import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
 
-private class ScalaFxView extends View {
+import scala.concurrent.{Future, Promise}
+
+private class ScalaFxView extends View
+    with MoreObservableInstances with ToMoreMonadPlusOps {
   private var stage: Stage = _
   private var mapGrid: MapGrid = _
   private var eqBar: EventQueueBar = _
@@ -27,12 +27,10 @@ private class ScalaFxView extends View {
   Platform.runLater {
     stage = new Stage {
       scene = new Scene(800, 800)
-      onCloseRequest = new EventHandler[WindowEvent] {
-        override def handle(event: WindowEvent) = {
-          hasClosed = true
-          latestPromise.opt.foreach(_.failure(new IOException("User closed the GUI")))
-          Platform.runLater(Platform.exit())
-        }
+      onCloseRequest = (_: WindowEvent) => {
+        hasClosed = true
+        latestPromise.opt.foreach(_.failure(new IOException("User closed the GUI")))
+        Platform.runLater(Platform.exit())
       }
     }
   }

@@ -37,7 +37,7 @@ object GameState {
   def fromMap(map: BattleMap): GameState = {
     val units = map.points.map(_._2).flatMap(_.safeCast[CombatUnitObject]).map(_.unit)
     val eq = units.foldLeft(new EventQueue[Event]) {
-      (agg, next) => agg.repeat(UnitTurn(next)).infinite.inIntervalsOf(1.0)
+      (agg, next) => agg.repeat(UnitTurn(next)).infinitely.inIntervalsOf(1.0)
     }
     GameState(map, eq)
   }

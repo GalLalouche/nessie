@@ -51,19 +51,19 @@ class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar {
 		}
 		"infinite should" - {
 			"throw an exception on illegal inputs" in {
-				an[IllegalArgumentException] should be thrownBy {eq.repeat(e).infinite.inIntervalsOf(0)}
+				an[IllegalArgumentException] should be thrownBy {eq.repeat(e).infinitely.inIntervalsOf(0)}
 			}
 			"repeat e an infinite number of times" in {
-				eq.repeat(e).infinite.inIntervalsOf(0.5).take(10).toSeq shouldReturn List.fill(10)(e)
+				eq.repeat(e).infinitely.inIntervalsOf(0.5).take(10).toSeq shouldReturn List.fill(10)(e)
 			}
 			"interleaved" in {
-				eq.add(e, 0).add(e2, 0.8).repeat(e3).infinite.inIntervalsOf(0.3).take(6).toSeq shouldReturn List(e, e3, e3, e2, e3, e3)
+				eq.add(e, 0).add(e2, 0.8).repeat(e3).infinitely.inIntervalsOf(0.3).take(6).toSeq shouldReturn List(e, e3, e3, e2, e3, e3)
 			}
 		}
 	}
 	"next should" - {
 		"calculate delay correctly" in {
-			eq.repeat(e).infinite.inIntervalsOf(0.1).add(e2, 0.51).take(6).toSeq shouldReturn List(e, e, e, e, e, e2)
+			eq.repeat(e).infinitely.inIntervalsOf(0.1).add(e2, 0.51).take(6).toSeq shouldReturn List(e, e, e, e, e, e2)
 		}
 	}
 }
