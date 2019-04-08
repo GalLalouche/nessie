@@ -5,7 +5,6 @@ import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.MoveAbility
 import com.nessie.view.sfx.MapGrid._
-import com.nessie.view.sfx.NodeWrapper.jfx2sfx
 import com.nessie.view.sfx.RichNode._
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
@@ -24,14 +23,15 @@ import scalafx.scene.layout._
 
 import scala.concurrent.Promise
 
-private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps with MoreObservableInstances {
+private class MapGrid(map: BattleMap)
+    extends ToMoreFunctorOps with MoreObservableInstances {
 
   private val cells: Map[MapPoint, BorderPane] = map.points
       .map {case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
       .mapBy(toPoint)
 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] =
-    NodeWrapper.mouseEvents(cells.mapValues(_.center.get).mapValues(jfx2sfx))
+    NodeUtils.mouseEvents(cells.mapValues(_.center.get))
 
   // Color walls.
   // We use black border between grid elements if there is a wall between the two map points, grey otherwise.
@@ -46,7 +46,7 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
     })(cells(pd.toPoint))
   }
 
-  override val node = new GridPane() {
+  val node = new GridPane() {
     children = cells.values
   }
 
@@ -58,7 +58,7 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps 
       menuFactory(destination).show(node, Side.Bottom, 0, 0)
     val subscription = mouseEvents
         .filter(_._1.eventType == MouseEvent.MouseClicked)
-        .map(TuplePLenses.tuple2First.modify(e => jfx2sfx(e.source.asInstanceOf[jfxs.Node])))
+        .map(TuplePLenses.tuple2First.modify(_.source.asInstanceOf[jfxs.Node].toScalaNode))
         .subscribe((createMenu _).tupled)
 
     menuEvents.subscribe(e => {
@@ -108,7 +108,7 @@ private object MapGrid {
 
   private val borderPaneIndex: Index[BorderPane, Direction, Node] = new Index[BorderPane, Direction, Node] {
     private def toOpt[T](objectProperty: ObjectProperty[jfxs.Node]): Option[Node] =
-      objectProperty.value.opt.map(NodeWrapper.jfx2sfx)
+      objectProperty.value.opt.map(_.toScalaNode)
     override def index(d: Direction): Optional[BorderPane, Node] = Optional[BorderPane, Node](bp => d match {
       case Direction.Up => toOpt(bp.top)
       case Direction.Down => toOpt(bp.bottom)

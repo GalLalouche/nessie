@@ -8,7 +8,7 @@ import scalafx.scene.layout.VBox
 
 import scala.collection.JavaConversions._
 
-private class PropertiesPane(gs: GameState) extends NodeWrapper {
+private class PropertiesPane(gs: GameState) {
   val highlighter = new Highlighter[CombatUnit] {
     override def highlight(u: CombatUnit) =
       node.children.setAll(List(u.simpleName, s"${u.currentHp}/${u.maxHp}").map(new Label(_)))

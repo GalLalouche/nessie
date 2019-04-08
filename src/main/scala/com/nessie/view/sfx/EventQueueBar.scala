@@ -11,10 +11,10 @@ import scalafx.scene.layout.HBox
 
 import scalaz.syntax.ToFunctorOps
 
-private class EventQueueBar(gameState: GameState) extends NodeWrapper
-    with ToFunctorOps with MoreIterableInstances {
-  private val labels = gameState.eq.take(10).map(_.asInstanceOf[UnitTurn].u).fproduct(e => Label(NodeWrapper.shortName(e)))
-  val mouseEvents: Observable[(MouseEvent, CombatUnit)] = NodeWrapper mouseEvents labels
+private class EventQueueBar(gameState: GameState)
+    extends ToFunctorOps with MoreIterableInstances {
+  private val labels = gameState.eq.take(10).map(_.asInstanceOf[UnitTurn].u).fproduct(e => Label(NodeUtils.shortName(e)))
+  val mouseEvents: Observable[(MouseEvent, CombatUnit)] = NodeUtils mouseEvents labels
   val highlighter = new Highlighter[CombatUnit] {
     override def highlight(u: CombatUnit): Unit =
       labels.filter(_._1 == u).map(_._2).foreach(_.setBackgroundColor("teal"))
