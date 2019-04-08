@@ -21,7 +21,7 @@ private trait NodeWrapper {
 
 private object NodeWrapper
     extends ToFunctorOps with MoreObservableInstances {
-  implicit def jfx2sfx(node: javafx.scene.Node): scalafx.scene.Node = node match {
+  def jfx2sfx(node: javafx.scene.Node): scalafx.scene.Node = node match {
     case b: jfxsc.Button => new Button(b)
     case l: jfxsc.Label => new Label(l)
     case b: jfxl.BorderPane => new BorderPane(b)

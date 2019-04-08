@@ -1,19 +1,20 @@
 package com.nessie.common.graph
 
+import com.nessie.common.graph.RichUndirected._
 import common.AuxSpecs
-import org.scalatest.concurrent.{Interruptor, Signaler, TimeLimitedTests}
 import common.rich.collections.RichTraversableOnce._
-import org.scalatest.time.Span
 import org.scalatest.{FreeSpec, OneInstancePerTest}
-
-import scala.concurrent.duration.DurationInt
+import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
+import org.scalatest.time.Span
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
 import scalax.collection.immutable.Graph
+
+import scala.concurrent.duration.DurationInt
+
 class RichUndirectedTest extends FreeSpec with AuxSpecs with TimeLimitedTests with OneInstancePerTest {
   override def timeLimit = Span.convertDurationToSpan(1.second)
   override val defaultTestSignaler = Signaler(_.stop())
-  private implicit def rich[T](g: Graph[T, UnDiEdge]): RichUndirected[T] = new RichUndirected(g)
   "distance" - {
     "Throws exception if missing source" in {
       an[IllegalArgumentException] should be thrownBy Graph[Int, UnDiEdge](1, 2, 3).distance(1, 4)

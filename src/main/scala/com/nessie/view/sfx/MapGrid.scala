@@ -4,6 +4,8 @@ import com.nessie.gm.GameState
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.MoveAbility
+import com.nessie.view.sfx.MapGrid._
+import com.nessie.view.sfx.NodeWrapper.{jfx2sfx, setBaseColor}
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
@@ -23,14 +25,13 @@ import scalafx.scene.layout._
 import scala.concurrent.Promise
 
 private class MapGrid(map: BattleMap) extends NodeWrapper with ToMoreFunctorOps with MoreObservableInstances {
-  import MapGrid._
-  import NodeWrapper.{jfx2sfx, setBaseColor}
 
   private val cells: Map[MapPoint, BorderPane] = map.points
       .map {case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
       .mapBy(toPoint)
 
-  val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeWrapper.mouseEvents(cells.mapValues(_.center.get))
+  val mouseEvents: Observable[(MouseEvent, MapPoint)] =
+    NodeWrapper.mouseEvents(cells.mapValues(_.center.get).mapValues(jfx2sfx))
 
   for ((pd, bo) <- map.betweens) {
     val d = pd.direction
