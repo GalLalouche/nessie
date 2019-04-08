@@ -29,7 +29,7 @@ private class MapGrid(map: BattleMap) extends NodeWrapper with Highlighter[Comba
       .map { case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y)) }
       .mapBy(toPoint)
 
-  val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeWrapper mouseEvents cells
+  val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeWrapper.mouseEvents(cells.mapValues(_.center.get))
 
   for ((pd, bo) <- map.betweens) {
     val d = pd.direction
