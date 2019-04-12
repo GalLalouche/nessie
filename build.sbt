@@ -1,7 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "org.me",
   version := "0.01",
-  scalaVersion := "2.12.3")
+  scalaVersion := "2.12.8")
 
 resolvers += Resolver.sonatypeRepo("releases")
 autoCompilerPlugins := true
