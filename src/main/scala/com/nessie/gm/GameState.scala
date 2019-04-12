@@ -14,7 +14,7 @@ import scalaz.std.OptionInstances
 case class GameState(map: BattleMap, eq: EventQueue[Event]) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
-    val noneIfDead = replacer(original).opt.filterNot(_.isDead)
+    val noneIfDead = replacer(original).opt.filterNot(_.hitPoints.isDead)
     val mapLens: Lens[BattleMap, Option[CombatUnit]] =
       CombatUnitObject.lens(original).^|->(MonocleUtils.lift(CombatUnitObject.unit)(optionInstance))
     val queueLens = Setter[EventQueue[Event], Option[CombatUnit]](GameState.updateEq(original))
@@ -24,7 +24,10 @@ case class GameState(map: BattleMap, eq: EventQueue[Event]) extends OptionInstan
   }
 }
 object GameState {
-  private def updateEq(original: CombatUnit)(mod: Option[CombatUnit] => Option[CombatUnit])(eq: EventQueue[Event]): EventQueue[Event] = {
+  private def updateEq(
+      original: CombatUnit)(
+      mod: Option[CombatUnit] => Option[CombatUnit])(
+      eq: EventQueue[Event]): EventQueue[Event] = {
     mod(original.opt) match {
       case None => eq.remove {
         case UnitTurn(u) if u == original => true

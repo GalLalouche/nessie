@@ -9,8 +9,8 @@ class MeleeAttackTest extends FreeSpec with AuxSpecs {
   "canBeUsed" - {
     "player on enemy" in {
       val map = DictBattleMap(2, 2)
-          .place(MapPoint(1, 0), CombatUnitObject(new Warrior()))
-          .place(MapPoint(1, 1), CombatUnitObject(new Skeleton()))
+          .place(MapPoint(1, 0), CombatUnitObject(Warrior.create))
+          .place(MapPoint(1, 1), CombatUnitObject(Skeleton.create))
 
       val meleeAttack = MeleeAttack(5)
       meleeAttack.canBeUsed(map, MapPoint(1, 0), MapPoint(1, 1)) shouldReturn true

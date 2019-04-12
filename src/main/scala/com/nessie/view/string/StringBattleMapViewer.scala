@@ -9,10 +9,7 @@ import scala.concurrent.Future
 private class StringBattleMapViewer extends View {
   private def print(o: BattleMapObject): Char = o match {
     case EmptyMapObject => '_'
-    case CombatUnitObject(u) => u match {
-      case _: Warrior => 'W'
-      case _: Skeleton => 'S'
-    }
+    case CombatUnitObject(u) => u.metadata.name.head
   }
   override def updateState(state: GameState): Unit = {
     val m = state.map

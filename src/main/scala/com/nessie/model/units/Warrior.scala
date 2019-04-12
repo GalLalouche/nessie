@@ -1,13 +1,12 @@
 package com.nessie.model.units
 
-class Warrior private(val currentHp: Int) extends PlayerUnit {
-  def this() = this(Warrior.maxHp)
-  override type T = Warrior
-  override protected def withHp(amount: Int): Warrior = new Warrior(amount)
-  override val owner: Owner = Owner.Player
-  override val maxHp: Int = Warrior.maxHp
-}
+import com.nessie.model.units.abilities.{MeleeAttack, MoveAbility}
 
 object Warrior {
-  private val maxHp = 10
+  def create: PlayerUnit = new PlayerUnit(
+    HitPoints.fullHp(10),
+    CombatUnitMetadata("Warrior"),
+  ) {
+    override val abilities = Vector(MoveAbility(3), MeleeAttack(5))
+  }
 }

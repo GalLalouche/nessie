@@ -96,7 +96,7 @@ private object MapGrid {
   private def createCell(o: BattleMapObject): BorderPane = {
     def text(o: BattleMapObject): String = o match {
       case EmptyMapObject => ""
-      case CombatUnitObject(u) => u.simpleName take 2
+      case CombatUnitObject(u) => NodeUtils.shortName(u)
     }
     new BorderPane() {
       center = new Button(text(o)) {

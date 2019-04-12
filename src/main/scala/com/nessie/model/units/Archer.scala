@@ -1,18 +1,13 @@
 package com.nessie.model.units
 
-import com.nessie.model.units.abilities.{RangedAttack, UnitAbility}
-
-class Archer private(val currentHp: Int) extends CombatUnit {
-  def this() = this(Archer.maxHp)
-  override type T = Archer
-  override protected def withHp(amount: Int): Archer = new Archer(amount)
-  def rangedAttack: RangedAttack = RangedAttack(3, 3)
-  override def abilities: Traversable[UnitAbility] = rangedAttack :: super.abilities.toList
-  override val owner: Owner = Owner.Player
-  override val maxHp: Int = Archer.maxHp
-}
+import com.nessie.model.units.abilities.{MeleeAttack, MoveAbility, RangedAttack}
 
 object Archer {
-  private val maxHp = 7
+  def create: PlayerUnit = new PlayerUnit(
+    HitPoints.fullHp(7),
+    CombatUnitMetadata("Archer"),
+  ) {
+    override val abilities = Vector(MoveAbility(3), MeleeAttack(1), RangedAttack(3, 3))
+  }
 }
 

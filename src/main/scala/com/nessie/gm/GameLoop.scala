@@ -7,11 +7,11 @@ import com.nessie.view.sfx.ScalaFxViewFactory
 private object GameLoop {
   def createInitialState: GameState = {
     val map = DictBattleMap(10, 10)
-        .place(MapPoint(0, 0), CombatUnitObject(new Warrior))
-        .place(MapPoint(0, 1), CombatUnitObject(new Archer))
+        .place(MapPoint(0, 0), CombatUnitObject(Warrior.create))
+        .place(MapPoint(0, 1), CombatUnitObject(Archer.create))
         .place(DirectionalMapPoint(0, 0, Direction.Down), Wall)
-        .place(MapPoint(9, 8), CombatUnitObject(new Skeleton))
-        .place(MapPoint (9, 9), CombatUnitObject(new Zombie))
+        .place(MapPoint(9, 8), CombatUnitObject(Skeleton.create))
+        .place(MapPoint(9, 9), CombatUnitObject(Zombie.create))
     GameState fromMap map
   }
 
