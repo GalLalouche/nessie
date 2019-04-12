@@ -13,7 +13,7 @@ class MeleeAttackTest extends FreeSpec with AuxSpecs {
           .place(MapPoint(1, 1), CombatUnitObject(Skeleton.create))
 
       val meleeAttack = MeleeAttack(5)
-      meleeAttack.canBeUsed(map, MapPoint(1, 0), MapPoint(1, 1)) shouldReturn true
+      CanBeUsed.apply(meleeAttack)(map, MapPoint(1, 0), MapPoint(1, 1)) shouldReturn true
     }
   }
 }

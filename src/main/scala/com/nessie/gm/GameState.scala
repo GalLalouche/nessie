@@ -45,5 +45,5 @@ object GameState {
     GameState(map, eq)
   }
   def unitSetter(original: CombatUnit): Setter[GameState, CombatUnit] =
-    Setter[GameState, CombatUnit](replacer => gs => gs.mapUnit(original, replacer))
+    Setter[GameState, CombatUnit](replacer => _.mapUnit(original, replacer))
 }

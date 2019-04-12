@@ -1,17 +1,19 @@
 package com.nessie.model.units.abilities
 
-import com.nessie.gm.GameState
-import com.nessie.model.map.{BattleMap, MapPoint}
-import common.rich.RichT._
+sealed trait UnitAbility {
+  def name: String
+}
 
-import scala.collection.mutable.ListBuffer
+case class MoveAbility(range: Int) extends UnitAbility {
+  override val name = "Move to"
+}
 
-trait UnitAbility {
-  private val constraints = new ListBuffer[CanBeUsed]
-  private[abilities] def addConstraint(canBeUsed: CanBeUsed) = constraints += canBeUsed
-  def name: String = this.simpleName
-  def applyTo(source: MapPoint, destination: MapPoint): GameState => GameState
-  def canBeApplied(m: BattleMap, source: MapPoint): Map[MapPoint, Boolean]
-  def canBeUsed(battleMap: BattleMap, source: MapPoint, destination: MapPoint): Boolean =
-    constraints.forall(_(battleMap, source, destination)) && canBeApplied(battleMap, source)(destination)
+trait DamageAbility extends UnitAbility {
+  def damage: Int
+}
+case class MeleeAttack(override val damage: Int) extends DamageAbility {
+  override val name = "Melee"
+}
+case class RangedAttack(override val damage: Int, range: Int) extends DamageAbility {
+  override val name = "Ranged"
 }

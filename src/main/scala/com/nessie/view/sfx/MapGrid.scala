@@ -3,7 +3,7 @@ package com.nessie.view.sfx
 import com.nessie.gm.GameState
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
-import com.nessie.model.units.abilities.MoveAbility
+import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
 import com.nessie.view.sfx.MapGrid._
 import com.nessie.view.sfx.RichNode._
 import common.rich.RichT._
@@ -70,9 +70,8 @@ private class MapGrid(map: BattleMap)
 
   def nextState(u: CombatUnit)(gs: GameState): Promise[GameState] = {
     def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
-      moveAbility.canBeApplied(map, location)
-          .filter(_._2)
-          .map(cells apply _._1)
+      cells.filterKeys(CanBeUsed(moveAbility)(map, location, _))
+          .values
           .foreach(_.setBaseColor("green"))
       cells(location).setBaseColor("blue")
     }

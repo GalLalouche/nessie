@@ -2,6 +2,7 @@ package com.nessie.gm
 
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.units.{CombatUnit, Owner}
+import com.nessie.model.units.abilities.{ApplyAbility, CanBeUsed}
 import common.rich.RichT._
 
 private class CatcherAI {
@@ -18,15 +19,15 @@ private class CatcherAI {
       val attackAbility = u.attackAbility
       map.points
           .map(_._1)
-          .find(attackAbility.canBeUsed(map, unitLocation, _))
-          .map(attackAbility.applyTo(unitLocation, _))
+          .find(CanBeUsed(attackAbility)(map, unitLocation, _))
+          .map(ApplyAbility(attackAbility)(unitLocation, _))
     }
     lazy val move: GameState => GameState = {
       val moveAbility = u.moveAbility
       map.points.map(_._1)
-          .filter(moveAbility.canBeUsed(map, unitLocation, _))
+          .filter(CanBeUsed(moveAbility)(map, unitLocation, _))
           .minBy(distanceToPlayer(map, _))
-          .mapTo(moveAbility.applyTo(unitLocation, _))
+          .mapTo(ApplyAbility(moveAbility)(unitLocation, _))
     }
     attack.getOrElse(move)(gs)
   }

@@ -1,5 +1,6 @@
 package com.nessie.model.units
 
+import com.nessie.common.MonocleUtils
 import monocle.Lens
 
 case class Monster(
@@ -7,6 +8,7 @@ case class Monster(
     metadata: CombatUnitMetadata,
 ) extends CombatUnit {
   override val owner = Owner.AI
+  override def hitPointsLens: Lens[CombatUnit, HitPoints] = MonocleUtils.unsafeCovariance(Monster.hitPoints)
 }
 
 object Monster {
