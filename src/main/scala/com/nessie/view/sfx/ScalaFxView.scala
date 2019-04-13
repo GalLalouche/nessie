@@ -2,7 +2,7 @@ package com.nessie.view.sfx
 
 import java.io.IOException
 
-import com.nessie.gm.{GameState, PlayerInput, View}
+import com.nessie.gm.{GameState, GameStateChange, PlayerInput, View}
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
@@ -22,6 +22,7 @@ private class ScalaFxView extends View
   private var mapGrid: MapGrid = _
   private var eqBar: EventQueueBar = _
   private var propPane: PropertiesPane = _
+  private val logger: Logger = new Logger()
   private var hasClosed = false
   Platform.runLater {
     stage = new Stage {
@@ -34,7 +35,7 @@ private class ScalaFxView extends View
     }
   }
 
-  override def updateState(gs: GameState): Unit = {
+  override def updateState(gsc: GameStateChange, gs: GameState): Unit = {
     mapGrid = new MapGrid(gs.map)
     propPane = new PropertiesPane(gs)
     eqBar = new EventQueueBar(gs)
@@ -48,20 +49,22 @@ private class ScalaFxView extends View
         .subscribe(obs)
     eqBar.mouseEvents.subscribe(obs)
     Platform.runLater {
+      logger.append(gsc)
       stage.scene.get.content = new BorderPane {
         top = eqBar.node
         center = mapGrid.node
         bottom = propPane.node
+        right = logger.node
       }
       if (!stage.isShowing)
         stage.show()
     }
   }
 
-  private var latestPromise: Promise[GameState] = _
+  private var latestPromise: Promise[GameStateChange] = _
 
   val playerInput = new PlayerInput {
-    override def nextState(u: CombatUnit)(gs: GameState): Future[GameState] = {
+    override def nextState(u: CombatUnit)(gs: GameState): Future[GameStateChange] = {
       if (hasClosed)
         throw new IllegalStateException("The gui has been closed")
       latestPromise = mapGrid.nextState(u)(gs)

@@ -1,6 +1,6 @@
 package com.nessie.view.sfx
 
-import com.nessie.gm.GameState
+import com.nessie.gm.{GameState, GameStateChange}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
@@ -50,9 +50,9 @@ private class MapGrid(map: BattleMap)
     children = cells.values
   }
 
-  private def getMove(source: MapPoint, gs: GameState): Promise[GameState] = {
-    val $ = Promise[GameState]()
-    val menuEvents = PublishSubject[GameState]()
+  private def getMove(source: MapPoint, gs: GameState): Promise[GameStateChange] = {
+    val $ = Promise[GameStateChange]()
+    val menuEvents = PublishSubject[GameStateChange]()
     val menuFactory = new ActionMenuFactory(source, gs, menuEvents)
     def createMenu(node: Node, destination: MapPoint): Unit =
       menuFactory(destination).show(node, Side.Bottom, 0, 0)
@@ -68,7 +68,7 @@ private class MapGrid(map: BattleMap)
     $
   }
 
-  def nextState(u: CombatUnit)(gs: GameState): Promise[GameState] = {
+  def nextState(u: CombatUnit)(gs: GameState): Promise[GameStateChange] = {
     def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
       cells.filterKeys(CanBeUsed(moveAbility)(map, location, _))
           .values
