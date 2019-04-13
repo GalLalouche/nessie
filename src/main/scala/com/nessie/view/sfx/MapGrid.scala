@@ -80,11 +80,11 @@ private class MapGrid(map: BattleMap)
     getMove(unitLocation, gs)
   }
 
-  val highlighter: Highlighter[CombatUnit] = new Highlighter[CombatUnit] {
+  val highlighter: Focuser[CombatUnit] = new Focuser[CombatUnit] {
     private def changeWeight(u: CombatUnit, style: String): Unit =
       CombatUnitObject.findIn(u, map).map(cells).get.center.get.setFontWeight(style)
-    override def highlight(u: CombatUnit) = changeWeight(u, "900")
-    override def disableHighlighting(u: CombatUnit) = changeWeight(u, "normal")
+    override def focus(u: CombatUnit) = changeWeight(u, "900")
+    override def unfocus(u: CombatUnit) = changeWeight(u, "normal")
   }
 }
 

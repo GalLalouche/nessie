@@ -10,21 +10,21 @@ import scalafx.scene.layout.VBox
 import scala.collection.JavaConverters._
 
 private class PropertiesPane(gs: GameState) {
-  val highlighter: Highlighter[CombatUnit] = new Highlighter[CombatUnit] {
+  val highlighter: Focuser[CombatUnit] = new Focuser[CombatUnit] {
     private def parseStats(stats: Stats): Seq[String] = Vector(
       "Stats:",
       "  Strength: " + stats.strength,
       "  Constitution: " + stats.constitution,
       "  Dexterity: " + stats.dexterity,
     )
-    override def highlight(u: CombatUnit) = {
+    override def focus(u: CombatUnit) = {
       val strings = List(
         u.metadata.name,
         s"${u.hitPoints.currentHp}/${u.hitPoints.maxHp}",
       ) ++ u.safeCast[PlayerUnit].map(_.stats).toIterator.flatMap(parseStats)
       node.children.setAll(strings.map(new Label(_)).asJava)
     }
-    override def disableHighlighting(u: CombatUnit) = node.children.clear()
+    override def unfocus(u: CombatUnit) = node.children.clear()
   }
 
   val node = new VBox()
