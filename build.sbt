@@ -4,15 +4,16 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.8")
 
 resolvers += Resolver.sonatypeRepo("releases")
+val MonocleVersion = "1.5.0"
 autoCompilerPlugins := true
 lazy val nessie = (project in file("."))
     .settings(commonSettings: _*)
     .settings(
       name := "nessie",
       libraryDependencies ++= Seq(
-        "com.github.julien-truffaut" %% "monocle-core" % "1.3.2",
-        "com.github.julien-truffaut" %% "monocle-macro" % "1.3.2",
-        "com.github.julien-truffaut" %% "monocle-unsafe" % "1.3.2",
+        "com.github.julien-truffaut" %% "monocle-core" % MonocleVersion,
+        "com.github.julien-truffaut" %% "monocle-macro" % MonocleVersion,
+        "com.github.julien-truffaut" %% "monocle-unsafe" % MonocleVersion,
         "com.typesafe.akka" %% "akka-actor" % "2.5.4",
         "com.typesafe.akka" %% "akka-testkit" % "2.5.4" % "test",
         "com.zenjava" % "javafx-maven-plugin" % "8.8.3",
