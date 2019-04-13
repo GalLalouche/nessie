@@ -11,6 +11,7 @@ lazy val nessie = (project in file("."))
     .settings(
       name := "nessie",
       libraryDependencies ++= Seq(
+        "com.beachape" %% "enumeratum" % "1.5.13",
         "com.github.julien-truffaut" %% "monocle-core" % MonocleVersion,
         "com.github.julien-truffaut" %% "monocle-macro" % MonocleVersion,
         "com.github.julien-truffaut" %% "monocle-unsafe" % MonocleVersion,

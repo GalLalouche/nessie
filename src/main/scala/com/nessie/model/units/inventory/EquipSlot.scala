@@ -1,25 +1,24 @@
 package com.nessie.model.units.inventory
 
+import common.rich.collections.RichTraversableOnce._
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable
+
 /**
- * An equipment slot on a character, just as the head, torso, or left/right hand.
+ * An equipment slot on a character, e.g., head, torso, or left/right hand.
  * Every slot has a type, but there can be several slots for each type: e.g., left/right
  * hand, two rings, etc.
  */
-sealed abstract class EquipSlot(val equipType: EquipType)
-import common.rich.collections.RichTraversableOnce._
-import common.rich.primitives.RichBoolean._
+sealed abstract class EquipSlot(val equipType: EquipType) extends EnumEntry
 
-object EquipSlot {
-  object Head extends EquipSlot(EquipType.Head)
-  object Torso extends EquipSlot(EquipType.Torso)
-  object RightHand extends EquipSlot(EquipType.Hand)
-  object LeftHand extends EquipSlot(EquipType.Hand)
-  val values: Traversable[EquipSlot] = { // extract all hosts by reflection
-    import scala.reflect.runtime.{universe => u}
-    u.typeOf[EquipSlot.type]
-        .decls
-        .flatMap(e => e.isModule.ifTrue(e.asModule))
-        .map(e => u.runtimeMirror(getClass.getClassLoader).reflectModule(e).instance.asInstanceOf[EquipSlot])
-  }
+object EquipSlot extends Enum[EquipSlot] {
+  val values: immutable.IndexedSeq[EquipSlot] = findValues
+
+  case object Head extends EquipSlot(EquipType.Head)
+  case object Torso extends EquipSlot(EquipType.Torso)
+  case object RightHand extends EquipSlot(EquipType.Hand)
+  case object LeftHand extends EquipSlot(EquipType.Hand)
+
   val default: EquipType => EquipSlot = values.toMultiMap(_.equipType).mapValues(_.head)
 }

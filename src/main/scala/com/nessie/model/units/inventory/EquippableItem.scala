@@ -1,3 +1,3 @@
 package com.nessie.model.units.inventory
 
-abstract class EquippableItem(val equipType: EquipType)
+case class EquippableItem(equipType: EquipType, name: String)
