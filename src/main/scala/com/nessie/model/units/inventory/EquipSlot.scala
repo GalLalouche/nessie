@@ -20,5 +20,5 @@ object EquipSlot extends Enum[EquipSlot] {
   case object RightHand extends EquipSlot(EquipType.Hand)
   case object LeftHand extends EquipSlot(EquipType.Hand)
 
-  val default: EquipType => EquipSlot = values.toMultiMap(_.equipType).mapValues(_.head)
+  val default: EquipType => Seq[EquipSlot] = values.toMultiMap(_.equipType)
 }
