@@ -14,7 +14,7 @@ object CombatUnitObject {
   def lens(u: CombatUnit): Lens[BattleMap, Option[CombatUnitObject]] = {
     def get(map: BattleMap) = findIn(u, map).map(map.apply).map(_.asInstanceOf[CombatUnitObject])
     def set(replace: Option[CombatUnitObject])(map: BattleMap) = {
-      findIn(u, map).map { currentLocation =>
+      findIn(u, map).map {currentLocation =>
         replace match {
           case None => map.remove(currentLocation)
           case Some(r) => map.replace(currentLocation, r)
