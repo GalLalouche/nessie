@@ -14,7 +14,7 @@ class EventQueue[A] private(
   // this ensures by induction that there are no null events
   require(q.isEmpty || q.head._1 != null)
 
-  def this() = this(List[(A, Double)](), 0.0, Map())
+  def this() = this(List[(A, Double)](), 0.0, Map.empty)
   /** Unlike collect, partialMap does not modify elements the partial function does not apply to. */
   def partialMap(f: PartialFunction[A, A]): EventQueue[A] = {
     val orNop: A => A = f.orElse {case e => e}
@@ -57,7 +57,6 @@ class EventQueue[A] private(
   def repeat(e: A) = new {
     def times(n: Int) = new {
       require(n > 0, "The number of repeats must be a positive integer")
-      // TODO extract in Intervals of trait
       def inIntervalsOf(delay: Double) = new {
         require(delay >= 0, "The intervals length must non-negative")
         def withDefaultDelay = withDelay(delay)
