@@ -1,9 +1,12 @@
 package com.nessie.view.sfx
 
+import com.nessie.view.sfx.PromiseZ._
 import common.rich.RichT._
 import rx.lang.scala.subjects.ReplaySubject
-import scalaz.concurrent.Task
+import rx.lang.scala.Subscriber
+
 import scalaz.{-\/, \/, \/-}
+import scalaz.concurrent.Task
 
 /** Because god forbid ScalaZ have a proper Promise. */
 // TODO move to common
@@ -25,13 +28,33 @@ private class PromiseZ[A] {
   }
   def toTask: Task[A] = this.synchronized {
     value.opt match {
-      case None => Task.async[A](ps.subscribe(_))
+      case None => Task.async(callback => ps.subscribe(singleTimeSubscriber(callback)))
       case Some(-\/(e)) => Task.fail(e)
       case Some(\/-(v)) => Task.now(v)
     }
   }
+
+  def map[B](f: A => B): PromiseZ[B] = this.synchronized {
+    val $ = PromiseZ[B]()
+    value.opt match {
+      case None => ps.subscribe(singleTimeSubscriber[Value] {
+        case -\/(e) => $.fail(e)
+        case \/-(v) => $.fulfill(f(v))
+      })
+      case Some(-\/(e)) => $.fail(e)
+      case Some(\/-(v)) => $.fulfill(f(v))
+    }
+    $
+  }
 }
 
 private object PromiseZ {
+  // TODO move to ScalaCommon
+  private def singleTimeSubscriber[A](f: A => Any): Subscriber[A] = new Subscriber[A]() {
+    override def onNext(value: A): Unit = {
+      f(value)
+      unsubscribe()
+    }
+  }
   def apply[A](): PromiseZ[A] = new PromiseZ[A]()
 }
