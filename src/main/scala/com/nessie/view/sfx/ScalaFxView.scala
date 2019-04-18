@@ -13,8 +13,7 @@ import scalafx.application.Platform
 import scalafx.scene.Scene
 import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
-
-import scala.concurrent.{Future, Promise}
+import scalaz.concurrent.Task
 
 private class ScalaFxView extends View
     with MoreObservableInstances with ToMoreMonadPlusOps {
@@ -29,7 +28,7 @@ private class ScalaFxView extends View
       scene = new Scene(800, 800)
       onCloseRequest = (_: WindowEvent) => {
         hasClosed = true
-        latestPromise.opt.foreach(_.failure(new IOException("User closed the GUI")))
+        latestPromise.opt.foreach(_ fail new IOException("User closed the GUI"))
         Platform.runLater(Platform.exit())
       }
     }
@@ -61,14 +60,14 @@ private class ScalaFxView extends View
     }
   }
 
-  private var latestPromise: Promise[GameStateChange] = _
+  private var latestPromise: PromiseZ[GameStateChange] = _
 
   val playerInput = new PlayerInput {
-    override def nextState(u: CombatUnit)(gs: GameState): Future[GameStateChange] = {
+    override def nextState(u: CombatUnit)(gs: GameState): Task[GameStateChange] = {
       if (hasClosed)
         throw new IllegalStateException("The gui has been closed")
       latestPromise = mapGrid.nextState(u)(gs)
-      latestPromise.future
+      latestPromise.toTask
     }
   }
 }

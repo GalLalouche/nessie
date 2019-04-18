@@ -1,9 +1,6 @@
 package com.nessie.gm
 
 import com.nessie.model.units.Owner._
-import common.rich.RichFuture._
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 private class GameMaster private(playerInput: PlayerInput) {
   private val ai = new CatcherAI
@@ -14,7 +11,7 @@ private class GameMaster private(playerInput: PlayerInput) {
     val nextChange: GameStateChange = nextEvent match {
       case UnitTurn(u) => u.owner match {
         case AI => ai(u)(gs)
-        case Player => playerInput.nextState(u)(gs).get
+        case Player => playerInput.nextState(u)(gs).unsafePerformSync
       }
     }
     val nextState = ApplyAbility(nextChange)(gs)

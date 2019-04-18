@@ -9,7 +9,9 @@ import scalafx.event.ActionEvent
 import scalafx.scene.control.{ContextMenu, MenuItem}
 import scalafx.scene.control.MenuItem._
 
-private class ActionMenuFactory(source: MapPoint, gs: GameState, pubSubManager: Observer[GameStateChange]) {
+private class ActionMenuFactory(
+    source: MapPoint, gs: GameState, pubSubManager: Observer[GameStateChange]
+) {
   def apply(destination: MapPoint): ContextMenu = {
     val $ = new ContextMenu()
     def toItem(unitAbility: UnitAbility): MenuItem =

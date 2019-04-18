@@ -21,8 +21,6 @@ import scalafx.scene.control.Button
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
-import scala.concurrent.Promise
-
 private class MapGrid(map: BattleMap)
     extends ToMoreFunctorOps with MoreObservableInstances {
 
@@ -50,8 +48,8 @@ private class MapGrid(map: BattleMap)
     children = cells.values
   }
 
-  private def getMove(source: MapPoint, gs: GameState): Promise[GameStateChange] = {
-    val $ = Promise[GameStateChange]()
+  private def getMove(source: MapPoint, gs: GameState): PromiseZ[GameStateChange] = {
+    val $ = PromiseZ[GameStateChange]()
     val menuEvents = PublishSubject[GameStateChange]()
     val menuFactory = new ActionMenuFactory(source, gs, menuEvents)
     def createMenu(node: Node, destination: MapPoint): Unit =
@@ -63,12 +61,12 @@ private class MapGrid(map: BattleMap)
 
     menuEvents.subscribe(e => {
       subscription.unsubscribe
-      $ success e
+      $.fulfill(e)
     })
     $
   }
 
-  def nextState(u: CombatUnit)(gs: GameState): Promise[GameStateChange] = {
+  def nextState(u: CombatUnit)(gs: GameState): PromiseZ[GameStateChange] = {
     def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
       cells.filterKeys(CanBeUsed(moveAbility)(map, location, _))
           .values
