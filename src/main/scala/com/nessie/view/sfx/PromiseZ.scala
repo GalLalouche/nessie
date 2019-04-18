@@ -33,19 +33,6 @@ private class PromiseZ[A] {
       case Some(\/-(v)) => Task.now(v)
     }
   }
-
-  def map[B](f: A => B): PromiseZ[B] = this.synchronized {
-    val $ = PromiseZ[B]()
-    value.opt match {
-      case None => ps.subscribe(singleTimeSubscriber[Value] {
-        case -\/(e) => $.fail(e)
-        case \/-(v) => $.fulfill(f(v))
-      })
-      case Some(-\/(e)) => $.fail(e)
-      case Some(\/-(v)) => $.fulfill(f(v))
-    }
-    $
-  }
 }
 
 private object PromiseZ {
