@@ -1,7 +1,5 @@
 package com.nessie.view.sfx
 
-import java.io.IOException
-
 import com.nessie.gm.{GameState, GameStateChange, PlayerInput, View}
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
@@ -13,6 +11,7 @@ import scalafx.application.Platform
 import scalafx.scene.Scene
 import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
+
 import scalaz.concurrent.Task
 
 private class ScalaFxView extends View
@@ -28,7 +27,7 @@ private class ScalaFxView extends View
       scene = new Scene(800, 800)
       onCloseRequest = (_: WindowEvent) => {
         hasClosed = true
-        latestPromise.opt.foreach(_ fail new IOException("User closed the GUI"))
+        mapGrid.opt.foreach(_.killLastTask())
         Platform.runLater(Platform.exit())
       }
     }
@@ -60,14 +59,11 @@ private class ScalaFxView extends View
     }
   }
 
-  private var latestPromise: PromiseZ[GameStateChange] = _
-
   val playerInput = new PlayerInput {
     override def nextState(u: CombatUnit)(gs: GameState): Task[GameStateChange] = {
       if (hasClosed)
         throw new IllegalStateException("The gui has been closed")
-      latestPromise = mapGrid.nextState(u)(gs)
-      latestPromise.toTask
+      mapGrid.nextState(u)(gs).toTask
     }
   }
 }

@@ -1,5 +1,7 @@
 package com.nessie.view.sfx
 
+import java.io.IOException
+
 import com.nessie.gm.{GameState, GameStateChange}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
@@ -23,7 +25,6 @@ import scalafx.scene.layout._
 
 private class MapGrid(map: BattleMap)
     extends ToMoreFunctorOps with MoreObservableInstances {
-
   private val cells: Map[MapPoint, BorderPane] = map.points
       .map {case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
       .mapBy(toPoint)
@@ -63,6 +64,7 @@ private class MapGrid(map: BattleMap)
       subscription.unsubscribe
       $.fulfill(e)
     })
+    lastPromise = $
     $
   }
 
@@ -84,6 +86,9 @@ private class MapGrid(map: BattleMap)
     override def focus(u: CombatUnit) = changeWeight(u, "900")
     override def unfocus(u: CombatUnit) = changeWeight(u, "normal")
   }
+
+  private var lastPromise: PromiseZ[_] = _
+  def killLastTask(): Unit = lastPromise.opt.foreach(_.fail(new IOException("User closed the GUI")))
 }
 
 private object MapGrid {
