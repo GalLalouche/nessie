@@ -1,11 +1,13 @@
 lazy val commonSettings = Seq(
   organization := "org.me",
   version := "0.01",
-  scalaVersion := "2.12.8")
+  scalaVersion := "2.12.8",
+)
 
 resolvers += Resolver.sonatypeRepo("releases")
 val MonocleVersion = "1.5.0"
 autoCompilerPlugins := true
+val ScalaZVersion = "7.2.15"
 lazy val nessie = (project in file("."))
     .settings(commonSettings: _*)
     .settings(
@@ -28,7 +30,8 @@ lazy val nessie = (project in file("."))
         "org.scalamock" %% "scalamock-core" % "3.6.0" % "test",
         "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % "test",
         "org.scalatest" %% "scalatest" % "3.0.4",
-        "org.scalaz" %% "scalaz-core" % "7.2.15"
+        "org.scalaz" %% "scalaz-core" % ScalaZVersion,
+        "org.scalaz" %% "scalaz-concurrent" % ScalaZVersion,
       )
     )
 
