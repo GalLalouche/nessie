@@ -5,13 +5,18 @@ import com.nessie.model.eq.EventQueue
 import com.nessie.model.map.{BattleMap, CombatUnitObject}
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
-import monocle.macros.Lenses
 import monocle.{Lens, Setter}
+import monocle.macros.Lenses
 
 import scalaz.std.OptionInstances
 
 @Lenses
-case class GameState(map: BattleMap, eq: EventQueue[Event]) extends OptionInstances {
+case class GameState(
+    map: BattleMap,
+    eq: EventQueue[Event],
+    // TODO less hackish
+    isMidMove: Boolean, // True after a unit has moved but not taken an action yet.
+) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
     val noneIfDead = replacer(original).opt.filterNot(_.hitPoints.isDead)
@@ -42,7 +47,7 @@ object GameState {
     val eq = units.foldLeft(new EventQueue[Event]) {
       (agg, next) => agg.repeat(UnitTurn(next)).infinitely.inIntervalsOf(1.0)
     }
-    GameState(map, eq)
+    GameState(map, eq, isMidMove = false)
   }
   def unitSetter(original: CombatUnit): Setter[GameState, CombatUnit] =
     Setter[GameState, CombatUnit](replacer => _.mapUnit(original, replacer))
