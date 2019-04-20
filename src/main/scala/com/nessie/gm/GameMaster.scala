@@ -2,6 +2,10 @@ package com.nessie.gm
 
 import com.nessie.model.units.Owner._
 
+/**
+ * A GameMaster runs the game. It keeps the current state of the game, and can fetch the next state, either
+ * by making applying a natural event, making an AI movie, or ask the user for input.
+ */
 private class GameMaster private(playerInput: PlayerInput) {
   private val ai = new CatcherAI
 
