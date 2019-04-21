@@ -6,10 +6,10 @@ import monocle.syntax.ApplySyntax
 /** Changes the GameState by applying a GameStateChange. Doesn't verify the validity of the change. */
 // TODO verify the validity of the change?
 private object ApplyAbility extends ApplySyntax {
-
   def apply(gameStateChange: GameStateChange)(gs: GameState): GameState = gameStateChange match {
-    case Movement(src, dst) => gs.&|->(GameState.map).modify(_ move src to dst)
-    case Attack(_, dst, damage) =>
+    case Movement(src, dst, _) =>
+      gs.&|->(GameState.map).modify(_ move src to dst)
+    case Attack(_, dst, damage, _) =>
       val unit = gs.map(dst).asInstanceOf[CombatUnitObject].unit
       GameState.unitSetter(unit).^|->(unit.hitPointsLens).modify(_.reduceHp(damage))(gs)
   }

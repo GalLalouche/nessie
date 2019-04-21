@@ -11,8 +11,8 @@ private class Logger {
     if (gameStateChange == NoOp)
       return
     val string = gameStateChange match {
-      case Movement(src, dst) => s"Moved <$src> to <$dst>"
-      case Attack(src, dst, damageAmount) => s"<$src> attacked <$dst> for <$damageAmount>"
+      case Movement(src, dst, delay) => s"Moved <$src> to <$dst>, delay = <$delay>"
+      case Attack(src, dst, damageAmount, delay) => s"<$src> attacked <$dst> for <$damageAmount>, delay = <$delay>"
     }
     node.children.add(new Label(string))
   }

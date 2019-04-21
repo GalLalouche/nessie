@@ -15,7 +15,7 @@ case class GameState(
     map: BattleMap,
     eq: EventQueue[Event],
     // TODO less hackish
-    isMidMove: Boolean, // True after a unit has moved but not taken an action yet.
+    midMovement: Option[Movement], // True after a unit has moved but not taken an action yet.
 ) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
@@ -45,9 +45,9 @@ object GameState {
   def fromMap(map: BattleMap): GameState = {
     val units = map.points.map(_._2).flatMap(_.safeCast[CombatUnitObject]).map(_.unit)
     val eq = units.foldLeft(new EventQueue[Event]) {
-      (agg, next) => agg.repeat(UnitTurn(next)).infinitely.inIntervalsOf(1.0)
+      (agg, next) => agg.add(UnitTurn(next), 1.0 / next.moveAbility.range)
     }
-    GameState(map, eq, isMidMove = false)
+    GameState(map, eq, midMovement = None)
   }
   def unitSetter(original: CombatUnit): Setter[GameState, CombatUnit] =
     Setter[GameState, CombatUnit](replacer => _.mapUnit(original, replacer))

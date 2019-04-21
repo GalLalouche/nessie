@@ -9,9 +9,9 @@ class AbilityToChangeTest extends FreeSpec with AuxSpecs {
   private val src = MapPoint(0, 0)
   private val dst = MapPoint(1, 1)
   "MoveAbility" in {
-    AbilityToChange(MoveAbility(3))(src, dst) shouldReturn Movement(src, dst)
+    AbilityToChange(MoveAbility(3))(src, dst) shouldReturn Movement(src, dst, 2.0 / 3.0)
   }
   "Damage ability" in {
-    AbilityToChange(MeleeAttack(3))(src, dst) shouldReturn Attack(src, dst, 3)
+    AbilityToChange(MeleeAttack(3))(src, dst) shouldReturn Attack(src, dst, 3, 1.0)
   }
 }
