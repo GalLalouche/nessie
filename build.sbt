@@ -4,6 +4,8 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.8",
 )
 
+addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.0")
+
 resolvers += Resolver.sonatypeRepo("releases")
 val MonocleVersion = "1.5.0"
 autoCompilerPlugins := true

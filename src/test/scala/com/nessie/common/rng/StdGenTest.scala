@@ -1,13 +1,10 @@
 package com.nessie.common.rng
 
 import common.AuxSpecs
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalatest.PropSpec
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 class StdGenTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks {
-  implicit lazy val arbSong: Gen[StdGen] = arbitrary[Long].map(StdGen.fromSeed)
   property("Same next every time") {
     forAll {rng: StdGen =>
       rng.next._1 shouldReturn rng.next._1
