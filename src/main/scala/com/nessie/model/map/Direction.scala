@@ -4,8 +4,8 @@ sealed trait Direction
 
 object Direction {
   val values: Iterable[Direction] = Vector(Up, Down, Left, Right)
-  object Up extends Direction
-  object Down extends Direction
-  object Left extends Direction
-  object Right extends Direction
+  case object Up extends Direction
+  case object Down extends Direction
+  case object Left extends Direction
+  case object Right extends Direction
 }

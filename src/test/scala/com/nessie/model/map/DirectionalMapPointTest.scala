@@ -47,4 +47,11 @@ class DirectionalMapPointTest extends FreeSpec with AuxSpecs {
       }
     }
   }
+
+  "points" in {
+    DirectionalMapPoint(2, 5, Direction.Up).points shouldReturn (MapPoint(2, 4), MapPoint(2, 5))
+    DirectionalMapPoint(2, 5, Direction.Down).points shouldReturn (MapPoint(2, 5), MapPoint(2, 6))
+    DirectionalMapPoint(2, 5, Direction.Left).points shouldReturn (MapPoint(1, 5), MapPoint(2, 5))
+    DirectionalMapPoint(2, 5, Direction.Right).points shouldReturn (MapPoint(2, 5), MapPoint(3, 5))
+  }
 }

@@ -8,6 +8,14 @@ final class DirectionalMapPoint private(val x: Int, val y: Int, val direction: D
 
   val toPoint = MapPoint(x, y)
 
+  private def canonical(ps: (MapPoint, MapPoint)): (MapPoint, MapPoint) =
+    if (ps._1.x < ps._2.x || ps._1.x == ps._2.x && ps._1.y < ps._2.y) ps else ps.swap
+  def points: (MapPoint, MapPoint) = canonical(toPoint -> (direction match {
+    case Direction.Up => MapPoint(x, y - 1)
+    case Direction.Down => MapPoint(x, y + 1)
+    case Direction.Left => MapPoint(x - 1, y)
+    case Direction.Right => MapPoint(x + 1, y)
+  }))
   def canEqual(other: Any): Boolean = other.isInstanceOf[DirectionalMapPoint]
   override def equals(other: Any): Boolean = other match {
     case that: DirectionalMapPoint =>

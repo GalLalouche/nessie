@@ -45,6 +45,11 @@ private class MapGrid(map: BattleMap)
     })(cells(pd.toPoint))
   }
 
+  // Color full walls as black
+  for (
+    (point, bo) <- cells if map(point) == FullWall
+  ) bo.setBaseColor("black")
+
   val node = new GridPane() {
     children = cells.values
   }
@@ -98,6 +103,7 @@ private object MapGrid {
   private def createCell(o: BattleMapObject): BorderPane = {
     def text(o: BattleMapObject): String = o match {
       case EmptyMapObject => ""
+      case FullWall => "*"
       case CombatUnitObject(u) => NodeUtils.shortName(u)
     }
     new BorderPane() {

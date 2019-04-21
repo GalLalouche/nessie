@@ -3,16 +3,17 @@ package com.nessie.model.map
 import common.rich.RichT._
 import common.rich.func.MoreSetInstances
 import monocle.Lens
-
-import scala.util.Try
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.immutable.Graph
+
+import scala.util.Try
+
 import scalaz.syntax.ToFunctorOps
 
 /**
  * A map of a given level.
  * Is immutable.
- * @param width  The map's width
+ * @param width The map's width
  * @param height The map's height
  */
 abstract class BattleMap(val width: Int, val height: Int)
@@ -111,6 +112,17 @@ abstract class BattleMap(val width: Int, val height: Int)
     }
     Graph.from(vertices, edges)
   }
+
+  /** Adds walls between all points. */
+  def wallItUp: BattleMap = betweens.map(_._1).foldLeft(this)(_.place(_, Wall))
+  /** marks all points as a FullWall. */
+  def fillItUp: BattleMap = points.map(_._1).foldLeft(this)(_.place(_, FullWall))
+
+  def isBorder(dmp: DirectionalMapPoint): Boolean =
+    (dmp.x == 0 && dmp.direction == Direction.Left) ||
+        (dmp.y == 0 && dmp.direction == Direction.Up) ||
+        (dmp.x == width - 1 && dmp.direction == Direction.Right) ||
+        (dmp.y == height - 1 && dmp.direction == Direction.Down)
 }
 
 object BattleMap {
