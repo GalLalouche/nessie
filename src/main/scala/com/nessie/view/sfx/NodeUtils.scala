@@ -12,6 +12,6 @@ private object NodeUtils
     extends ToFunctorOps with MoreObservableInstances {
   def mouseEvents[Key, N: NodeLike](m: Traversable[(Key, N)]): Observable[(MouseEvent, Key)] = m.map {
     case (key, node) => implicitly[NodeLike[N]].scalaNode(node).mouseEvents.strengthR(key)
-  }.reduce(_ merge _)
+  }.foldLeft[Observable[(MouseEvent, Key)]](Observable.empty)(_ merge _)
   def shortName(u: CombatUnit): String = u.metadata.name.take(2)
 }

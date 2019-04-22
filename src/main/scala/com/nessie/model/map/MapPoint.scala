@@ -13,4 +13,11 @@ case class MapPoint(x: Int, y: Int) {
     case Direction.Left => MapPoint(x - 1, y)
     case Direction.Right => MapPoint(x + 1, y)
   }
+  def safeGo(d: Direction): Option[MapPoint] = d match {
+    case Direction.Up if y == 0 => None
+    case Direction.Left if x == 0 => None
+    case _ => Some(go(d))
+  }
+
+  def neighbors: Iterable[MapPoint] = Direction.values.flatMap(safeGo)
 }

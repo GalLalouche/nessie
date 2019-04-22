@@ -1,5 +1,7 @@
 package com.nessie.model.map
 
+import com.nessie.model.map.Direction._
+
 // Not a case class, since the default apply method is overriden.
 final class DirectionalMapPoint private(val x: Int, val y: Int, val direction: Direction) {
   require(y >= 0)
@@ -11,10 +13,10 @@ final class DirectionalMapPoint private(val x: Int, val y: Int, val direction: D
   private def canonical(ps: (MapPoint, MapPoint)): (MapPoint, MapPoint) =
     if (ps._1.x < ps._2.x || ps._1.x == ps._2.x && ps._1.y < ps._2.y) ps else ps.swap
   def points: (MapPoint, MapPoint) = canonical(toPoint -> (direction match {
-    case Direction.Up => MapPoint(x, y - 1)
-    case Direction.Down => MapPoint(x, y + 1)
-    case Direction.Left => MapPoint(x - 1, y)
-    case Direction.Right => MapPoint(x + 1, y)
+    case Up => MapPoint(x, y - 1)
+    case Down => MapPoint(x, y + 1)
+    case Left => MapPoint(x - 1, y)
+    case Right => MapPoint(x + 1, y)
   }))
   def canEqual(other: Any): Boolean = other.isInstanceOf[DirectionalMapPoint]
   override def equals(other: Any): Boolean = other match {
@@ -35,15 +37,27 @@ final class DirectionalMapPoint private(val x: Int, val y: Int, val direction: D
 object DirectionalMapPoint {
   def apply(p: MapPoint, d: Direction): DirectionalMapPoint = apply(p.x, p.y, d)
   def apply(x: Int, y: Int, d: Direction): DirectionalMapPoint =
-    if (d == Direction.Down ||
-        d == Direction.Right ||
-        d == Direction.Up && y == 0 ||
-        d == Direction.Left && x == 0)
+    if (d == Down ||
+        d == Right ||
+        d == Up && y == 0 ||
+        d == Left && x == 0)
       new DirectionalMapPoint(x, y, d)
     else d match {
-      case Direction.Up => new DirectionalMapPoint(x, y - 1, Direction.Down)
-      case Direction.Left => new DirectionalMapPoint(x - 1, y, Direction.Right)
+      case Up => new DirectionalMapPoint(x, y - 1, Down)
+      case Left => new DirectionalMapPoint(x - 1, y, Right)
     }
 
   def unapply(arg: DirectionalMapPoint): Option[(Int, Int, Direction)] = Some((arg.x, arg.y, arg.direction))
+  def between(p1: MapPoint, p2: MapPoint): DirectionalMapPoint = {
+    require(p1.manhattanDistanceTo(p2) == 1)
+    DirectionalMapPoint(p1,
+      if (p1.x == p2.x + 1) Left
+      else if (p1.x == p2.x - 1) Right
+      else if (p1.y == p2.y + 1) Up
+      else {
+        assert(p1.y == p2.y - 1)
+        Down
+      }
+    )
+  }
 }

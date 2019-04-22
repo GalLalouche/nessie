@@ -1,5 +1,6 @@
 package com.nessie.model.map
 
+import com.nessie.common.rng.StdGen
 import common.rich.RichT._
 import common.rich.func.MoreSetInstances
 import monocle.Lens
@@ -63,15 +64,15 @@ abstract class BattleMap(val width: Int, val height: Int)
   def isEmptyAt(pd: DirectionalMapPoint): Boolean = apply(pd) == EmptyBetweenMapObject
 
   def remove(p: MapPoint): BattleMap =
-    if (isOccupiedAt(p))
-      this.internalPlace(p, EmptyMapObject)
-    else
-      throw new MapEmptyException(p)
+    if (isOccupiedAt(p)) this.internalPlace(p, EmptyMapObject)
+    else throw new MapEmptyException(p)
+  def removeSafely(p: MapPoint): BattleMap =
+    this.mapIf(isOccupiedAt(p)).to(_.internalPlace(p, EmptyMapObject))
   def remove(pd: DirectionalMapPoint): BattleMap =
-    if (isOccupiedAt(pd))
-      this.internalPlace(pd, EmptyBetweenMapObject)
-    else
-      throw new MapEmptyException(pd)
+    if (isOccupiedAt(pd)) this.internalPlace(pd, EmptyBetweenMapObject)
+    else throw new MapEmptyException(pd)
+  def removeSafely(pd: DirectionalMapPoint): BattleMap =
+    this.mapIf(isOccupiedAt(pd)).to(internalPlace(pd, EmptyBetweenMapObject))
 
   /**
    * Moves an object from one location to another
@@ -123,6 +124,7 @@ abstract class BattleMap(val width: Int, val height: Int)
         (dmp.y == 0 && dmp.direction == Direction.Up) ||
         (dmp.x == width - 1 && dmp.direction == Direction.Right) ||
         (dmp.y == height - 1 && dmp.direction == Direction.Down)
+  def neighbors(mp: MapPoint): Set[MapPoint] = mp.neighbors.filter(isInBounds).toSet
 }
 
 object BattleMap {

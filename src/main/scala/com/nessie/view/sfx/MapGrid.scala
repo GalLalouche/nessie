@@ -49,6 +49,10 @@ private class MapGrid(map: BattleMap)
   for (
     (point, bo) <- cells if map(point) == FullWall
   ) bo.setBaseColor("black")
+  // Color tunnels as yellow
+  for (
+    (point, bo) <- cells if map(point).isInstanceOf[TunnelMapObject]
+  ) bo.setBaseColor("yellow")
 
   val node = new GridPane() {
     children = cells.values
@@ -104,6 +108,7 @@ private object MapGrid {
     def text(o: BattleMapObject): String = o match {
       case EmptyMapObject => ""
       case FullWall => "*"
+      case TunnelMapObject(i) => s"$i"
       case CombatUnitObject(u) => NodeUtils.shortName(u)
     }
     new BorderPane() {

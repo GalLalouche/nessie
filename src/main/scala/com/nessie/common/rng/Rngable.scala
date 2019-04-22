@@ -73,6 +73,11 @@ object Rngable {
   //  ev.mkRandoms(rng1) -> rng2
   //}
 
+  def sample[A](seq: IndexedSeq[A]): Rngable[A] = {
+    require(seq.nonEmpty)
+    intRange(0, seq.size).map(seq.apply)
+  }
+
   trait ToRngableOps {
     def mkRandom[A: Rngable]: Rngable[A] = implicitly[Rngable[A]]
     def mkRandom[A: Rngable](rng: StdGen): A = implicitly[Rngable[A]].mkRandom(rng)

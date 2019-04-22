@@ -49,3 +49,4 @@ ScalaCommon.jar
 lib/*
 *QuickMain*
 *QuickJava*
+**/*GitIgnore.*

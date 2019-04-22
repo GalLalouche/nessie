@@ -9,7 +9,7 @@ import common.rich.RichT._
 import scalaz.syntax.ToMonadOps
 
 /** Creates a BattleMap made up of just non-overlapping rooms. */
-class CreateRooms(
+private class CreateRooms(
     minRoomWidth: Int, maxRoomWidth: Int,
     minRoomHeight: Int, maxRoomHeight: Int,
     mapWidth: Int, mapHeight: Int,
@@ -37,7 +37,8 @@ class CreateRooms(
 
   private def notInRooms(p: MapPoint): Boolean = rooms.forall(_.pointNotInRectangle(p))
   private def inRooms(p: MapPoint): Boolean = notInRooms(p).isFalse
-  private def walls(p: MapPoint): Traversable[DirectionalMapPoint] = rooms.flatMap(_.walls(p))
+  private def inSameRoom(p1: MapPoint, p2: MapPoint): Boolean =
+    rooms.exists(r => r.pointInRectangle(p1) && r.pointInRectangle(p2))
   private def addRooms: BattleMap = {
     println(rooms)
     val emptyMap: BattleMap = DictBattleMap(mapWidth, mapHeight).fillItUp.wallItUp
@@ -46,26 +47,26 @@ class CreateRooms(
       map.mapIf(inRooms(p)).to(_.remove(p))
     )
     removeFullWalls.betweens.map(_._1).foldLeft(removeFullWalls) {(map, dmp) =>
-      if (dmp == DirectionalMapPoint(0, 8, Direction.Right))
-        println("FooBar!")
       if (map.isBorder(dmp)) map else {
         val (p1, p2) = dmp.points
-        map.mapIf(inRooms(p1) && inRooms(p2)).to(_.remove(dmp))
+        map.mapIf(inSameRoom(p1, p2)).to(_.remove(dmp))
       }
     }
   }
 
-  def finish: Rngable[BattleMap] =
-    if (maxAttempts == 0) Rngable.pure(addRooms) else addRoom.flatMap(_.finish)
+  def roomPoints: Set[MapPoint] = rooms.flatMap(_.mapPoints).toSet
+
+  def finish: Rngable[MapWithRooms] =
+    if (maxAttempts == 0) Rngable.pure(MapWithRooms(addRooms, roomPoints)) else addRoom.flatMap(_.finish)
 }
 
-object CreateRooms {
+private object CreateRooms {
   def go(
       minRoomWidth: Int, maxRoomWidth: Int,
       minRoomHeight: Int, maxRoomHeight: Int,
       mapWidth: Int, mapHeight: Int,
       maxAttempts: Int,
-  ): Rngable[BattleMap] =
+  ): Rngable[MapWithRooms] =
     new CreateRooms(
       minRoomWidth: Int, maxRoomWidth: Int,
       minRoomHeight: Int, maxRoomHeight: Int,

@@ -20,7 +20,7 @@ private object Focuser {
       case _ => ()
     }
     override def onError(error: Throwable) = ???
-    override def onCompleted() = ???
+    override def onCompleted() = ()
   }
   def composite[T](hs: Focuser[T]*) = new Focuser[T] {
     override def focus(t: T) = hs.foreach(_ focus t)
