@@ -2,7 +2,7 @@ package com.nessie.model.map.gen
 
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
-import com.nessie.model.map.{BattleMap, DirectionalMapPoint, EmptyMapObject, FullWall, MapPoint, TunnelMapObject}
+import com.nessie.model.map.{BattleMap, DirectionalMapPoint, EmptyMapObject, FullWall, MapPoint}
 import common.rich.RichT._
 import common.rich.func.ToMoreFoldableOps
 
@@ -28,12 +28,10 @@ private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
   private def isEmptyAt(map: BattleMap, p: MapPoint): Boolean = map(p) match {
     case EmptyMapObject => true
     case TunnelMapObject(_) => true
+    case RoomMapObject(_) => true
     case _ => false
   }
-  def go(rooms: MapWithRooms): Rngable[MapWithRooms] =
-    new CreateMazes(nonEmptyPoints(rooms.map), rooms.map)
-        .finish
-        .map(MapWithRooms(_, rooms.roomPoints))
+  def go(map: BattleMap): Rngable[BattleMap] = new CreateMazes(nonEmptyPoints(map), map).finish
 
   private class Digger(map: BattleMap, path: List[MapPoint], index: Int) {
     def dig: Rngable[BattleMap] = path match {
