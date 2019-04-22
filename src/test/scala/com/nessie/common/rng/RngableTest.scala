@@ -26,8 +26,19 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   property("Different for loop") {
     forAll((rng: StdGen) => {
       val (x, y) = mkRandom[(Int, Int)](rng)
-      println(x, y)
       x should not equal y
     })
+  }
+
+  property("Computation is trampolined") {
+    def randomVector(n: Int): Rngable[Vector[Int]] =
+      if (n == 0) Rngable.pure[Vector[Int]](Vector.empty) else for {
+        x <- mkRandom[Int]
+        y <- mkRandom[Int]
+        result <- randomVector(n - 2).map(Vector(x, y) ++ _)
+      } yield result
+    noException shouldBe thrownBy {
+      randomVector(100000).mkRandom(StdGen.fromSeed(0))
+    }
   }
 }

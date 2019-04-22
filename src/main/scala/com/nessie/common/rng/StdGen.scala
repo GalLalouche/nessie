@@ -4,11 +4,12 @@ import scala.util.Random
 
 class StdGen(val seed: Long ) {
   def random: Random = new Random(seed)
-  def nextSeed: Long = next._1
   def next: (Long, StdGen) = {
     val nextSeed = random.nextLong()
     nextSeed -> new StdGen(nextSeed)
   }
+  def nextSeed: Long = next._1
+  def nextGen: StdGen = next._2
   def split: (StdGen, StdGen) = {
     val nextSeed1 = random.nextLong()
     val nextSeed2 = new Random(nextSeed1 + 1).nextLong()
