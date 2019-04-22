@@ -14,7 +14,7 @@ import scalafx.stage.Stage
 
 import scalaz.concurrent.Task
 
-private class ScalaFxView extends View
+private class ScalaFxView(customizer: ScalaFxViewCustomizer) extends View
     with MoreObservableInstances with ToMoreMonadPlusOps {
   private var stage: Stage = _
   private var mapGrid: MapGrid = _
@@ -34,7 +34,7 @@ private class ScalaFxView extends View
   }
 
   override def updateState(gsc: GameStateChange, gs: GameState): Unit = {
-    mapGrid = new MapGrid(gs.map)
+    mapGrid = new MapGrid(gs.map, customizer.mapCustomizer)
     propPane = new PropertiesPane(gs)
     eqBar = new EventQueueBar(gs)
     val obs = Focuser.observer(Focuser.composite(

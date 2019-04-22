@@ -23,10 +23,10 @@ import scalafx.scene.control.Button
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
-private class MapGrid(map: BattleMap)
+private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     extends ToMoreFunctorOps with MoreObservableInstances {
   private val cells: Map[MapPoint, BorderPane] = map.points
-      .map {case (p, o) => MapGrid.createCell(o).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
+      .map {case (p, o) => MapGrid.createCell(o, customizer).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
       .mapBy(toPoint)
 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] =
@@ -45,14 +45,11 @@ private class MapGrid(map: BattleMap)
     })(cells(pd.toPoint))
   }
 
-  // Color full walls as black
-  for (
-    (point, bo) <- cells if map(point) == FullWall
-  ) bo.setBaseColor("black")
-  // Color tunnels as yellow
-  for (
-    (point, bo) <- cells if map(point).isInstanceOf[TunnelMapObject]
-  ) bo.setBaseColor("yellow")
+  // Color cells
+  for ((point, bo) <- cells) {
+    val obj = map(point)
+    customizer.cellColor.orElse(defaultColors).lift(obj).foreach(bo.setBaseColor)
+  }
 
   val node = new GridPane() {
     children = cells.values
@@ -104,13 +101,15 @@ private object MapGrid {
   private val CellSide = 40
   private val WallWidth = 5
 
-  private def createCell(o: BattleMapObject): BorderPane = {
-    def text(o: BattleMapObject): String = o match {
+  private def defaultColors: PartialFunction[BattleMapObject, String] = {
+    case FullWall => "black"
+  }
+  private def createCell(o: BattleMapObject, customizer: ScalaFxMapCustomizer): BorderPane = {
+    def text(o: BattleMapObject): String = customizer.text.lift(o).getOrElse(o match {
       case EmptyMapObject => ""
       case FullWall => "*"
-      case TunnelMapObject(i) => s"$i"
       case CombatUnitObject(u) => NodeUtils.shortName(u)
-    }
+    })
     new BorderPane() {
       center = new Button(text(o)) {
         prefHeight = CellSide
