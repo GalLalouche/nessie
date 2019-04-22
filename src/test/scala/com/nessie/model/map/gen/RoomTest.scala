@@ -36,6 +36,9 @@ class RoomTest extends FreeSpec with AuxSpecs {
     $.pointNotInRectangle(MapPoint(1, 3)) shouldReturn true
     $.pointNotInRectangle(MapPoint(2, 3)) shouldReturn true
     $.pointNotInRectangle(MapPoint(3, 3)) shouldReturn true
-    $.pointNotInRectangle(MapPoint(4, 3)) shouldReturn true
+  }
+
+  "noOverlap" in {
+    Room(0, 5, 10, 1).noOverlap(Room(5, 0, 1, 10)) shouldReturn false
   }
 }
