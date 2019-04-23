@@ -125,6 +125,12 @@ abstract class BattleMap(val width: Int, val height: Int)
         (dmp.x == width - 1 && dmp.direction == Direction.Right) ||
         (dmp.y == height - 1 && dmp.direction == Direction.Down)
   def neighbors(mp: MapPoint): Set[MapPoint] = mp.neighbors.filter(isInBounds).toSet
+  /** Neighbors without a wall in between. */
+  def reachableNeighbors(mp: MapPoint): Set[MapPoint] = mp.neighbors.view
+      .filter(isInBounds)
+      .filter(other => isEmptyAt(DirectionalMapPoint.between(mp, other)))
+      .filter(apply(_) != FullWall) // TODO add a method to object to check if can traverse to
+      .toSet
 }
 
 object BattleMap {

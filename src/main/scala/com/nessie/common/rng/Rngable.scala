@@ -1,5 +1,6 @@
 /*
 Copyright (c) 2013 National ICT Australia Limited
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,6 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Adapted from https://github.com/NICTA/rng
 package com.nessie.common.rng
 
+import com.nessie.common.Percentage
+
+import scala.math.Ordering.Implicits._
 import scala.util.Random
 
 import scalaz.{-\/, \/-, Free}
@@ -67,6 +71,7 @@ object Rngable {
   implicit val DoubleEv: Rngable[Double] = fromRandom(_.nextDouble())
   implicit val FloatEv: Rngable[Float] = DoubleEv.map(_.toInt)
   implicit val CharEv: Rngable[Char] = fromRandom(_.nextPrintableChar())
+  def boolean(p: Percentage): Rngable[Boolean] = DoubleEv.map(p > _)
   def stringAtLength(length: Int): Rngable[String] = fromRandom(_.nextString(length))
   //implicit def IterableEv[A](implicit ev: Rng[A]): Rng[Iterable[A]] = (rng: StdGen) => {
   //  val (rng1, rng2) = rng.split
@@ -76,6 +81,16 @@ object Rngable {
   def sample[A](seq: IndexedSeq[A]): Rngable[A] = {
     require(seq.nonEmpty)
     intRange(0, seq.size).map(seq.apply)
+  }
+  def keepWithProbability[A](p: Percentage, as: TraversableOnce[A]): Rngable[List[A]] = {
+    def aux(as: List[A]): Rngable[List[A]] = as match {
+      case Nil => Rngable.pure(Nil)
+      case x :: xs => for {
+        keepX <- boolean(p)
+        tail <- aux(xs)
+      } yield if (keepX) x :: tail else tail
+    }
+    aux(as.toList)
   }
 
   trait ToRngableOps {
