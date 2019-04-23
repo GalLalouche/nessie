@@ -37,20 +37,15 @@ private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
     def dig: Rngable[BattleMap] = path match {
       case Nil => Rngable.pure(map)
       case mp :: tail =>
-        println(s"At <$mp>")
         val mapDiggedAtLocation = map.mapIf(_ (mp) == FullWall).to(_.remove(mp).place(mp, TunnelMapObject(index)))
         val filledNeighbors = map.neighbors(mp).filterNot(isEmptyAt(mapDiggedAtLocation, _)).toVector
         if (filledNeighbors.isEmpty) {
-          println("No filled neighbors, retreating")
           new Digger(mapDiggedAtLocation, tail, index).dig
         } else {
           for {
             next <- Rngable.sample(filledNeighbors)
-            _ = println(s"Next = <$next>")
             wall = DirectionalMapPoint.between(mp, next)
-            _ = println(s"Tearing down the wall @ <$wall>")
             mapWithoutWall = mapDiggedAtLocation.remove(wall)
-            _ = println(s"Moving on to <$next>")
             result <- new Digger(mapWithoutWall, next :: path, index + 1).dig
           } yield result
         }

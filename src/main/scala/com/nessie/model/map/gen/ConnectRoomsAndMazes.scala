@@ -13,7 +13,8 @@ import scala.annotation.tailrec
 import scalaz.std.VectorInstances
 import scalaz.syntax.ToTraverseOps
 
-/** Outline of algorithm:
+/**
+ * Outline of algorithm:
  *
  * Pick a random room point
  * Mark said point as Reachable
