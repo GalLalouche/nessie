@@ -116,8 +116,17 @@ abstract class BattleMap(val width: Int, val height: Int)
 
   /** Adds walls between all points. */
   def wallItUp: BattleMap = betweens.map(_._1).foldLeft(this)(_.place(_, Wall))
-  /** marks all points as a FullWall. */
-  def fillItUp: BattleMap = points.map(_._1).foldLeft(this)(_.place(_, FullWall))
+  /** Marks all points as a FullWall. */
+  def fillItAll: BattleMap = points.map(_._1).foldLeft(this)(_.place(_, FullWall))
+  /** Marks the points as a FullWall and places walls around it. */
+  def fill(next: MapPoint): BattleMap = {
+    // TODO extract to method
+    Direction.values.map(DirectionalMapPoint(next, _)).foldLeft(place(next, FullWall))(
+      // TODO replace safely
+      (map, dmp) => map.mapIf(_.isEmptyAt(dmp)).to(map.place(dmp, Wall)))
+
+  }
+
 
   def isBorder(dmp: DirectionalMapPoint): Boolean =
     (dmp.x == 0 && dmp.direction == Direction.Left) ||
