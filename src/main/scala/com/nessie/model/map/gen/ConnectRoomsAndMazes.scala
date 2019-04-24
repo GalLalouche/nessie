@@ -25,9 +25,10 @@ import scalaz.syntax.ToTraverseOps
  *   Pick all other points in p with probability *additionalPathProbability* and break down their walls
  */
 private object ConnectRoomsAndMazes {
+  def wrap(o: BattleMapObject, index: Int) = ReachableMapObject(o.asInstanceOf[AlgorithmStepMapObject], index)
   def go(map: BattleMap, additionalPathProbability: Percentage): Rngable[BattleMap] = for {
     firstPoint <- Rngable.sample(map.objects.view.filter(_._2.isInstanceOf[RoomMapObject]).map(_._1).toVector)
-    firstPointMarked = map.replace(firstPoint, ReachableMapObject(0))
+    firstPointMarked = map.replace(firstPoint, wrap(map(firstPoint), 0))
     allMarked = markReachable(firstPointMarked, map.reachableNeighbors(firstPoint).toList, 1, Set())
     result <- new Aux(
       map = allMarked,
@@ -65,7 +66,7 @@ private object ConnectRoomsAndMazes {
       val next :: tail = queue
       if (visited(next)) markReachable(map, tail, index, visited) else {
         val nextPoints = map.reachableNeighbors(next).toList ++ tail
-        val nextMap = map.mapIf(map(next).|>(isNotReachable)).to(_.replace(next, ReachableMapObject(index)))
+        val nextMap = map.mapIf(map(next).|>(isNotReachable)).to(_.replace(next, wrap(map(next), index)))
         markReachable(nextMap, nextPoints, index, visited + next)
       }
     }
