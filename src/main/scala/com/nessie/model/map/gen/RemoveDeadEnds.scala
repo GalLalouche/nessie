@@ -1,5 +1,6 @@
 package com.nessie.model.map.gen
 
+
 import com.nessie.model.map.{BattleMap, MapPoint}
 import common.rich.func.{MoreIterableInstances, ToMoreMonadPlusOps}
 
@@ -19,10 +20,16 @@ private object RemoveDeadEnds extends ToMoreMonadPlusOps with MoreIterableInstan
           .collect {
             case e: (MapPoint, AlgorithmStepMapObject) => e._1
           }
-          .filter(map.reachableNeighbors(_).size == 1)
+          .filter(e => hasExactSize(map.reachableNeighbors(e), 1))
       if (deadEnds.isEmpty) map else aux(deadEnds.foldLeft(map)((map, next) => map.remove(next).fill(next)))
     }
     assert(map.objects.forall(_._2.isInstanceOf[ReachableMapObject]))
     aux(map)
+  }
+
+  // TODO move to ScalaCommon
+  private def hasExactSize(i: Iterable[_], size: Int) = {
+    val iterator = i.iterator.drop(size - 1)
+    iterator.hasNext && {iterator.next(); iterator.isEmpty}
   }
 }
