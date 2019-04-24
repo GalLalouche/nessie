@@ -3,7 +3,6 @@ package com.nessie.model.map.gen
 import com.nessie.common.rng.Rngable
 import com.nessie.common.Percentage
 import com.nessie.model.map.{BattleMap, BattleMapObject, DirectionalMapPoint, MapPoint, Wall}
-import com.nessie.model.map.gen.ConnectRoomsAndMazes._
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.RichTuple._
@@ -25,37 +24,38 @@ import scalaz.syntax.ToTraverseOps
  *   Pick a random point p in ps and tear down the wall between p and its reachable neighbor
  *   Pick all other points in p with probability *additionalPathProbability* and break down their walls
  */
-private class ConnectRoomsAndMazes private(
-    map: BattleMap,
-    additionalPathProbability: Percentage,
-    index: Int,
-) extends ToTraverseOps with VectorInstances {
-  def finish: Rngable[BattleMap] = {
-    val walls = perimeterWalls(map)
-    if (walls.isEmpty) Rngable.pure(map) else for {
-      wall <- Rngable.sample(walls)
-      otherWalls <- Rngable.keepWithProbability(additionalPathProbability, walls.toList)
-      nextPoint = wall.points.mapTo {case (x, y) => if (map(x) |> isReachable) y else x}
-      nextMap = otherWalls.iterator.filter(_ != wall).foldLeft(map remove wall)(_ remove _)
-      result <- new ConnectRoomsAndMazes(
-        markReachable(nextMap, List(nextPoint), index, Set()), additionalPathProbability, index + 1).finish
-    } yield result
-  }
-}
-
 private object ConnectRoomsAndMazes {
-  private def isReachable(o: BattleMapObject) = o.isInstanceOf[ReachableMapObject]
-  private def isNotReachable(o: BattleMapObject) = isReachable(o).isFalse
   def go(map: BattleMap, additionalPathProbability: Percentage): Rngable[BattleMap] = for {
     firstPoint <- Rngable.sample(map.points.view.filter(_._2.isInstanceOf[RoomMapObject]).map(_._1).toVector)
     firstPointMarked = map.replace(firstPoint, ReachableMapObject(0))
     allMarked = markReachable(firstPointMarked, map.reachableNeighbors(firstPoint).toList, 1, Set())
-    result <- new ConnectRoomsAndMazes(
+    result <- new Aux(
       map = allMarked,
       additionalPathProbability = additionalPathProbability,
       index = 2,
     ).finish
   } yield result
+
+  private class Aux(
+      map: BattleMap,
+      additionalPathProbability: Percentage,
+      index: Int,
+  ) extends ToTraverseOps with VectorInstances {
+    def finish: Rngable[BattleMap] = {
+      val walls = perimeterWalls(map)
+      if (walls.isEmpty) Rngable.pure(map) else for {
+        wall <- Rngable.sample(walls)
+        otherWalls <- Rngable.keepWithProbability(additionalPathProbability, walls.toList)
+        nextPoint = wall.points.mapTo {case (x, y) => if (map(x) |> isReachable) y else x}
+        nextMap = otherWalls.iterator.filter(_ != wall).foldLeft(map remove wall)(_ remove _)
+        result <- new Aux(
+          markReachable(nextMap, List(nextPoint), index, Set()), additionalPathProbability, index + 1).finish
+      } yield result
+    }
+  }
+
+  private def isReachable(o: BattleMapObject) = o.isInstanceOf[ReachableMapObject]
+  private def isNotReachable(o: BattleMapObject) = isReachable(o).isFalse
 
   // TODO I should really start using plain old graph algorithms for this :|
   @tailrec
