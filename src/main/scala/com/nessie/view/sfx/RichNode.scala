@@ -13,6 +13,7 @@ private object RichNode {
     def setBackgroundColor(color: String): Unit = runLater(n.setStyle(Styles.backgroundColor(color)))
     def setBaseColor(color: String): Unit = runLater(n.setStyle(Styles.baseColor(color)))
     def setFontWeight(style: String): Unit = runLater(n.setStyle(Styles.fontWeight(style)))
+    def setFontSize(size: Int): Unit = runLater(n.setStyle(Styles.fontSize(size)))
 
     def toObservable[T <: Event](eventType: EventType[T]): Observable[T] = {
       val $ = PublishSubject[T]()

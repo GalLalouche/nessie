@@ -28,7 +28,7 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     p -> MapGrid.createCell(o, customizer).<|(GridPane.setConstraints(_, p.x + 1, p.y + 1))
   }.toMap
 
-  val mouseEvents: Observable[(MouseEvent, MapPoint)] =
+  val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeUtils.mouseEvents(cells.mapValues(_.center.get))
     NodeUtils.mouseEvents(cells.mapValues(_.center.get))
 
   // Color walls.
@@ -45,10 +45,8 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
   }
 
   // Color cells
-  for ((point, bo) <- cells) {
-    val obj = map(point)
-    customizer.cellColor.orElse(defaultColors).lift(obj).foreach(bo.setBaseColor)
-  }
+  for ((point, bo) <- cells)
+    customizer.cellColor.orElse(defaultColors).lift(map(point)).foreach(bo.setBaseColor)
 
   val node: Node = {
     val yRow = createCoordinateCells("X\\Y" +: 0.until(map.width), (_, 0))
@@ -101,7 +99,7 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
 }
 
 private object MapGrid {
-  private val CellSide = 40
+  private val CellSide = 50
   private val WallWidth = 5
 
   private def defaultColors: PartialFunction[BattleMapObject, String] = {
@@ -130,7 +128,8 @@ private object MapGrid {
       center = new Button(text(o)) {
         prefHeight = CellSide
         prefWidth = CellSide
-      }
+        style = "-fx-font-size: 8pt"
+      } <| (_.setFontSize(8))
     }
   }
 

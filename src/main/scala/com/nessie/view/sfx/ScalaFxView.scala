@@ -24,7 +24,7 @@ private class ScalaFxView(customizer: ScalaFxViewCustomizer) extends View
   private var hasClosed = false
   Platform.runLater {
     stage = new Stage {
-      scene = new Scene(1000, 1000)
+      scene = new Scene(1200, 1200)
       onCloseRequest = (_: WindowEvent) => {
         hasClosed = true
         mapGrid.opt.foreach(_.killLastTask())

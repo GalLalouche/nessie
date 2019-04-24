@@ -5,6 +5,9 @@ private object Styles {
   val FontWeight = "-fx-font-weight"
   def fontWeight(value: String): String = style(FontWeight, value)
 
+  val FontSize = "-fx-font-size"
+  def fontSize(value: Int): String = style(FontSize, value + "pt")
+
   val BackgroundColor = "-fx-background-color"
   def backgroundColor(value: String): String = style(BackgroundColor, value)
 
