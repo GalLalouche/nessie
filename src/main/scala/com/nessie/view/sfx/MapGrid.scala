@@ -9,25 +9,24 @@ import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
 import com.nessie.view.sfx.MapGrid._
 import com.nessie.view.sfx.RichNode._
 import common.rich.RichT._
-import common.rich.collections.RichTraversableOnce._
-import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
+import common.rich.func.{MoreIterableInstances, MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
 import javafx.{scene => jfxs}
 import monocle.Optional
 import monocle.function.Index
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
 import scalafx.beans.property.ObjectProperty
-import scalafx.geometry.Side
+import scalafx.geometry.{Pos, Side}
 import scalafx.scene.Node
-import scalafx.scene.control.Button
+import scalafx.scene.control.{Button, Label}
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
 private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
-    extends ToMoreFunctorOps with MoreObservableInstances {
-  private val cells: Map[MapPoint, BorderPane] = map.objects
-      .map {case (p, o) => MapGrid.createCell(o, customizer).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
-      .mapBy(toPoint)
+    extends ToMoreFunctorOps with MoreObservableInstances with MoreIterableInstances {
+  private val cells: Map[MapPoint, BorderPane] = map.objects.map {case (p, o) =>
+    p -> MapGrid.createCell(o, customizer).<|(GridPane.setConstraints(_, p.x + 1, p.y + 1))
+  }.toMap
 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] =
     NodeUtils.mouseEvents(cells.mapValues(_.center.get))
@@ -51,8 +50,12 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     customizer.cellColor.orElse(defaultColors).lift(obj).foreach(bo.setBaseColor)
   }
 
-  val node = new GridPane() {
-    children = cells.values
+  val node: Node = {
+    val yRow = createCoordinateCells("X\\Y" +: 0.until(map.width), (_, 0))
+    val xRow = createCoordinateCells(0.until(map.width), i => (0, i + 1))
+    new GridPane() {
+      children = xRow ++ yRow ++ cells.values
+    }
   }
 
   private def getMove(source: MapPoint, gs: GameState): PromiseZ[GameStateChange] = {
@@ -104,10 +107,23 @@ private object MapGrid {
   private def defaultColors: PartialFunction[BattleMapObject, String] = {
     case FullWall => "black"
   }
+  private def createCoordinateCells(seq: Seq[_], f: Int => (Int, Int)): Seq[BorderPane] =
+    seq.map(_.toString).zipWithIndex.map {case (l, i) =>
+      val (x, y) = f(i)
+      createCoordinateCell(l, x, y)
+    }
+  private def createCoordinateCell(text: String, x: Int, y: Int): BorderPane = new BorderPane() {
+    center = new Label(text) {
+      prefHeight = CellSide
+      prefWidth = CellSide
+      alignment = Pos.Center
+    } <| (_ setBaseColor "white")
+  } <| (GridPane.setConstraints(_, x, y))
+
   private def createCell(o: BattleMapObject, customizer: ScalaFxMapCustomizer): BorderPane = {
     def text(o: BattleMapObject): String = customizer.text.lift(o).getOrElse(o match {
       case EmptyMapObject => ""
-      case FullWall => "*"
+      case FullWall => ""
       case CombatUnitObject(u) => NodeUtils.shortName(u)
     })
     new BorderPane() {
@@ -137,6 +153,4 @@ private object MapGrid {
       bp
     })
   }
-
-  private def toPoint(e: Node): MapPoint = MapPoint(GridPane.getColumnIndex(e), GridPane.getRowIndex(e))
 }
