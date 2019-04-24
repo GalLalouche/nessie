@@ -50,8 +50,9 @@ abstract class BattleMap(val width: Int, val height: Int)
     if (isOccupiedAt(pd)) throw new MapOccupiedException(pd) else internalPlace(pd, o)
   }
 
-  def isEmptyAt(p: MapPoint): Boolean = apply(p) == EmptyMapObject
-  def isEmptyAt(pd: DirectionalMapPoint): Boolean = apply(pd) == EmptyBetweenMapObject
+  // Using eq for singletons is potentially faster
+  def isEmptyAt(p: MapPoint): Boolean = EmptyMapObject eq apply(p)
+  def isEmptyAt(pd: DirectionalMapPoint): Boolean = EmptyBetweenMapObject eq apply(pd)
   def isOccupiedAt(p: MapPoint): Boolean = isEmptyAt(p).isFalse
   def isOccupiedAt(pd: DirectionalMapPoint): Boolean = isEmptyAt(pd).isFalse
 
@@ -133,7 +134,8 @@ abstract class BattleMap(val width: Int, val height: Int)
   def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.view
       .filter(isInBounds)
       .filter(other => isEmptyAt(DirectionalMapPoint.between(mp, other)))
-      .filter(apply(_) != FullWall) // TODO add a method to object to check if can traverse to
+      .filter(apply(_).eq(FullWall).isFalse) // TODO add a method to object to check if can traverse to
+      .toStream
 }
 
 object BattleMap {

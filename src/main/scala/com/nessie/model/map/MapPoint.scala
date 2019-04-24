@@ -19,5 +19,5 @@ case class MapPoint(x: Int, y: Int) {
     case _ => Some(go(d))
   }
 
-  def neighbors: Iterable[MapPoint] = Direction.values.flatMap(safeGo)
+  def neighbors: Iterable[MapPoint] = Direction.values.view.flatMap(safeGo)
 }
