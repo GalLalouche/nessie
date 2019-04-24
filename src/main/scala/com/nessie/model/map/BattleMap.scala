@@ -84,7 +84,17 @@ abstract class BattleMap(val width: Int, val height: Int)
     }
   }
 
-  def betweenPoints: Iterable[DirectionalMapPoint] = points.flatMap(DirectionalMapPoint.around).toSet
+  def betweenPoints: Iterable[DirectionalMapPoint] = {
+    // Take the bottom and right border of every cell, in addition to the left side of the first column and
+    // the top side of the first row.
+    val topBorder = points.view.filter(_.y == 0).map(DirectionalMapPoint(_, Direction.Up))
+    val leftBorder = points.view.filter(_.x == 0).map(DirectionalMapPoint(_, Direction.Left))
+    val rest = points.view.flatMap(p => Vector(
+      DirectionalMapPoint(p, Direction.Down),
+      DirectionalMapPoint(p, Direction.Right),
+    ))
+    (topBorder ++ leftBorder ++ rest).toVector
+  }
   def betweenObjects: Iterable[(DirectionalMapPoint, BetweenMapObject)] = betweenPoints fproduct apply
 
   lazy val toGraph: Graph[MapPoint, UnDiEdge] = {
@@ -118,13 +128,12 @@ abstract class BattleMap(val width: Int, val height: Int)
         (dmp.y == 0 && dmp.direction == Direction.Up) ||
         (dmp.x == width - 1 && dmp.direction == Direction.Right) ||
         (dmp.y == height - 1 && dmp.direction == Direction.Down)
-  def neighbors(mp: MapPoint): Set[MapPoint] = mp.neighbors.filter(isInBounds).toSet
+  def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
   /** Neighbors without a wall in between. */
-  def reachableNeighbors(mp: MapPoint): Set[MapPoint] = mp.neighbors.view
+  def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.view
       .filter(isInBounds)
       .filter(other => isEmptyAt(DirectionalMapPoint.between(mp, other)))
       .filter(apply(_) != FullWall) // TODO add a method to object to check if can traverse to
-      .toSet
 }
 
 object BattleMap {
