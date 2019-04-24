@@ -34,14 +34,15 @@ private case class CreateRooms private(
     nextRooms = if (isValid(room) && isNonOverlapping(room)) room :: rooms else rooms
   } yield copy(rooms = nextRooms, maxAttempts = maxAttempts - 1)
 
-  private def roomIndex(p: MapPoint): Option[Int] = rooms.findIndex(_.pointInRectangle(p))
+  private def roomIndex(p: MapPoint): Option[RoomMapObject] =
+    rooms.findIndex(_.pointInRectangle(p)).map(RoomMapObject)
   private def inSameRoom(p1: MapPoint, p2: MapPoint): Boolean =
     rooms.exists(r => r.pointInRectangle(p1) && r.pointInRectangle(p2))
   private def addRooms: BattleMap = {
     val emptyMap: BattleMap = DictBattleMap(mapWidth, mapHeight).fillItAll.wallItUp
     //TODO add fold to BattleMap
     val removeFullWalls = emptyMap.points.map(_._1).foldLeft(emptyMap)((map, p) =>
-      roomIndex(p).map(RoomMapObject).mapHeadOrElse(map.remove(p).place(p, _), map)
+      roomIndex(p).mapHeadOrElse(map.replace(p, _), map)
     )
     removeFullWalls.betweens.map(_._1).foldLeft(removeFullWalls) {(map, dmp) =>
       map mapIf map.isBorder(dmp).isFalse to {

@@ -37,7 +37,7 @@ private class ConnectRoomsAndMazes(
       wall <- Rngable.sample(walls)
       otherWalls <- Rngable.keepWithProbability(additionalPathProbability, walls.toList)
       nextPoint = wall.points.mapTo {case (x, y) => if (map(x) |> isReachable) y else x}
-      nextMap = otherWalls.iterator.filter(_ != wall).foldLeft(map.remove(wall))(_.remove(_))
+      nextMap = otherWalls.iterator.filter(_ != wall).foldLeft(map remove wall)(_ remove _)
       result <- new ConnectRoomsAndMazes(
         markReachable(nextMap, List(nextPoint), index, Set()), additionalPathProbability, index + 1).finish
     } yield result
