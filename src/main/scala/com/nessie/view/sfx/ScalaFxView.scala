@@ -37,15 +37,18 @@ private class ScalaFxView(customizer: ScalaFxViewCustomizer) extends View
     mapGrid = new MapGrid(gs.map, customizer.mapCustomizer)
     propPane = new PropertiesPane(gs)
     eqBar = new EventQueueBar(gs)
-    val obs = Focuser.observer(Focuser.composite(
+
+    val combatUnitObserver = Focuser.observer(Focuser.composite(
       mapGrid.highlighter,
-      propPane.highlighter,
       eqBar.highlighter,
+      propPane.combatUnitHighlighter,
     ))
     mapGrid.mouseEvents
         .oMap(e => gs.map(e._2).safeCast[CombatUnitObject].map(_.unit).map(e._1 -> _))
-        .subscribe(obs)
-    eqBar.mouseEvents.subscribe(obs)
+        .subscribe(combatUnitObserver)
+    eqBar.mouseEvents.subscribe(combatUnitObserver)
+    mapGrid.mouseEvents.subscribe(Focuser.observer(propPane.pointHighlighter))
+
     Platform.runLater {
       logger.append(gsc)
       stage.scene.get.content = new BorderPane {
