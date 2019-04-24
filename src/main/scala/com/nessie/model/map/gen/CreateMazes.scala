@@ -40,8 +40,7 @@ private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
     map.points.map(_._1).filterNot(isEmptyAt(map, _)).toSet
   private def isEmptyAt(map: BattleMap, p: MapPoint): Boolean = map(p) match {
     case EmptyMapObject => true
-    case TunnelMapObject(_) => true
-    case RoomMapObject(_) => true
+    case _: AlgorithmStepMapObject => true
     case _ => false
   }
 }
