@@ -10,7 +10,7 @@ import scalaz.std.OptionInstances
 import scalaz.syntax.ToMonadOps
 
 /** Fills up the locations between the rooms. */
-private class CreateMazes(
+private class CreateMazes private(
     remainingCells: Set[MapPoint], private val result: BattleMap
 ) extends ToMonadOps with ToRngableOps
     with ToMoreFoldableOps with OptionInstances {
@@ -37,18 +37,14 @@ private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
     def dig: Rngable[BattleMap] = path match {
       case Nil => Rngable.pure(map)
       case mp :: tail =>
-        val mapDiggedAtLocation = map.mapIf(_ (mp) == FullWall).to(_.replace(mp, TunnelMapObject(index)))
-        val filledNeighbors = map.neighbors(mp).filterNot(isEmptyAt(mapDiggedAtLocation, _)).toVector
-        if (filledNeighbors.isEmpty) {
-          new Digger(mapDiggedAtLocation, tail, index).dig
-        } else {
-          for {
-            next <- Rngable.sample(filledNeighbors)
-            wall = DirectionalMapPoint.between(mp, next)
-            mapWithoutWall = mapDiggedAtLocation.remove(wall)
-            result <- new Digger(mapWithoutWall, next :: path, index + 1).dig
-          } yield result
-        }
+        val mapDugAtLocation = map.mapIf(_ (mp) == FullWall).to(_.replace(mp, TunnelMapObject(index)))
+        val filledNeighbors = map.neighbors(mp).filterNot(isEmptyAt(mapDugAtLocation, _)).toVector
+        if (filledNeighbors.isEmpty) new Digger(mapDugAtLocation, tail, index).dig else for {
+          next <- Rngable.sample(filledNeighbors)
+          wall = DirectionalMapPoint.between(mp, next)
+          mapWithoutWall = mapDugAtLocation.remove(wall)
+          result <- new Digger(mapWithoutWall, next :: path, index + 1).dig
+        } yield result
     }
   }
 }

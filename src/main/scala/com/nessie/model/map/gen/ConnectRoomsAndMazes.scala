@@ -24,9 +24,8 @@ import scalaz.syntax.ToTraverseOps
  *   non reachable, we can assume there is a wall between these points and a reachable point.
  *   Pick a random point p in ps and tear down the wall between p and its reachable neighbor
  *   Pick all other points in p with probability *additionalPathProbability* and break down their walls
- * </p>
  */
-private class ConnectRoomsAndMazes(
+private class ConnectRoomsAndMazes private(
     map: BattleMap,
     additionalPathProbability: Percentage,
     index: Int,
