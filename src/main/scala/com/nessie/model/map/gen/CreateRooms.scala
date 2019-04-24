@@ -2,7 +2,7 @@ package com.nessie.model.map.gen
 
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
-import com.nessie.model.map.{BattleMap, DictBattleMap, MapPoint}
+import com.nessie.model.map.{BattleMap, MapPoint, VectorBattleMap}
 import common.rich.collections.RichSeq._
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
@@ -14,23 +14,25 @@ import scalaz.syntax.ToMonadOps
 /** Creates a BattleMap made up of just non-overlapping rooms. */
 private object CreateRooms {
   def go(
+      initialMap: BattleMap,
       minRoomWidth: Int, maxRoomWidth: Int,
       minRoomHeight: Int, maxRoomHeight: Int,
-      mapWidth: Int, mapHeight: Int,
       maxAttempts: Int,
   ): Rngable[BattleMap] = Aux(
+    initialMap = initialMap,
     minRoomWidth: Int, maxRoomWidth: Int,
     minRoomHeight: Int, maxRoomHeight: Int,
-    mapWidth: Int, mapHeight: Int,
     rooms = Nil, maxAttempts: Int,
   ).finish
 
   private case class Aux(
+      initialMap: BattleMap,
       minRoomWidth: Int, maxRoomWidth: Int,
       minRoomHeight: Int, maxRoomHeight: Int,
-      mapWidth: Int, mapHeight: Int,
       rooms: List[Room], maxAttempts: Int,
   ) extends ToMonadOps with ToRngableOps with ToMoreFoldableOps with OptionInstances {
+    private val mapWidth = initialMap.width
+    private val mapHeight = initialMap.height
     private implicit val rngableRoom: Rngable[Room] = for {
       x <- Rngable.intRange(0, mapWidth)
       y <- Rngable.intRange(0, mapHeight)
@@ -50,7 +52,7 @@ private object CreateRooms {
     private def inSameRoom(p1: MapPoint, p2: MapPoint): Boolean =
       rooms.exists(r => r.pointInRectangle(p1) && r.pointInRectangle(p2))
     private def addRooms: BattleMap = {
-      val fullMap: BattleMap = DictBattleMap(mapWidth, mapHeight).fillItAll.wallItUp
+      val fullMap: BattleMap = initialMap.clearAllPoints.fillItAll.wallItUp
       val removeFullWallsInRooms =
         fullMap.foldPoints((map, p) => roomIndex(p).mapHeadOrElse(map.replace(p, _), map))
       val removeWallsInsideRooms = removeFullWallsInRooms.foldBetweenPoints((map, dmp) =>
