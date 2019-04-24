@@ -5,10 +5,10 @@ class DictBattleMap private(objects: Map[MapPoint, BattleMapObject],
   override def apply(p: MapPoint) = objects.getOrElse(p, EmptyMapObject)
   override def apply(pd: DirectionalMapPoint) = betweens.getOrElse(pd, EmptyBetweenMapObject)
 
-  override def internalPlace(p: MapPoint, o: BattleMapObject) =
-    new DictBattleMap(objects + (p -> o), betweens, width, height)
-  override def internalPlace(pd: DirectionalMapPoint, o: BetweenMapObject) =
-    new DictBattleMap(objects, betweens + (pd -> o), width, height)
+  override def internalPlace(p: MapPoint, o: BattleMapObject) = new DictBattleMap(
+    if (o == EmptyMapObject) objects - p else objects + (p -> o), betweens, width, height)
+  override def internalPlace(pd: DirectionalMapPoint, o: BetweenMapObject) = new DictBattleMap(
+    objects, if (o == EmptyBetweenMapObject) betweens - pd else betweens + (pd -> o), width, height)
 }
 
 object DictBattleMap {
