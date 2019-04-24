@@ -102,7 +102,7 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
 
   def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
-  def clearAllPoints: BattleMap = foldPoints(_ remove _)
+  def clearAllPoints: BattleMap = foldPoints(_ removeSafely _)
   /** Marks the points as a FullWall and places walls around it. */
   def fillItAll: BattleMap = foldPoints(_.place(_, FullWall))
   def foldBetweenPoints: ((BattleMap, DirectionalMapPoint) => BattleMap) => BattleMap =
