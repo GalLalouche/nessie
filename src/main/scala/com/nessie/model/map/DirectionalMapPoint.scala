@@ -42,8 +42,8 @@ object DirectionalMapPoint {
     if (d == Down ||
         d == Right ||
         d == Up && y == 0 ||
-        d == Left && x == 0)
-      new DirectionalMapPoint(x, y, d)
+        d == Left && x == 0
+    ) new DirectionalMapPoint(x, y, d)
     else d match {
       case Up => new DirectionalMapPoint(x, y - 1, Down)
       case Left => new DirectionalMapPoint(x - 1, y, Right)

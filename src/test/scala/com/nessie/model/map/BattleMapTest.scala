@@ -51,8 +51,8 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
       "Between" in {an[IllegalArgumentException] should be thrownBy $.place(emptyBetween, EmptyBetweenMapObject)}
     }
     "Remove empty" - {
-      "Object" in {an[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1))}
-      "Between" in {an[MapEmptyException] should be thrownBy $.remove(DirectionalMapPoint(0, 0, Direction.Down))}
+      "Object" in {a[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1))}
+      "Between" in {a[MapEmptyException] should be thrownBy $.remove(DirectionalMapPoint(0, 0, Direction.Down))}
     }
   }
   "betweens" - {
