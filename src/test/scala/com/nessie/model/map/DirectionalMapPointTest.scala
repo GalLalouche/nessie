@@ -61,4 +61,13 @@ class DirectionalMapPointTest extends FreeSpec with AuxSpecs {
     DirectionalMapPoint.between(MapPoint(2, 5), MapPoint(2, 4)) shouldReturn DirectionalMapPoint(2, 4, Down)
     DirectionalMapPoint.between(MapPoint(2, 5), MapPoint(2, 6)) shouldReturn DirectionalMapPoint(2, 6, Up)
   }
+
+  "around" in {
+    DirectionalMapPoint.around(MapPoint(2, 5)) shouldSetEqual Vector(
+      DirectionalMapPoint(MapPoint(2, 5), Direction.Up),
+      DirectionalMapPoint(MapPoint(2, 5), Direction.Down),
+      DirectionalMapPoint(MapPoint(2, 5), Direction.Left),
+      DirectionalMapPoint(MapPoint(2, 5), Direction.Right),
+    )
+  }
 }

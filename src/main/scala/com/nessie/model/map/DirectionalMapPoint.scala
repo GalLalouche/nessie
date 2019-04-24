@@ -35,6 +35,8 @@ final class DirectionalMapPoint private(val x: Int, val y: Int, val direction: D
 }
 
 object DirectionalMapPoint {
+  def around(p: MapPoint): Iterable[DirectionalMapPoint] = Direction.values.map(DirectionalMapPoint(p, _))
+
   def apply(p: MapPoint, d: Direction): DirectionalMapPoint = apply(p.x, p.y, d)
   def apply(x: Int, y: Int, d: Direction): DirectionalMapPoint =
     if (d == Down ||
