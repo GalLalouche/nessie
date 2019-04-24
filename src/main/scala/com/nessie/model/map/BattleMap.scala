@@ -101,11 +101,15 @@ abstract class BattleMap(val width: Int, val height: Int)
     Graph.from(vertices, edges)
   }
 
-  /** Adds walls between all points. */
-  def wallItUp: BattleMap = betweenPoints.foldLeft(this)(_.place(_, Wall))
-  /** Marks all points as a FullWall. */
-  def fillItAll: BattleMap = points.foldLeft(this)(_.place(_, FullWall))
+  def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
+  def clearAllPoints: BattleMap = foldPoints(_ remove _)
   /** Marks the points as a FullWall and places walls around it. */
+  def fillItAll: BattleMap = foldPoints(_.place(_, FullWall))
+  def foldBetweenPoints: ((BattleMap, DirectionalMapPoint) => BattleMap) => BattleMap =
+    betweenPoints.foldLeft(this)
+  /** Adds walls between all points. */
+  def wallItUp: BattleMap = foldBetweenPoints(_.place(_, Wall))
+  /** Marks all points as a FullWall. */
   def fill(next: MapPoint): BattleMap =
     DirectionalMapPoint.around(next).foldLeft(place(next, FullWall))(_.replaceSafely(_, Wall))
 

@@ -17,10 +17,9 @@ private object RemoveDeadEnds {
       val deadEnds: Iterable[MapPoint] = map.points.view
           .filter(map.isEmptyAt)
           .filter(map.reachableNeighbors(_).size == 1)
-      if (deadEnds.isEmpty) map else aux(deadEnds.foldLeft(map)((map, next) => map.fill(next)))
+      if (deadEnds.isEmpty) map else aux(deadEnds.foldLeft(map)(_ fill _))
     }
     assert(map.objects.forall(_._2.isInstanceOf[ReachableMapObject]))
-    val clearedMap = map.points.foldLeft(map)(_ remove _)
-    aux(clearedMap)
+    aux(map.clearAllPoints)
   }
 }

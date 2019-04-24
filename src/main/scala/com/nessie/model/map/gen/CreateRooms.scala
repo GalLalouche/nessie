@@ -50,17 +50,15 @@ private object CreateRooms {
     private def inSameRoom(p1: MapPoint, p2: MapPoint): Boolean =
       rooms.exists(r => r.pointInRectangle(p1) && r.pointInRectangle(p2))
     private def addRooms: BattleMap = {
-      val emptyMap: BattleMap = DictBattleMap(mapWidth, mapHeight).fillItAll.wallItUp
-      //TODO add fold to BattleMap
-      val removeFullWalls = emptyMap.points.foldLeft(emptyMap)((map, p) =>
-        roomIndex(p).mapHeadOrElse(map.replace(p, _), map)
-      )
-      removeFullWalls.betweenPoints.foldLeft(removeFullWalls) {(map, dmp) =>
+      val fullMap: BattleMap = DictBattleMap(mapWidth, mapHeight).fillItAll.wallItUp
+      val removeFullWallsInRooms =
+        fullMap.foldPoints((map, p) => roomIndex(p).mapHeadOrElse(map.replace(p, _), map))
+      val removeWallsInsideRooms = removeFullWallsInRooms.foldBetweenPoints((map, dmp) =>
         map mapIf map.isBorder(dmp).isFalse to {
           val (p1, p2) = dmp.points
           map.mapIf(inSameRoom(p1, p2)).to(_.remove(dmp))
-        }
-      }
+        })
+      removeWallsInsideRooms
     }
 
     def finish: Rngable[BattleMap] = if (maxAttempts == 0) Rngable.pure(addRooms) else addRoom.flatMap(_.finish)
