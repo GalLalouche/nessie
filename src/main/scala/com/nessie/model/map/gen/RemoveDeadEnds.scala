@@ -14,13 +14,13 @@ private object RemoveDeadEnds {
   def apply(map: BattleMap): BattleMap = {
     @tailrec
     def aux(map: BattleMap): BattleMap = {
-      val deadEnds: Iterable[MapPoint] = map.points.map(_._1).view
+      val deadEnds: Iterable[MapPoint] = map.points.view
           .filter(map.isEmptyAt)
           .filter(map.reachableNeighbors(_).size == 1)
       if (deadEnds.isEmpty) map else aux(deadEnds.foldLeft(map)((map, next) => map.fill(next)))
     }
-    assert(map.points.forall(_._2.isInstanceOf[ReachableMapObject]))
-    val clearedMap = map.points.map(_._1).foldLeft(map)(_.remove(_))
+    assert(map.objects.forall(_._2.isInstanceOf[ReachableMapObject]))
+    val clearedMap = map.points.foldLeft(map)(_ remove _)
     aux(clearedMap)
   }
 }

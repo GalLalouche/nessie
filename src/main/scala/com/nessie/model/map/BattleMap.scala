@@ -1,7 +1,7 @@
 package com.nessie.model.map
 
 import common.rich.RichT._
-import common.rich.func.MoreSetInstances
+import common.rich.func.{MoreIterableInstances, MoreSetInstances}
 import common.rich.primitives.RichBoolean._
 import monocle.Lens
 import scalax.collection.GraphEdge.UnDiEdge
@@ -13,7 +13,7 @@ import scalaz.syntax.ToFunctorOps
 
 /** An (immutable) map of a given level. */
 abstract class BattleMap(val width: Int, val height: Int)
-    extends ToFunctorOps with MoreSetInstances {
+    extends ToFunctorOps with MoreSetInstances with MoreIterableInstances {
   require(width > 0)
   require(height > 0)
 
@@ -27,8 +27,8 @@ abstract class BattleMap(val width: Int, val height: Int)
   def replace(dmp: DirectionalMapPoint, o: BetweenMapObject): BattleMap = remove(dmp).place(dmp, o)
   def replaceSafely(dmp: DirectionalMapPoint, o: BetweenMapObject): BattleMap = removeSafely(dmp).place(dmp, o)
 
-  def points: Iterable[(MapPoint, BattleMapObject)] =
-    for (y <- 0 until height; x <- 0 until width) yield MapPoint(x, y) |-> apply
+  def points: Iterable[MapPoint] = for (y <- 0 until height; x <- 0 until width) yield MapPoint(x, y)
+  def objects: Iterable[(MapPoint, BattleMapObject)] = points fproduct apply
 
   def isInBounds(p: MapPoint): Boolean = p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
 
@@ -84,14 +84,12 @@ abstract class BattleMap(val width: Int, val height: Int)
     }
   }
 
-  def betweens: Iterable[(DirectionalMapPoint, BetweenMapObject)] = points.map(_._1)
-      .flatMap(p => Direction.values.map(DirectionalMapPoint(p, _)))
-      .toSet
-      .fproduct(apply)
+  def betweenPoints: Iterable[DirectionalMapPoint] = points.flatMap(DirectionalMapPoint.around).toSet
+  def betweenObjects: Iterable[(DirectionalMapPoint, BetweenMapObject)] = betweenPoints fproduct apply
 
   lazy val toGraph: Graph[MapPoint, UnDiEdge] = {
-    val vertices = points.map(_._1).toSet
-    val edges = betweens.filter {
+    val vertices = points.toSet
+    val edges = betweenObjects.filter {
       case (_, Wall) => false
       case (_, EmptyBetweenMapObject) => true
     }.map(_._1).flatMap {pd =>
@@ -104,9 +102,9 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
 
   /** Adds walls between all points. */
-  def wallItUp: BattleMap = betweens.map(_._1).foldLeft(this)(_.place(_, Wall))
+  def wallItUp: BattleMap = betweenPoints.foldLeft(this)(_.place(_, Wall))
   /** Marks all points as a FullWall. */
-  def fillItAll: BattleMap = points.map(_._1).foldLeft(this)(_.place(_, FullWall))
+  def fillItAll: BattleMap = points.foldLeft(this)(_.place(_, FullWall))
   /** Marks the points as a FullWall and places walls around it. */
   def fill(next: MapPoint): BattleMap =
     DirectionalMapPoint.around(next).foldLeft(place(next, FullWall))(_.replaceSafely(_, Wall))

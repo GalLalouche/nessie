@@ -26,7 +26,7 @@ import scalaz.syntax.ToTraverseOps
  */
 private object ConnectRoomsAndMazes {
   def go(map: BattleMap, additionalPathProbability: Percentage): Rngable[BattleMap] = for {
-    firstPoint <- Rngable.sample(map.points.view.filter(_._2.isInstanceOf[RoomMapObject]).map(_._1).toVector)
+    firstPoint <- Rngable.sample(map.objects.view.filter(_._2.isInstanceOf[RoomMapObject]).map(_._1).toVector)
     firstPointMarked = map.replace(firstPoint, ReachableMapObject(0))
     allMarked = markReachable(firstPointMarked, map.reachableNeighbors(firstPoint).toList, 1, Set())
     result <- new Aux(
@@ -72,7 +72,7 @@ private object ConnectRoomsAndMazes {
   }
 
   /** There perimeter walls are the all the walls that are between a reachable and a non-reachable point. */
-  private def perimeterWalls(map: BattleMap): Vector[DirectionalMapPoint] = map.betweens.view
+  private def perimeterWalls(map: BattleMap): Vector[DirectionalMapPoint] = map.betweenObjects.view
       .filter(_._2 == Wall)
       .map(_._1)
       .filterNot(map.isBorder)

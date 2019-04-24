@@ -36,8 +36,7 @@ private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
     }
   }
 
-  private def nonEmptyPoints(map: BattleMap): Set[MapPoint] =
-    map.points.map(_._1).filterNot(isEmptyAt(map, _)).toSet
+  private def nonEmptyPoints(map: BattleMap): Set[MapPoint] = map.points.filterNot(isEmptyAt(map, _)).toSet
   private def isEmptyAt(map: BattleMap, p: MapPoint): Boolean = map(p) match {
     case EmptyMapObject => true
     case _: AlgorithmStepMapObject => true

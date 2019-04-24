@@ -12,7 +12,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
     "Zero width" in {an[IllegalArgumentException] should be thrownBy createBattleMap(0, 10)}
     "Negative height" in {an[IllegalArgumentException] should be thrownBy createBattleMap(3, -10)}
     "Zero height" in {an[IllegalArgumentException] should be thrownBy createBattleMap(3, 0)}
-    "starts out as all empty" in {DictBattleMap(10, 20).points.map(_._2).forall(_ == EmptyMapObject) shouldReturn true}
+    "starts out as all empty" in {DictBattleMap(10, 20).objects.map(_._2).forall(_ == EmptyMapObject) shouldReturn true}
   }
   "Attributes" in {
     val $ = createBattleMap(width = 5, height = 10)
@@ -57,17 +57,17 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs {
         for (w <- 1 to 10; h <- 1 to 10) {
           val map = createBattleMap(width = w, height = h)
           val expectedBetweenSize = w * 2 + h * 2 + (w - 1) * h + (h - 1) * w
-          val actualSize = map.betweens.map(_._1).toSet.size
+          val actualSize = map.betweenObjects.map(_._1).toSet.size
           if (actualSize != expectedBetweenSize)
             fail(s"For map of dimensions <$w, $h>, " +
                 s"expected between size to be <$expectedBetweenSize> but was <$actualSize>. " +
-                s"\nBetweens was equal to <${map.betweens.mkString("\n")}>")
+                s"\nBetweens was equal to <${map.betweenObjects.mkString("\n")}>")
         }
       }
       "Set should be correct" in {
-        createBattleMap(1, 1).betweens shouldSetEqual
+        createBattleMap(1, 1).betweenObjects shouldSetEqual
             Direction.values.map(DirectionalMapPoint(0, 0, _)).map(e => e -> EmptyBetweenMapObject)
-        createBattleMap(2, 2).betweens shouldSetEqual
+        createBattleMap(2, 2).betweenObjects shouldSetEqual
             Set(
               DirectionalMapPoint(0, 0, Direction.Up),
               DirectionalMapPoint(0, 0, Direction.Right),

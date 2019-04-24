@@ -7,7 +7,7 @@ import common.rich.RichT._
 
 private class CatcherAI extends AI {
   //TODO cache
-  private def distanceToPlayer(map: BattleMap, point: MapPoint): Int = map.points
+  private def distanceToPlayer(map: BattleMap, point: MapPoint): Int = map.objects
       .flatMap(e => e._2.safeCast[CombatUnitObject].map(e._1 -> _))
       .filter(_._2.unit.owner == Owner.Player)
       .map(_._1.manhattanDistanceTo(point))
@@ -18,13 +18,12 @@ private class CatcherAI extends AI {
     val attack: Option[GameStateChange] = {
       val attackAbility = u.attackAbility
       map.points
-          .map(_._1)
           .find(CanBeUsed(attackAbility)(map, unitLocation, _))
           .map(AbilityToChange(attackAbility)(unitLocation, _))
     }
     lazy val move: GameStateChange = {
       val moveAbility = u.moveAbility
-      map.points.map(_._1)
+      map.points
           .filter(CanBeUsed(moveAbility)(map, unitLocation, _))
           .minBy(distanceToPlayer(map, _))
           .mapTo(AbilityToChange(moveAbility)(unitLocation, _))

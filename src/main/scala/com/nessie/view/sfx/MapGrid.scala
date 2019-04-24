@@ -25,7 +25,7 @@ import scalafx.scene.layout._
 
 private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     extends ToMoreFunctorOps with MoreObservableInstances {
-  private val cells: Map[MapPoint, BorderPane] = map.points
+  private val cells: Map[MapPoint, BorderPane] = map.objects
       .map {case (p, o) => MapGrid.createCell(o, customizer).applyAndReturn(GridPane.setConstraints(_, p.x, p.y))}
       .mapBy(toPoint)
 
@@ -34,7 +34,7 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
 
   // Color walls.
   // We use black border between grid elements if there is a wall between the two map points, grey otherwise.
-  for ((pd, bo) <- map.betweens) {
+  for ((pd, bo) <- map.betweenObjects) {
     val d = pd.direction
     val (wallWidth, wallHeight) =
       if (d == Direction.Left || d == Direction.Right) WallWidth -> CellSide else CellSide -> WallWidth

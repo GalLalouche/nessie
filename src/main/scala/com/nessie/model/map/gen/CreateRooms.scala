@@ -52,10 +52,10 @@ private object CreateRooms {
     private def addRooms: BattleMap = {
       val emptyMap: BattleMap = DictBattleMap(mapWidth, mapHeight).fillItAll.wallItUp
       //TODO add fold to BattleMap
-      val removeFullWalls = emptyMap.points.map(_._1).foldLeft(emptyMap)((map, p) =>
+      val removeFullWalls = emptyMap.points.foldLeft(emptyMap)((map, p) =>
         roomIndex(p).mapHeadOrElse(map.replace(p, _), map)
       )
-      removeFullWalls.betweens.map(_._1).foldLeft(removeFullWalls) {(map, dmp) =>
+      removeFullWalls.betweenPoints.foldLeft(removeFullWalls) {(map, dmp) =>
         map mapIf map.isBorder(dmp).isFalse to {
           val (p1, p2) = dmp.points
           map.mapIf(inSameRoom(p1, p2)).to(_.remove(dmp))
