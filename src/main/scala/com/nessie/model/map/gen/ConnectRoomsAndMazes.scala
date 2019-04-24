@@ -1,10 +1,10 @@
 package com.nessie.model.map.gen
 
 import com.nessie.common.rng.Rngable
-import common.rich.primitives.RichBoolean._
 import com.nessie.common.Percentage
 import com.nessie.model.map.{BattleMap, BattleMapObject, DirectionalMapPoint, MapPoint, Wall}
 import com.nessie.model.map.gen.ConnectRoomsAndMazes._
+import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.RichTuple._
 
@@ -46,6 +46,7 @@ private class ConnectRoomsAndMazes(
 
 private object ConnectRoomsAndMazes {
   private def isReachable(o: BattleMapObject) = o.isInstanceOf[ReachableMapObject]
+  private def isNotReachable(o: BattleMapObject) = isReachable(o).isFalse
   def go(map: BattleMap, additionalPathProbability: Percentage): Rngable[BattleMap] = for {
     firstPoint <- Rngable.sample(map.points.view.filter(_._2.isInstanceOf[RoomMapObject]).map(_._1).toVector)
     firstPointMarked = map.replace(firstPoint, ReachableMapObject(0))
@@ -65,7 +66,7 @@ private object ConnectRoomsAndMazes {
       val next :: tail = queue
       if (visited(next)) markReachable(map, tail, index, visited) else {
         val nextPoints = map.reachableNeighbors(next).toList ++ tail
-        val nextMap = map.mapIf(map(next).|>(isReachable).isFalse).to(_.replace(next, ReachableMapObject(index)))
+        val nextMap = map.mapIf(map(next).|>(isNotReachable)).to(_.replace(next, ReachableMapObject(index)))
         markReachable(nextMap, nextPoints, index, visited + next)
       }
     }
@@ -78,6 +79,6 @@ private object ConnectRoomsAndMazes {
       .filterNot(map.isBorder)
       .filter {dmp =>
         val (p1, p2) = dmp.points.map(map.apply)
-        p1.|>(isReachable) && p2.|>(isReachable).isFalse || p2.|>(isReachable) && p1.|>(isReachable).isFalse
+        p1.|>(isReachable) && p2.|>(isNotReachable) || p2.|>(isReachable) && p1.|>(isNotReachable)
       }.toVector
 }
