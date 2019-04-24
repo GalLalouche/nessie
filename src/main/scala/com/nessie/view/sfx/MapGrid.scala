@@ -18,7 +18,7 @@ import rx.lang.scala.subjects.PublishSubject
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.{Pos, Side}
 import scalafx.scene.Node
-import scalafx.scene.control.{Button, Label}
+import scalafx.scene.control.{Button, Label, ScrollPane}
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
@@ -29,7 +29,6 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
   }.toMap
 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeUtils.mouseEvents(cells.mapValues(_.center.get))
-    NodeUtils.mouseEvents(cells.mapValues(_.center.get))
 
   // Color walls.
   // We use black border between grid elements if there is a wall between the two map points, grey otherwise.
@@ -51,8 +50,15 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
   val node: Node = {
     val yRow = createCoordinateCells("X\\Y" +: 0.until(map.width), (_, 0))
     val xRow = createCoordinateCells(0.until(map.width), i => (0, i + 1))
-    new GridPane() {
-      children = xRow ++ yRow ++ cells.values
+
+    new ScrollPane {
+      content = new GridPane() {
+        children = xRow ++ yRow ++ cells.values
+      }
+      fitToWidth = false
+      fitToHeight = false
+      maxHeight = 1000
+      maxWidth = 1000
     }
   }
 
