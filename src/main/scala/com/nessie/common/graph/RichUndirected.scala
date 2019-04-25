@@ -35,5 +35,8 @@ object RichUndirected {
     def distances(source: T): Map[T, Int] = distances(source, None)
     // TODO optimize
     def distances(source: T, maxDistance: Int): Map[T, Int] = distances(source, None).filter(_._2 <= maxDistance)
+
+    // Because the type inference of EdgesT is wack yo
+    def properEdges: Iterable[UnDiEdge[T]] = g.edges
   }
 }

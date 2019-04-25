@@ -1,11 +1,14 @@
 package com.nessie.model.map
 
+import common.rich.RichTuple._
 import common.rich.RichT._
+import com.nessie.common.graph.RichUndirected._
 import common.rich.func.{MoreIterableInstances, MoreSetInstances}
 import common.rich.primitives.RichBoolean._
 import monocle.Lens
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.immutable.Graph
+import scalax.collection.GraphEdge
 
 import scala.util.Try
 
@@ -98,19 +101,18 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
   def betweenObjects: Iterable[(DirectionalMapPoint, BetweenMapObject)] = betweenPoints fproduct apply
 
-  lazy val toPointGraph: Graph[MapPoint, UnDiEdge] = {
-    val vertices = points.toSet
-    val edges = betweenObjects.filter {
-      case (_, Wall) => false
-      case (_, EmptyBetweenMapObject) => true
-    }.map(_._1).flatMap {pd =>
-      Try(pd.toPoint.go(pd.direction))
-          .filter(vertices)
-          .map(UnDiEdge(pd.toPoint, _))
-          .toOption
-    }
-    Graph.from(vertices, edges)
+  lazy val toObjectGraph: Graph[(MapPoint, BattleMapObject), UnDiEdge] = {
+    val nodes: Iterable[(MapPoint, BattleMapObject)] = objects
+    val edges: Iterable[UnDiEdge[(MapPoint, BattleMapObject)]] = betweenObjects
+        .filterNot(e => e._2.eq(Wall) || isBorder(e._1))
+        .map(_._1.points)
+        .map(_.map(_.|->(apply)).reduce(UnDiEdge.apply))
+    Graph.from(nodes, edges)
   }
+
+  lazy val toPointGraph: Graph[MapPoint, UnDiEdge] =
+    // TODO add mapEdges to RichGraph
+    Graph.from(points, toObjectGraph.properEdges.map {case UnDiEdge((p1, _), (p2, _)) => UnDiEdge(p1, p2)})
 
   def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
   def clearAllPoints: BattleMap = foldPoints(_ removeSafely _)
