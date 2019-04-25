@@ -12,7 +12,7 @@ object CanBeUsed {
     override def apply(map: BattleMap, src: MapPoint, dst: MapPoint) = all.forall(_ (map, src, dst))
   }
   private def inRange(range: Int): Constraint = (map, src, dst) =>
-    map.toGraph.distance(src, dst).exists(d => d > 0 && d <= range)
+    map.toPointGraph.distance(src, dst).exists(d => d > 0 && d <= range)
   private def emptyDst: Constraint = (map, _, dst) => map.isEmptyAt(dst)
   private def differentOwner: Constraint = (map, src, dst) => {
     def getOwner(point: MapPoint) = map(point).safeCast[CombatUnitObject].map(_.unit.owner)

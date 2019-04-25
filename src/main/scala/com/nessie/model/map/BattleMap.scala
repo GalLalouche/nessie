@@ -98,7 +98,7 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
   def betweenObjects: Iterable[(DirectionalMapPoint, BetweenMapObject)] = betweenPoints fproduct apply
 
-  lazy val toGraph: Graph[MapPoint, UnDiEdge] = {
+  lazy val toPointGraph: Graph[MapPoint, UnDiEdge] = {
     val vertices = points.toSet
     val edges = betweenObjects.filter {
       case (_, Wall) => false

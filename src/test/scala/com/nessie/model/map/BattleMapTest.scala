@@ -106,7 +106,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     }
   }
   "toGraph" in {
-    val g = createBattleMap(2, 2).place(DirectionalMapPoint(0, 0, Direction.Right), Wall).toGraph
+    val g = createBattleMap(2, 2).place(DirectionalMapPoint(0, 0, Direction.Right), Wall).toPointGraph
     g.nodes.map(_.value) shouldSetEqual Seq(
       MapPoint(0, 0),
       MapPoint(1, 0),
