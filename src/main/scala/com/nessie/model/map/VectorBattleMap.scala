@@ -1,7 +1,5 @@
 package com.nessie.model.map
 
-import common.rich.RichT._
-
 /**
  * Trades space for (amortized) performance. Unlike DictMap which doesn't need to save empty objects, this
  * class does. In addition, it has to allocate the entire map on construction. However, since it doesn't need
@@ -15,25 +13,29 @@ case class VectorBattleMap private(
     override val height: Int,
 ) extends BattleMap(width, height) {
   override def apply(p: MapPoint) = grid(p.x)(p.y)
-  private def canonicalCoordinates(pd: DirectionalMapPoint): MapPoint = MapPoint(
-    x = pd.x.mapIf(pd.direction == Direction.Right).to(_ + 1),
-    y = pd.y.mapIf(pd.direction == Direction.Down).to(_ + 1),
-  )
-  override def apply(pd: DirectionalMapPoint) = {
-    val p = canonicalCoordinates(pd)
-    if (pd.direction == Direction.Up || pd.direction == Direction.Down) verticalBetweens(p.x)(p.y)
-    else horizontalBetweens(p.x)(p.y)
+  // Since the apply methods are called very often, we opt for performance over nicer code here.
+  @inline private def canonicalX(pd: DirectionalMapPoint): Int =
+    if (pd.direction eq Direction.Right) pd.x + 1 else pd.x
+  @inline private def canonicalY(pd: DirectionalMapPoint): Int =
+    if (pd.direction eq Direction.Down) pd.y + 1 else pd.y
+  @inline private def isVertical(pd: DirectionalMapPoint) =
+    pd.direction.eq(Direction.Up) || pd.direction.eq(Direction.Down)
+  @inline override final def apply(pd: DirectionalMapPoint) = {
+    val x = canonicalX(pd)
+    val y = canonicalY(pd)
+    if (isVertical(pd)) verticalBetweens(x)(y) else horizontalBetweens(x)(y)
   }
 
   // TODO lenses?
-  override def internalPlace(p: MapPoint, o: BattleMapObject) =
+  @inline override final def internalPlace(p: MapPoint, o: BattleMapObject) =
     copy(grid = grid.updated(p.x, grid(p.x).updated(p.y, o)))
-  override def internalPlace(pd: DirectionalMapPoint, o: BetweenMapObject) = {
-    val p = canonicalCoordinates(pd)
-    if (pd.direction == Direction.Up || pd.direction == Direction.Down)
-      copy(verticalBetweens = verticalBetweens.updated(p.x, verticalBetweens(p.x).updated(p.y, o)))
+  @inline override final def internalPlace(pd: DirectionalMapPoint, o: BetweenMapObject) = {
+    val x = canonicalX(pd)
+    val y = canonicalY(pd)
+    if (isVertical(pd))
+      copy(verticalBetweens = verticalBetweens.updated(x, verticalBetweens(x).updated(y, o)))
     else
-      copy(horizontalBetweens = horizontalBetweens.updated(p.x, horizontalBetweens(p.x).updated(p.y, o)))
+      copy(horizontalBetweens = horizontalBetweens.updated(x, horizontalBetweens(x).updated(y, o)))
   }
 }
 
