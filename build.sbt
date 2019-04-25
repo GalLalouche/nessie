@@ -25,7 +25,7 @@ lazy val nessie = (project in file("."))
         "io.reactivex" %% "rxscala" % "0.26.4",
         "org.me" %% "scalacommon" % "1.0" changing(),
         "org.mockito" % "mockito-all" % "1.9.5" % "test",
-        "org.scala-graph" %% "graph-core" % "1.11.5",
+        "org.scala-graph" %% "graph-core" % "1.12.5",
         "org.scala-lang" % "scala-swing" % "2.10.6",
         "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
         "org.scalafx" %% "scalafx" % "8.0.102-R11",
