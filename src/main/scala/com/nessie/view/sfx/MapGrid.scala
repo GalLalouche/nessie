@@ -48,7 +48,7 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     customizer.cellColor.orElse(defaultColors).lift(map(point)).foreach(bo.setBaseColor)
 
   val node: Node = {
-    val yRow = createCoordinateCells("X\\Y" +: 0.until(map.width), (_, 0))
+    val yRow = createCoordinateCells("Y\\X" +: 0.until(map.width), (_, 0))
     val xRow = createCoordinateCells(0.until(map.width), i => (0, i + 1))
 
     new ScrollPane {
