@@ -23,6 +23,10 @@ import scalaz.syntax.ToTraverseOps
  *   non reachable, we can assume there is a wall between these points and a reachable point.
  *   Pick a random point p in ps and tear down the wall between p and its reachable neighbor
  *   Pick all other points in p with probability *additionalPathProbability* and break down their walls
+ *
+ * At the end of this procedure the resulting [[BattleMap]] will be strongly connected, with connectivity
+ * level dependent on the additionalPathProbability parameter. All the objects in the map will be
+ * [[ReachableMapObject]]s.
  */
 private object ConnectRoomsAndMazes {
   def wrap(o: BattleMapObject, index: Int) = ReachableMapObject(o.asInstanceOf[AlgorithmStepMapObject], index)

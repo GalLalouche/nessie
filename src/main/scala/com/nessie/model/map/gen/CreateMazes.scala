@@ -9,7 +9,12 @@ import common.rich.func.ToMoreFoldableOps
 import scalaz.std.OptionInstances
 import scalaz.syntax.ToMonadOps
 
-/** Fills up the locations between the rooms. */
+/**
+ * Fills up the locations between the rooms. This is done by selecting a random non-room point in the graph
+ * and performing a random depth-first-search from it. Repeat until there are no more full walls in the graph.
+ * At the end of this procedure all the points in the resulting BattleMap will be either [[RoomMapObject]] or
+ * [[TunnelMapObject]].
+ */
 private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
   def go(map: BattleMap): Rngable[BattleMap] = new Aux(nonEmptyPoints(map), map).finish
 

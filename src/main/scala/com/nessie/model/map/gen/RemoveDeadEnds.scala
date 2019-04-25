@@ -4,10 +4,15 @@ import com.nessie.model.map.{BattleMap, MapPoint}
 import common.rich.func.{MoreIterableInstances, ToMoreMonadPlusOps}
 
 import scala.annotation.tailrec
+import com.nessie.model.map.FullWall
 
 /**
  * Remove all dead end-paths from the map. This is done iteratively by replacing all dead-end cells (i.e.,
  * cells with a single neighbor) with FullWalls and continuing until there are no dead-end cells left.
+ *
+ * At the end of this procedure the resulting [[BattleMap]] will have no dead-ends, and will be made up of
+ * the original objects (probably [[ReachableMapObject]] if [[ConnectRoomsAndMazes]] was used before) and
+ * [[FullWall]]s.
  */
 private object RemoveDeadEnds extends ToMoreMonadPlusOps with MoreIterableInstances {
   def apply(map: BattleMap): BattleMap = {

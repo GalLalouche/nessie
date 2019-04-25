@@ -2,7 +2,7 @@ package com.nessie.model.map.gen
 
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
-import com.nessie.model.map.{BattleMap, MapPoint}
+import com.nessie.model.map.{BattleMap, FullWall, MapPoint}
 import common.rich.collections.RichSeq._
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
@@ -11,7 +11,10 @@ import common.rich.func.ToMoreFoldableOps
 import scalaz.std.OptionInstances
 import scalaz.syntax.ToMonadOps
 
-/** Creates a BattleMap made up of just non-overlapping rooms. */
+/**
+ * Creates a BattleMap made up of just non-overlapping rooms. At the end of this procedure the resulting
+ * [[BattleMap]] will be made up of [[FullWall]]s and [[RoomMapObject]]s.
+ */
 private object CreateRooms
     extends ToMoreFoldableOps with OptionInstances {
   def go(
