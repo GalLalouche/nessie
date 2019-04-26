@@ -30,19 +30,6 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
 
   val mouseEvents: Observable[(MouseEvent, MapPoint)] = NodeUtils.mouseEvents(cells.mapValues(_.center.get))
 
-  // Color walls.
-  // We use black border between grid elements if there is a wall between the two map points, grey otherwise.
-  for ((pd, bo) <- map.betweenObjects) {
-    val d = pd.direction
-    val (wallWidth, wallHeight) =
-      if (d == Direction.Left || d == Direction.Right) WallWidth -> CellSide else CellSide -> WallWidth
-    borderPaneIndex.index(d).set(new Pane {
-      prefWidth = wallWidth
-      prefHeight = wallHeight
-      style = Styles.backgroundColor(if (bo == Wall) "black" else "grey")
-    })(cells(pd.toPoint))
-  }
-
   // Color cells
   for ((point, bo) <- cells)
     customizer.cellColor.orElse(defaultColors).lift(map(point)).foreach(bo.setBaseColor)

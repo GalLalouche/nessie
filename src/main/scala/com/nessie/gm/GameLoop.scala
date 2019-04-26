@@ -13,7 +13,7 @@ private object GameLoop {
     DictBattleMap(5, 5)
         .place(MapPoint(0, 0), CombatUnitObject(Warrior.create))
         .place(MapPoint(0, 1), CombatUnitObject(Archer.create))
-        .place(DirectionalMapPoint(0, 0, Direction.Down), Wall)
+        .place(MapPoint(1, 0), FullWall)
         .place(MapPoint(4, 4), CombatUnitObject(Skeleton.create))
         .place(MapPoint(3, 4), CombatUnitObject(Zombie.create))
   )

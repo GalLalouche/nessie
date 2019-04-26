@@ -7,7 +7,7 @@ import org.scalatest.FreeSpec
 class CombatUnitObjectTest extends FreeSpec with AuxSpecs {
   private val exists = Archer.create
   private val missing = Warrior.create
-  private val map = DictBattleMap(2, 2).place(MapPoint(1, 0), CombatUnitObject(exists))
+  private val map = VectorBattleMap(2, 2).place(MapPoint(1, 0), CombatUnitObject(exists))
   "findIn" - {
     "exists" in {
       CombatUnitObject.findIn(exists, map).get shouldReturn MapPoint(1, 0)

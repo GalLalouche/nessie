@@ -16,7 +16,9 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     "Zero width" in {an[IllegalArgumentException] should be thrownBy createBattleMap(0, 10)}
     "Negative height" in {an[IllegalArgumentException] should be thrownBy createBattleMap(3, -10)}
     "Zero height" in {an[IllegalArgumentException] should be thrownBy createBattleMap(3, 0)}
-    "starts out as all empty" in {DictBattleMap(10, 20).objects.map(_._2).forall(_ == EmptyMapObject) shouldReturn true}
+    "starts out as all empty" in {
+      createBattleMap(10, 20).objects.map(_._2).forall(_ == EmptyMapObject) shouldReturn true
+    }
   }
   "Attributes" in {
     val $ = createBattleMap(width = 5, height = 10)
@@ -27,107 +29,41 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
   "Exceptions" - {
     val objectPoint = MapPoint(0, 0)
     val emptyPoint = MapPoint(3, 4)
-    val betweenPoints = DirectionalMapPoint(objectPoint, Direction.Left)
-    val emptyBetween = DirectionalMapPoint(1, 2, Direction.Up)
-    val $ = createBattleMap(5, 2)
-        .place(objectPoint, NonEmptyBattleMapObject)
-        .place(betweenPoints, NonEmptyBetweenMapObject)
+    val $ = createBattleMap(5, 2).place(objectPoint, NonEmptyBattleMapObject)
     "Out of bounds" - { // Negatives indices handled by the appropriate case class constructor
       "Object" in {
         an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(5, 1), NonEmptyBattleMapObject)
         an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(1, 2), NonEmptyBattleMapObject)
       }
-      "Between" in {
-        an[IndexOutOfBoundsException] should be thrownBy $.place(DirectionalMapPoint(5, 1, Direction.Down), NonEmptyBetweenMapObject)
-        an[IndexOutOfBoundsException] should be thrownBy $.place(DirectionalMapPoint(1, 2, Direction.Down), NonEmptyBetweenMapObject)
-      }
     }
-    "Place on non-empty" - {
-      "Object" in {an[MapOccupiedException] should be thrownBy $.place(objectPoint, NonEmptyBattleMapObject)}
-      "Between" in {an[MapOccupiedException] should be thrownBy $.place(betweenPoints, NonEmptyBetweenMapObject)}
-    }
-    "Place empty" - {
-      "Object" in {an[IllegalArgumentException] should be thrownBy $.place(emptyPoint, EmptyMapObject)}
-      "Between" in {an[IllegalArgumentException] should be thrownBy $.place(emptyBetween, EmptyBetweenMapObject)}
-    }
-    "Remove empty" - {
-      "Object" in {a[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1))}
-      "Between" in {a[MapEmptyException] should be thrownBy $.remove(DirectionalMapPoint(0, 0, Direction.Down))}
-    }
-  }
-  "betweens" - {
-    "sizes" in {
-      for (w <- 1 to 10; h <- 1 to 10) {
-        val map = createBattleMap(width = w, height = h)
-        val expectedBetweenSize = w * 2 + h * 2 + (w - 1) * h + (h - 1) * w
-        val actualSize = map.betweenObjects.map(_._1).toSet.size
-        if (actualSize != expectedBetweenSize)
-          fail(s"For map of dimensions <$w, $h>, " +
-              s"expected between size to be <$expectedBetweenSize> but was <$actualSize>. " +
-              s"\nBetweens was equal to <${map.betweenObjects.mkString("\n")}>")
-      }
-    }
-    "Set should be correct" in {
-      createBattleMap(1, 1).betweenObjects shouldSetEqual
-          DirectionalMapPoint.around(MapPoint(0, 0)).strengthR(EmptyBetweenMapObject)
-      createBattleMap(2, 2).betweenObjects shouldSetEqual
-          Set(
-            DirectionalMapPoint(0, 0, Direction.Up),
-            DirectionalMapPoint(0, 0, Direction.Right),
-            DirectionalMapPoint(0, 0, Direction.Down),
-            DirectionalMapPoint(0, 0, Direction.Left),
-            DirectionalMapPoint(1, 0, Direction.Down),
-            DirectionalMapPoint(1, 0, Direction.Right),
-            DirectionalMapPoint(1, 0, Direction.Up),
-            DirectionalMapPoint(0, 1, Direction.Down),
-            DirectionalMapPoint(0, 1, Direction.Left),
-            DirectionalMapPoint(0, 1, Direction.Right),
-            DirectionalMapPoint(1, 1, Direction.Down),
-            DirectionalMapPoint(1, 1, Direction.Right)
-          ).map(e => e -> EmptyBetweenMapObject)
-    }
-    "directions should be different" in {
-      val p = MapPoint(8, 2)
-      for (direction <- Direction.values) {
-        val $ = createBattleMap(10, 5).place(DirectionalMapPoint(p, direction), Wall)
-        $.isOccupiedAt(DirectionalMapPoint(p, direction)) shouldReturn true
-        for (d <- Direction.values; if d != direction) {
-          $.isOccupiedAt(DirectionalMapPoint(p, d)) shouldReturn false
-          $.isOccupiedAt(DirectionalMapPoint(p, d)) shouldReturn false
-          $.isOccupiedAt(DirectionalMapPoint(p, d)) shouldReturn false
-        }
-      }
-    }
-  }
-  "Place" - {
-    "Between" in {
-      val pd = DirectionalMapPoint(0, 0, Direction.Down)
-      createBattleMap(1, 2).place(pd, Wall)(pd) shouldReturn Wall
-    }
+    "Place on non-empty" in {an[MapOccupiedException] should be thrownBy $.place(objectPoint, NonEmptyBattleMapObject)}
+    "Place empty" in {an[IllegalArgumentException] should be thrownBy $.place(emptyPoint, EmptyMapObject)}
+    "Remove empty" in {a[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1))}
   }
   "toGraph" in {
-    val g = createBattleMap(2, 2).place(DirectionalMapPoint(0, 0, Direction.Right), Wall).toPointGraph
+    val g = createBattleMap(width = 2, height = 3)
+        .place(MapPoint(0, 1), FullWall)
+        .toObjectGraph
+    val node00 = MapPoint(0, 0) -> EmptyMapObject
+    val node10 = MapPoint(1, 0) -> EmptyMapObject
+    val node01 = MapPoint(0, 1) -> FullWall
+    val node11 = MapPoint(1, 1) -> EmptyMapObject
+    val node02 = MapPoint(0, 2) -> EmptyMapObject
+    val node12 = MapPoint(1, 2) -> EmptyMapObject
     g.nodes.map(_.value) shouldSetEqual Seq(
-      MapPoint(0, 0),
-      MapPoint(1, 0),
-      MapPoint(0, 1),
-      MapPoint(1, 1),
+      node00,
+      node10,
+      node01,
+      node11,
+      node02,
+      node12,
     )
-    g.edges.map(e => UnDiEdge(e._1.value, e._2.value)) shouldSetEqual Seq(
-      UnDiEdge(MapPoint(0, 0), MapPoint(0, 1)),
-      UnDiEdge(MapPoint(0, 1), MapPoint(1, 1)),
-      UnDiEdge(MapPoint(1, 1), MapPoint(1, 0)),
+    g.edges.map(_.toOuter) shouldSetEqual Seq(
+      UnDiEdge(node00, node10),
+      UnDiEdge(node10, node11),
+      UnDiEdge(node11, node12),
+      UnDiEdge(node12, node02),
     )
-  }
-
-  "betweenPoints" in {
-    val $ = createBattleMap(width = 5, height = 10)
-    $.betweenPoints.size shouldReturn 5 * 10 * 2 + 5 + 10
-    $.betweenPoints.toSet.size shouldReturn 5 * 10 * 2 + 5 + 10
-  }
-
-  "wallItUp" in {
-    noException shouldBe thrownBy {createBattleMap(2, 1).clearAllPoints.fillItAll.wallItUp}
   }
 }
 
