@@ -11,4 +11,32 @@ class MapPointTest extends FreeSpec with AuxSpecs {
     "Left" in { p.go(Direction.Left) shouldReturn MapPoint(4, 5) }
     "Right" in { p.go(Direction.Right) shouldReturn MapPoint(6, 5) }
   }
+
+  "neighborsAndDiagonals" - {
+    "middle" in {
+      val p = MapPoint(5, 5)
+      val $ = p.neighborsAndDiagonals
+      $.size shouldReturn 8
+      $ shouldSetEqual Vector(
+        4 -> 4,
+        4 -> 5,
+        4 -> 6,
+        5 -> 4,
+        5 -> 6,
+        6 -> 4,
+        6 -> 5,
+        6 -> 6,
+      ).map(MapPoint.apply)
+    }
+    "corner shouldn't throw an exception but ignore invalid points" in {
+      val p = MapPoint(0, 0)
+      val $ = p.neighborsAndDiagonals
+      $.size shouldReturn 3
+      $ shouldSetEqual Vector(
+        0 -> 1,
+        1 -> 0,
+        1 -> 1,
+      ).map(MapPoint.apply)
+    }
+  }
 }

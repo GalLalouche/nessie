@@ -87,6 +87,7 @@ abstract class BattleMap(val width: Int, val height: Int)
   def fillItAll: BattleMap = foldPoints(_.place(_, FullWall))
 
   def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
+  def neighborsAndDiagonals(mp: MapPoint): Iterable[MapPoint] = mp.neighborsAndDiagonals.filter(isInBounds)
   def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] =
     if (isPassable(mp)) neighbors(mp).filter((apply _).andThen(BattleMap.isPassable)) else Nil
 }

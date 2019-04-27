@@ -13,11 +13,17 @@ case class MapPoint(x: Int, y: Int) {
     case Direction.Left => MapPoint(x - 1, y)
     case Direction.Right => MapPoint(x + 1, y)
   }
-  private def safeGo(d: Direction): Option[MapPoint] = d match {
-    case Direction.Up if y == 0 => None
-    case Direction.Left if x == 0 => None
-    case _ => Some(go(d))
-  }
 
-  def neighbors: Iterable[MapPoint] = Direction.values.view.flatMap(safeGo)
+  // Opt for performance over pretty code
+  lazy val neighbors: Iterable[MapPoint] = Array((x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y))
+      .filter(MapPoint.isValid).map(MapPoint.apply).toVector
+  lazy val neighborsAndDiagonals: Iterable[MapPoint] = Array(
+    (x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y),
+    (x - 1, y - 1), (x + 1, y + 1), (x - 1, y + 1), (x + 1, y - 1),
+  ).filter(MapPoint.isValid).map(MapPoint.apply).toVector
+}
+
+object MapPoint {
+  private def isValid(e: (Int, Int)): Boolean = e._1 >= 0 && e._2 >= 0
+  def apply(t: (Int, Int)): MapPoint = MapPoint(t._1, t._2)
 }
