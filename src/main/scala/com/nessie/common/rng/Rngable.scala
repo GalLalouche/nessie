@@ -30,6 +30,7 @@ package com.nessie.common.rng
 
 import com.nessie.common.Percentage
 
+import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
 import scala.util.Random
 
@@ -82,6 +83,20 @@ object Rngable {
     require(seq.nonEmpty)
     intRange(0, seq.size).map(seq.apply)
   }
+  def shuffle[A](seq: IndexedSeq[A]): Rngable[IndexedSeq[A]] = {
+    val array = ArrayBuffer[A]()
+    array.sizeHint(seq.size)
+    array ++= seq
+    fromRandom(random => {
+      for (n <- array.length - 1 to 0 by -1) {
+        val k = random.nextInt(n + 1)
+        val (a, b) = (array(n), array(k))
+        array(k) = a
+        array(n) = b
+      }
+      array.toVector
+    })
+  }
   def keepWithProbability[A](p: Percentage, as: TraversableOnce[A]): Rngable[List[A]] = {
     def aux(as: List[A]): Rngable[List[A]] = as match {
       case Nil => Rngable.pure(Nil)
@@ -96,6 +111,9 @@ object Rngable {
   trait ToRngableOps {
     def mkRandom[A: Rngable]: Rngable[A] = implicitly[Rngable[A]]
     def mkRandom[A: Rngable](rng: StdGen): A = implicitly[Rngable[A]].mkRandom(rng)
+    implicit class RngableTraversableOnce[A](xs: TraversableOnce[A]) {
+      def sample: Rngable[A] = Rngable.sample(xs.toIndexedSeq)
+    }
   }
 
   def main(args: Array[String]): Unit = {

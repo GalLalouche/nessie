@@ -28,11 +28,12 @@ private object GenMapDemo extends ToRngableOps {
 
   def main(args: Array[String]): Unit = {
     val (rooms, gen) = DemoConfigGitIgnore.rooms
-    //val finalMap = (for {
-      //withMazes <- CreateMazes.go(rooms)
+    val finalMap = (for {
+      connected <- ConnectRooms.go(rooms)
       //connected <- ConnectRoomsAndMazes.go(withMazes, 0.1)
-    //} yield RemoveDeadEnds(connected)).mkRandom(gen)
-    showMap(rooms)
+    } yield connected)
+            .mkRandom(gen)
+    showMap(finalMap)
   }
   private def showMap(map: BattleMap): Unit =
     ScalaFxViewFactory.create(Customizer).updateState(NoOp, GameState.fromMap(map))
