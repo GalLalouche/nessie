@@ -73,7 +73,7 @@ abstract class BattleMap(val width: Int, val height: Int)
     val nodes: Iterable[(MapPoint, BattleMapObject)] = objects
     val edges: Iterable[UnDiEdge[(MapPoint, BattleMapObject)]] = points
         .flatMap(o => reachableNeighbors(o).map(o -> _))
-        .map(_.map(_ |-> apply).reduce(UnDiEdge.apply))
+        .map(_.map(_ :-> apply).reduce(UnDiEdge.apply))
     Graph.from(nodes, edges)
   }
 
