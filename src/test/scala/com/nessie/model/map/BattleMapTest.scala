@@ -4,7 +4,6 @@ import common.AuxSpecs
 import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge
-
 import scalaz.syntax.ToFunctorOps
 
 abstract class BattleMapTest extends FreeSpec with AuxSpecs
@@ -40,6 +39,31 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     "Place empty" in {an[IllegalArgumentException] should be thrownBy $.place(emptyPoint, EmptyMapObject)}
     "Remove empty" in {a[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1))}
   }
+
+  "clearAllPoints" in {
+    val g = createBattleMap(width = 2, height = 3)
+        .place(MapPoint(0, 1), FullWall)
+        .place(MapPoint(1, 2), NonEmptyBattleMapObject)
+    all(g.clearAllPoints.objects.map(_._2)) shouldEqual EmptyMapObject
+  }
+
+  "fillItAll" in {
+    val g = createBattleMap(width = 2, height = 3)
+        .place(MapPoint(0, 1), FullWall)
+        .place(MapPoint(1, 2), NonEmptyBattleMapObject)
+    all(g.fillItAll.objects.map(_._2)) shouldEqual FullWall
+  }
+
+  "neighborsAndDiagonals" in {
+    createBattleMap(2, 3).neighborsAndDiagonals(MapPoint(1, 1)) shouldSetEqual Vector(
+      0 -> 0,
+      0 -> 1,
+      0 -> 2,
+      1 -> 0,
+      1 -> 2,
+    ).map(MapPoint.apply)
+  }
+
   "toGraph" in {
     val g = createBattleMap(width = 2, height = 3)
         .place(MapPoint(0, 1), FullWall)
@@ -66,4 +90,3 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     )
   }
 }
-
