@@ -5,7 +5,11 @@ import common.AuxSpecs
 import org.scalatest.PropSpec
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with ToRngableOps {
+import scalaz.std.VectorInstances
+import scalaz.syntax.ToTraverseOps
+
+class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with ToRngableOps
+    with ToTraverseOps with VectorInstances {
   private case class Person(age: Int, name: String)
   private implicit val RngEv: Rngable[Person] = for {
     age <- mkRandom[Int]
@@ -40,5 +44,28 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     noException shouldBe thrownBy {
       randomVector(100000).mkRandom(StdGen.fromSeed(0))
     }
+  }
+
+  property("SequenceU is trampolined") {
+    noException shouldBe thrownBy {
+      Vector.fill(100000)(Rngable.DoubleEv).sequenceU.mkRandom(StdGen.fromSeed(0))
+    }
+  }
+
+  property("Rngable.iterate") {
+    // TODO ToMoreFunctorOps.when?
+    val $ = Rngable.iterate(1)(e => Rngable.BooleanEv.map(b => e + (if (b) 1 else 0)))
+        .map(_ take 10)
+        .mkRandom(StdGen fromSeed 0)
+    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6)
+    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6)
+  }
+
+  property("Rngable.iterateOptionally") {
+    val $ = Rngable.iterateOptionally(1)(
+      e => if (e >= 10) Rngable.pure(None) else Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0)))
+    ).mkRandom(StdGen fromSeed 0)
+    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10)
+    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10)
   }
 }

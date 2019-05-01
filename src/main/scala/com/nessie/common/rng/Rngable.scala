@@ -29,21 +29,22 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.nessie.common.rng
 
 import common.Percentage
-import scalaz.{-\/, Free, \/-}
+import common.rich.collections.RichIterable
+import common.rich.collections.RichSeq._
 
-import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
 import scala.util.Random
+
+import scalaz.{-\/, \/-, Free, Monad}
 
 class Rngable[A](private val free: Free[Generator, A]) {
   def map[B](f: A => B): Rngable[B] = new Rngable(free map f)
   def flatMap[B](f: A => Rngable[B]): Rngable[B] = new Rngable(free flatMap (f(_).free))
 
-  private def resume: RngResume[A] =
-    free.resume match {
-      case -\/(x) => RngCont(x.map(new Rngable(_)))
-      case \/-(x) => RngTerm(x)
-    }
+  private def resume: RngResume[A] = free.resume match {
+    case -\/(x) => RngCont(x.map(new Rngable(_)))
+    case \/-(x) => RngTerm(x)
+  }
 
   def random(stdGen: StdGen): (A, StdGen) = {
     @annotation.tailrec
@@ -60,9 +61,11 @@ class Rngable[A](private val free: Free[Generator, A]) {
 object Rngable {
   def pure[A](a: A): Rngable[A] = Generator(_ => a).lift
 
-  private def fromRandom[A](f: Random => A): Rngable[A] = Generator(std => f(std.random)).lift
+  def fromRandom[A](f: Random => A): Rngable[A] = Generator(std => f(std.random)).lift
+  def fromStdGen[A](f: StdGen => A): Rngable[A] = Generator(f).lift
   implicit val LongEv: Rngable[Long] = fromRandom(_.nextLong())
   implicit val IntEv: Rngable[Int] = LongEv.map(_.toInt)
+  implicit val BooleanEv: Rngable[Boolean] = fromRandom(_.nextBoolean())
   def intRange(min: Int, max: Int): Rngable[Int] = {
     val range = max - min
     require(range > 0)
@@ -82,20 +85,8 @@ object Rngable {
     require(seq.nonEmpty)
     intRange(0, seq.size).map(seq.apply)
   }
-  def shuffle[A](seq: IndexedSeq[A]): Rngable[IndexedSeq[A]] = {
-    val array = ArrayBuffer[A]()
-    array.sizeHint(seq.size)
-    array ++= seq
-    fromRandom(random => {
-      for (n <- array.length - 1 to 0 by -1) {
-        val k = random.nextInt(n + 1)
-        val (a, b) = (array(n), array(k))
-        array(k) = a
-        array(n) = b
-      }
-      array.toVector
-    })
-  }
+  def shuffle[A](seq: IndexedSeq[A]): Rngable[Seq[A]] = fromRandom(seq.shuffle)
+
   def keepWithProbability[A](p: Percentage, as: TraversableOnce[A]): Rngable[List[A]] = {
     def aux(as: List[A]): Rngable[List[A]] = as match {
       case Nil => Rngable.pure(Nil)
@@ -112,16 +103,26 @@ object Rngable {
     def mkRandom[A: Rngable](rng: StdGen): A = implicitly[Rngable[A]].mkRandom(rng)
     implicit class RngableTraversableOnce[A](xs: TraversableOnce[A]) {
       def sample: Rngable[A] = Rngable.sample(xs.toIndexedSeq)
+      def shuffle: Rngable[Seq[A]] = Rngable.shuffle(xs.toIndexedSeq)
     }
   }
 
-  def main(args: Array[String]): Unit = {
-    def randomVector(n: Int): Rngable[Vector[Int]] =
-      if (n <= 0) Rngable.pure[Vector[Int]](Vector.empty) else for {
-        x <- IntEv
-        y <- IntEv
-        result <- randomVector(n - 2).map(Vector(x, y) ++ _)
-      } yield result
-    println(randomVector(100000).mkRandom(StdGen.fromSeed(0)))
+  implicit object ScalazInstances extends Monad[Rngable] {
+    override def point[A](a: => A): Rngable[A] = Rngable.pure(a)
+    override def bind[A, B](fa: Rngable[A])(f: A => Rngable[B]): Rngable[B] = fa.flatMap(f)
   }
+
+  // The default implementation using TraversableInstances would never terminate, so we cheat a little bit
+  // by constructing an Rngable from a StdGen and reusing that source.
+  // TODO This should exist all Monads, shouldn't it?
+  def iterate[A](a: A)(f: A => Rngable[A]): Rngable[Iterable[A]] = Rngable.fromStdGen(
+    stdGen => Iterator.iterate((a, stdGen)) {
+      case (current, g) => f(current).random(g)
+    }.map(_._1)).map(RichIterable.from(_))
+  def iterateOptionally[A](a: A)(f: A => Rngable[Option[A]]): Rngable[Iterable[A]] = Rngable.fromStdGen(
+    stdGen => Iterator.iterate((Option(a), stdGen)) {
+      case (current, g) => f(current.get).random(g)
+    }.map(_._1))
+      .map(RichIterable.from(_))
+      .map(_.takeWhile(_.isDefined).map(_.get))
 }
