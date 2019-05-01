@@ -90,8 +90,7 @@ abstract class BattleMap(val width: Int, val height: Int)
 }
 
 object BattleMap {
-  // TODO RichT.neq
   // TODO replace with a method on BattleMapObject
   // TODO add overloads implemented using simple ints, for performance?
-  private def isPassable(o: BattleMapObject): Boolean = o.eq(FullWall).isFalse
+  private def isPassable(o: BattleMapObject): Boolean = o neq FullWall
 }
