@@ -1,17 +1,13 @@
 package com.nessie.model.map.gen
 
-import com.nessie.common.collections.UnionFind
-import common.rich.primitives.RichBoolean._
 import com.nessie.common.rng.Rngable
-import common.rich.RichT._
 import com.nessie.model.map.{BattleMap, FullWall, MapPoint}
+import common.rich.RichT._
 import common.rich.func.{MoreIterableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
 
-import scalaz.std.OptionInstances
-
 /**
- * Creates a BattleMap made up of just non-overlapping rooms. At the end of this procedure the resulting
- * [[BattleMap]] will be made up of [[FullWall]]s and [[RoomMapObject]]s.
+ * Creates a BattleMap made up of just non-overlapping rooms. At the end of this procedure the
+ * resulting [[BattleMap]] will be made up of [[FullWall]]s and [[RoomMapObject]]s.
  */
 private object ConnectRooms
     extends ToMoreFoldableOps with ToMoreMonadPlusOps with MoreIterableInstances {
