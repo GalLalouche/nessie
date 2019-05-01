@@ -28,13 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Adapted from https://github.com/NICTA/rng
 package com.nessie.common.rng
 
-import com.nessie.common.Percentage
+import common.Percentage
+import scalaz.{-\/, Free, \/-}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
 import scala.util.Random
-
-import scalaz.{-\/, \/-, Free}
 
 class Rngable[A](private val free: Free[Generator, A]) {
   def map[B](f: A => B): Rngable[B] = new Rngable(free map f)
