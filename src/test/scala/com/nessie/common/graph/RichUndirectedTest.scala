@@ -62,4 +62,7 @@ class RichUndirectedTest extends FreeSpec with AuxSpecs with TimeLimitedTests wi
       }
     }
   }
+  "map edges" in {
+    Graph("foo" ~ "bazz", "bazz" ~ "foobar").mapNodes(_.length) shouldReturn Graph(3 ~ 4, 4 ~ 6)
+  }
 }

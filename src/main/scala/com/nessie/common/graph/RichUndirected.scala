@@ -6,15 +6,15 @@ import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
 object RichUndirected {
-  implicit class richUndirected[T](g: Graph[T, UnDiEdge]) {
-    private def neighbors(t: T): Traversable[T] = g.get(t).diSuccessors.map(_.value)
+  implicit class richUndirected[A]($: Graph[A, UnDiEdge]) {
+    private def neighbors(t: A): Traversable[A] = $.get(t).diSuccessors.map(_.value)
 
-    private def distances(source: T, destination: Option[T]): Map[T, Int] = {
-      require(g.nodes.contains(source), "No node equal to " + source)
-      destination.foreach(d => require(g.nodes.contains(d), "No node equal to " + d))
+    private def distances(source: A, destination: Option[A]): Map[A, Int] = {
+      require($.nodes.contains(source), "No node equal to " + source)
+      destination.foreach(d => require($.nodes.contains(d), "No node equal to " + d))
 
       @tailrec
-      def aux(queue: Queue[(T, Int)], result: Map[T, Int]): Map[T, Int] = queue.dequeueOption match {
+      def aux(queue: Queue[(A, Int)], result: Map[A, Int]): Map[A, Int] = queue.dequeueOption match {
         case None => result
         case Some(((next, d), tail)) =>
           if (result.contains(next))
@@ -30,13 +30,21 @@ object RichUndirected {
       aux(Queue(source -> 0), Map())
     }
 
-    def distance(source: T, destination: T): Option[Int] = distances(source, Some(destination)).get(destination)
+    def distance(source: A, destination: A): Option[Int] =
+      distances(source, Some(destination)).get(destination)
 
-    def distances(source: T): Map[T, Int] = distances(source, None)
+    def distances(source: A): Map[A, Int] = distances(source, None)
     // TODO optimize
-    def distances(source: T, maxDistance: Int): Map[T, Int] = distances(source, None).filter(_._2 <= maxDistance)
+    def distances(source: A, maxDistance: Int): Map[A, Int] =
+      distances(source, None).filter(_._2 <= maxDistance)
 
-    // Because the type inference of EdgesT is wack yo
-    def properEdges: Iterable[UnDiEdge[T]] = g.edges
+    def outerNodes: Iterable[A] = $.nodes
+    def outerEdges: Iterable[UnDiEdge[A]] = $.edges
+
+    def mapNodes[B](f: A => B): Graph[B, UnDiEdge] = {
+      val mappedNodes = outerNodes.map(f)
+      val mappedEdges = outerEdges.map {case UnDiEdge(a, b) => UnDiEdge(f(a), f(b))}
+      Graph.from(mappedNodes, mappedEdges)
+    }
   }
 }

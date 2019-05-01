@@ -5,9 +5,8 @@ import common.rich.RichT._
 import common.rich.RichTuple._
 import common.rich.func.{MoreIterableInstances, MoreSetInstances}
 import common.rich.primitives.RichBoolean._
+import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
-import scalax.collection.immutable.Graph
-
 import scalaz.syntax.ToFunctorOps
 
 /** An map of a given level without between-objects, so walls and its ilks taken up a full tile. */
@@ -77,9 +76,7 @@ abstract class BattleMap(val width: Int, val height: Int)
     Graph.from(nodes, edges)
   }
 
-  lazy val toPointGraph: Graph[MapPoint, UnDiEdge] =
-  // TODO add mapEdges to RichGraph
-    Graph.from(points, toObjectGraph.properEdges.map {case UnDiEdge((p1, _), (p2, _)) => UnDiEdge(p1, p2)})
+  lazy val toPointGraph: Graph[MapPoint, UnDiEdge] = toObjectGraph.mapNodes(_._1)
 
   def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
   def clearAllPoints: BattleMap = foldPoints(_ removeSafely _)
