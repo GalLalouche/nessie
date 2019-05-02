@@ -29,7 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.nessie.common.rng
 
 import common.Percentage
-import common.rich.collections.RichIterable
+import common.rich.collections.LazyIterable
 import common.rich.collections.RichSeq._
 
 import scala.math.Ordering.Implicits._
@@ -115,14 +115,12 @@ object Rngable {
   // The default implementation using TraversableInstances would never terminate, so we cheat a little bit
   // by constructing an Rngable from a StdGen and reusing that source.
   // TODO This should exist all Monads, shouldn't it?
-  def iterate[A](a: A)(f: A => Rngable[A]): Rngable[Iterable[A]] = Rngable.fromStdGen(
-    stdGen => Iterator.iterate((a, stdGen)) {
+  def iterate[A](a: A)(f: A => Rngable[A]): Rngable[LazyIterable[A]] = Rngable.fromStdGen(
+    stdGen => LazyIterable.iterate((a, stdGen)) {
       case (current, g) => f(current).random(g)
-    }.map(_._1)).map(RichIterable.from(_))
-  def iterateOptionally[A](a: A)(f: A => Rngable[Option[A]]): Rngable[Iterable[A]] = Rngable.fromStdGen(
-    stdGen => Iterator.iterate((Option(a), stdGen)) {
-      case (current, g) => f(current.get).random(g)
     }.map(_._1))
-      .map(RichIterable.from(_))
-      .map(_.takeWhile(_.isDefined).map(_.get))
+  def iterateOptionally[A](a: A)(f: A => Rngable[Option[A]]): Rngable[LazyIterable[A]] = Rngable.fromStdGen(
+    stdGen => LazyIterable.iterate((Option(a), stdGen)) {
+      case (current, g) => f(current.get).random(g)
+    }.map(_._1).takeWhile(_.isDefined).map(_.get))
 }

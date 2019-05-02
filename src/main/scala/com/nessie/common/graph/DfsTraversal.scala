@@ -3,6 +3,7 @@ package com.nessie.common.graph
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
 import common.rich.RichT._
+import common.rich.collections.LazyIterable
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
@@ -20,7 +21,7 @@ object DfsTraversal {
     }
   }
 
-  def apply[A](graph: Graph[A, UnDiEdge], startingPoint: A): Rngable[Iterable[A]] = Rngable
+  def apply[A](graph: Graph[A, UnDiEdge], startingPoint: A): Rngable[LazyIterable[A]] = Rngable
       .iterateOptionally(Aux[A](graph, List(startingPoint), Set.empty))(_.next)
       .map(_.map(_.head))
 }

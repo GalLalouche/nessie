@@ -3,13 +3,17 @@ package com.nessie.common.rng
 import com.nessie.common.rng.Rngable.ToRngableOps
 import common.AuxSpecs
 import org.scalatest.PropSpec
+import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.time.SpanSugar._
 
 import scalaz.std.VectorInstances
 import scalaz.syntax.ToTraverseOps
 
 class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with ToRngableOps
-    with ToTraverseOps with VectorInstances {
+    with ToTraverseOps with VectorInstances with TimeLimitedTests {
+  override val timeLimit = 1000 millis
+  override val defaultTestSignaler = Signaler(_.stop())
   private case class Person(age: Int, name: String)
   private implicit val RngEv: Rngable[Person] = for {
     age <- mkRandom[Int]
@@ -67,5 +71,12 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     ).mkRandom(StdGen fromSeed 0)
     $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10)
     $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10)
+  }
+  property("Rngable.iterateOptionally on infinite") {
+    val $ = Rngable.iterateOptionally(1)(e => Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0))))
+        .map(_.take(20))
+        .mkRandom(StdGen fromSeed 0)
+    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10, 11, 12)
+    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10, 11, 12)
   }
 }
