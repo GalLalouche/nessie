@@ -16,18 +16,18 @@ class RoomTest extends FreeSpec with AuxSpecs {
   "pointNotInRectangle" in {
     $.pointInRectangle(MapPoint(1, 2)) shouldReturn true
     $.pointInRectangle(MapPoint(1, 3)) shouldReturn true
-    $.pointInRectangle(MapPoint(1, 3)) shouldReturn true
     $.pointInRectangle(MapPoint(1, 4)) shouldReturn true
+    $.pointInRectangle(MapPoint(1, 5)) shouldReturn true
 
     $.pointInRectangle(MapPoint(2, 2)) shouldReturn true
     $.pointInRectangle(MapPoint(2, 3)) shouldReturn true
-    $.pointInRectangle(MapPoint(2, 3)) shouldReturn true
     $.pointInRectangle(MapPoint(2, 4)) shouldReturn true
+    $.pointInRectangle(MapPoint(2, 5)) shouldReturn true
 
     $.pointInRectangle(MapPoint(3, 2)) shouldReturn true
     $.pointInRectangle(MapPoint(3, 3)) shouldReturn true
-    $.pointInRectangle(MapPoint(3, 3)) shouldReturn true
     $.pointInRectangle(MapPoint(3, 4)) shouldReturn true
+    $.pointInRectangle(MapPoint(3, 5)) shouldReturn true
 
     $.pointInRectangle(MapPoint(0, 1)) shouldReturn false
     $.pointInRectangle(MapPoint(1, 1)) shouldReturn false
@@ -78,5 +78,23 @@ class RoomTest extends FreeSpec with AuxSpecs {
     "false" in {
       $.isAdjacent(Room(x = 5, y = 6, w = 5, h = 5)) shouldReturn false
     }
+  }
+
+  "mapPoints" in {
+    $.mapPoints.size shouldReturn 12
+    $.mapPoints shouldSetEqual Vector(
+      MapPoint(1, 2),
+      MapPoint(1, 3),
+      MapPoint(1, 4),
+      MapPoint(1, 5),
+      MapPoint(2, 2),
+      MapPoint(2, 3),
+      MapPoint(2, 4),
+      MapPoint(2, 5),
+      MapPoint(3, 2),
+      MapPoint(3, 3),
+      MapPoint(3, 4),
+      MapPoint(3, 5),
+    )
   }
 }

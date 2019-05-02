@@ -26,4 +26,6 @@ case class MapPoint(x: Int, y: Int) {
 object MapPoint {
   private def isValid(e: (Int, Int)): Boolean = e._1 >= 0 && e._2 >= 0
   def apply(t: (Int, Int)): MapPoint = MapPoint(t._1, t._2)
+
+  implicit val OrderingEv: Ordering[MapPoint] = Ordering.by(e => e.x -> e.y)
 }
