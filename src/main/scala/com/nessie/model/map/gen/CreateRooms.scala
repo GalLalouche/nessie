@@ -59,7 +59,7 @@ private object CreateRooms
 
   private def buildMap(initialMap: BattleMap)(rooms: Seq[Room]): BattleMap = {
     def roomIndex(p: MapPoint): Option[RoomMapObject] =
-      rooms.findIndex(_.pointInRectangle(p)).map(RoomMapObject)
+      rooms.findIndex(_.pointInRectangle(p)).map(RoomMapObject.apply)
 
     initialMap.clearAllPoints.fillItAll
         .foldPoints((map, p) => roomIndex(p).mapHeadOrElse(map.replace(p, _), map))
