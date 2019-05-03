@@ -30,8 +30,8 @@ package com.nessie.common.rng
 import scalaz.Free.liftF
 import scalaz.Functor
 
-private case class Generator[A](run: StdGen => A) {
-  def map[B](f: A => B) = Generator(run andThen f)
+private case class Generator[A](run: StdGen => (A, StdGen)) {
+  def map[B](f: A => B): Generator[B] = Generator(run andThen {case (a, stdGen) => f(a) -> stdGen})
   def lift: Rngable[A] = new Rngable(liftF(this))
 }
 

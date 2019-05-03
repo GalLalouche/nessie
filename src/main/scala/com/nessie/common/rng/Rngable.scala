@@ -49,7 +49,9 @@ class Rngable[A](private val free: Free[Generator, A]) {
   def random(stdGen: StdGen): (A, StdGen) = {
     @annotation.tailrec
     def aux(g: Rngable[A], r: StdGen): (A, StdGen) = g.resume match {
-      case RngCont(Generator(f)) => aux(f(r), r.nextGen)
+      case RngCont(Generator(f)) =>
+        val (nextValue, nextGen) = f(r)
+        aux(nextValue, nextGen)
       case RngTerm(a) => a -> r
     }
 
@@ -59,10 +61,16 @@ class Rngable[A](private val free: Free[Generator, A]) {
 }
 
 object Rngable {
-  def pure[A](a: A): Rngable[A] = Generator(_ => a).lift
+  def pure[A](a: A): Rngable[A] = Generator((a, _)).lift
 
-  def fromRandom[A](f: Random => A): Rngable[A] = Generator(std => f(std.random)).lift
-  def fromStdGen[A](f: StdGen => A): Rngable[A] = Generator(f).lift
+  def fromRandom[A](f: Random => A): Rngable[A] = Generator {std =>
+    val random = std.random
+    f(random) -> StdGen(random.nextLong)
+  }.lift
+  def fromStdGen[A](f: StdGen => A): Rngable[A] = Generator {stdGen =>
+    val (s1, s2) = stdGen.split
+    f(s1) -> s2
+  }.lift
   implicit val LongEv: Rngable[Long] = fromRandom(_.nextLong())
   implicit val IntEv: Rngable[Int] = LongEv.map(_.toInt)
   implicit val BooleanEv: Rngable[Boolean] = fromRandom(_.nextBoolean())
@@ -76,10 +84,6 @@ object Rngable {
   implicit val CharEv: Rngable[Char] = fromRandom(_.nextPrintableChar())
   def boolean(p: Percentage): Rngable[Boolean] = DoubleEv.map(p > _)
   def stringAtLength(length: Int): Rngable[String] = fromRandom(_.nextString(length))
-  //implicit def IterableEv[A](implicit ev: Rng[A]): Rng[Iterable[A]] = (rng: StdGen) => {
-  //  val (rng1, rng2) = rng.split
-  //  ev.mkRandoms(rng1) -> rng2
-  //}
 
   def sample[A](seq: IndexedSeq[A]): Rngable[A] = {
     require(seq.nonEmpty)
@@ -115,12 +119,16 @@ object Rngable {
   // The default implementation using TraversableInstances would never terminate, so we cheat a little bit
   // by constructing an Rngable from a StdGen and reusing that source.
   // TODO This should exist all Monads, shouldn't it?
-  def iterate[A](a: A)(f: A => Rngable[A]): Rngable[LazyIterable[A]] = Rngable.fromStdGen(
-    stdGen => LazyIterable.iterate((a, stdGen)) {
-      case (current, g) => f(current).random(g)
-    }.map(_._1))
-  def iterateOptionally[A](a: A)(f: A => Rngable[Option[A]]): Rngable[LazyIterable[A]] = Rngable.fromStdGen(
-    stdGen => LazyIterable.iterate((Option(a), stdGen)) {
-      case (current, g) => f(current.get).random(g)
-    }.map(_._1).takeWhile(_.isDefined).map(_.get))
+  def iterate[A](a: A)(f: A => Rngable[A]): Rngable[LazyIterable[A]] = Rngable.fromStdGen {
+    stdGen =>
+      LazyIterable.iterate((a, stdGen)) {
+        case (current, g) => f(current).random(g)
+      }.map(_._1)
+  }
+  def iterateOptionally[A](a: A)(f: A => Rngable[Option[A]]): Rngable[LazyIterable[A]] = Rngable.fromStdGen {
+    stdGen =>
+      LazyIterable.iterate((Option(a), stdGen)) {
+        case (current, g) => f(current.get).random(g)
+      }.map(_._1).takeWhile(_.isDefined).map(_.get)
+  }
 }

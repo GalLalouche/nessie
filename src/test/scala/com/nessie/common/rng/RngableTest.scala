@@ -56,27 +56,52 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     }
   }
 
+  property("Seed isn't leaked between random calls") {
+    val rng = StdGen(0)
+    def seqFromStdGen(stdGen: StdGen) = {
+      val random = stdGen.random
+      stdGen.seed :: List.fill(10)(random.nextLong())
+    }
+    val (x, y) = (for {
+      x <- Rngable.fromStdGen(seqFromStdGen)
+      y <- Rngable.fromStdGen(seqFromStdGen)
+    } yield (x, y)).mkRandom(rng)
+    x.intersect(y) shouldBe 'empty
+  }
+
   property("Rngable.iterate") {
     // TODO ToMoreFunctorOps.when?
     val $ = Rngable.iterate(1)(e => Rngable.BooleanEv.map(b => e + (if (b) 1 else 0)))
         .map(_ take 10)
         .mkRandom(StdGen fromSeed 0)
-    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6)
-    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6)
+    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3)
+    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3)
+  }
+
+  property("From random modifies the stdgen") {
+    forAll((rng: StdGen) => {
+      val (x, y) = (for {
+        x <- Rngable.fromRandom(_.nextInt())
+        y <- Rngable.fromRandom(_.nextInt())
+      } yield x -> y).mkRandom(rng)
+      x should not equal y
+    })
   }
 
   property("Rngable.iterateOptionally") {
     val $ = Rngable.iterateOptionally(1)(
       e => if (e >= 10) Rngable.pure(None) else Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0)))
     ).mkRandom(StdGen fromSeed 0)
-    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10)
-    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10)
+    $.toVector shouldReturn Vector(
+      1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10)
+    $.toVector shouldReturn Vector(
+      1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10)
   }
   property("Rngable.iterateOptionally on infinite") {
     val $ = Rngable.iterateOptionally(1)(e => Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0))))
         .map(_.take(20))
         .mkRandom(StdGen fromSeed 0)
-    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10, 11, 12)
-    $.toVector shouldReturn Vector(1, 2, 2, 3, 3, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 8, 9, 10, 11, 12)
+    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8)
+    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8)
   }
 }
