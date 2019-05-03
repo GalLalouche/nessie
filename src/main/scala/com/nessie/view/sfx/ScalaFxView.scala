@@ -1,6 +1,6 @@
 package com.nessie.view.sfx
 
-import com.nessie.gm.{GameState, GameStateChange, PlayerInput, View}
+import com.nessie.gm.{GameState, GameStateChange, NoOp, PlayerInput, View}
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
@@ -9,13 +9,15 @@ import javafx.stage.WindowEvent
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.Scene
+import scalafx.scene.control.Button
 import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
 
 import scalaz.concurrent.Task
 
-private class ScalaFxView(customizer: ScalaFxViewCustomizer) extends View
+private class ScalaFxView(customizer: ScalaFxViewCustomizer, i: Option[Iterator[GameState]] = None) extends View
     with MoreObservableInstances with ToMoreMonadPlusOps {
+  def this(customizer: ScalaFxViewCustomizer, i: Iterator[GameState]) = this(customizer, Some(i))
   private var stage: Stage = _
   private var mapGrid: MapGrid = _
   private var eqBar: EventQueueBar = _
@@ -56,6 +58,13 @@ private class ScalaFxView(customizer: ScalaFxViewCustomizer) extends View
         center = mapGrid.node
         bottom = propPane.node
         right = logger.node
+        i.foreach(i => {
+          left = new Button("Next") {
+            onAction = _ => {
+              updateState(NoOp, i.next())
+            }
+          }
+        })
       }
       if (!stage.isShowing)
         stage.show()
