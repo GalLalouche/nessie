@@ -4,6 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
+import scalax.collection.GraphPredef.Param
 
 object RichUndirected {
   implicit class richUndirected[A]($: Graph[A, UnDiEdge]) {
@@ -46,5 +47,8 @@ object RichUndirected {
       val mappedEdges = outerEdges.map {case UnDiEdge(a, b) => UnDiEdge(f(a), f(b))}
       Graph.from(mappedNodes, mappedEdges)
     }
+
+    def removeNodes(xs: Traversable[A]): Graph[A, UnDiEdge] =
+      $ -- Graph.from(xs, Nil)
   }
 }
