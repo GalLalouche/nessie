@@ -1,9 +1,6 @@
 package com.nessie.model.map
 
 case class MapPoint(x: Int, y: Int) {
-  require(x >= 0)
-  require(y >= 0)
-
   def manhattanDistanceTo(unitLocation: MapPoint): Int =
     Math.abs(x - unitLocation.x) + Math.abs(y - unitLocation.y)
 
