@@ -27,6 +27,7 @@ abstract class BattleMap(val width: Int, val height: Int)
   def objects: Iterable[(MapPoint, BattleMapObject)] = points fproduct apply
 
   def isInBounds(p: MapPoint): Boolean = p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
+  def isBorder(p: MapPoint): Boolean = p.x == 0 || p.y == 0 || p.x == width - 1 || p.y == height - 1
 
   def apply(p: MapPoint): BattleMapObject
   private def isPassable(mp: MapPoint): Boolean = BattleMap.isPassable(this (mp))

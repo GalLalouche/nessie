@@ -7,7 +7,7 @@ import com.nessie.view.sfx.ScalaFxViewFactory
 
 private object GenMapDemo extends ToRngableOps {
   def main(args: Array[String]): Unit = {
-    showMap(Iterator.apply(DemoConfigGitIgnore.generateMap))
+    showMap(DemoConfigGitIgnore.iterations.iterator)
   }
   private def showMap(i: Iterator[BattleMap]): Unit = {
     ScalaFxViewFactory.createWithIterator(DemoConfigGitIgnore.customizer, i map GameState.fromMap)
