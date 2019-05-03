@@ -3,6 +3,7 @@ package com.nessie.model.map
 import com.nessie.common.graph.RichUndirected._
 import common.rich.RichT._
 import common.rich.RichTuple._
+import scalax.collection.GraphPredef._
 import common.rich.func.{MoreIterableInstances, MoreSetInstances}
 import common.rich.primitives.RichBoolean._
 import scalax.collection.Graph
@@ -77,6 +78,12 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
 
   lazy val toPointGraph: Graph[MapPoint, UnDiEdge] = toObjectGraph.mapNodes(_._1)
+
+  lazy val toFullGraph: Graph[MapPoint, UnDiEdge] = Graph.from(
+    points,
+    // TODO implement more efficiently
+    points.fproduct(neighbors).flatMap {case (x, xs) => xs.map(x ~ _)}.toSet,
+  )
 
   def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
   def clearAllPoints: BattleMap = foldPoints(_ removeSafely _)
