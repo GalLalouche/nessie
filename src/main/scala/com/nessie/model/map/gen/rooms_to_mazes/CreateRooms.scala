@@ -1,4 +1,4 @@
-package com.nessie.model.map.gen
+package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps

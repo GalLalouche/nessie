@@ -1,4 +1,4 @@
-package com.nessie.model.map.gen
+package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.common.graph.DfsTraversal
 import com.nessie.common.graph.RichUndirected._
