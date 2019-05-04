@@ -69,15 +69,6 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     x.intersect(y) shouldBe 'empty
   }
 
-  property("Rngable.iterate") {
-    // TODO ToMoreFunctorOps.when?
-    val $ = Rngable.iterate(1)(e => Rngable.BooleanEv.map(b => e + (if (b) 1 else 0)))
-        .map(_ take 10)
-        .mkRandom(StdGen fromSeed 0)
-    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3)
-    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3)
-  }
-
   property("From random modifies the stdgen") {
     forAll((rng: StdGen) => {
       val (x, y) = (for {
@@ -88,20 +79,42 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     })
   }
 
+  private def verifyIncreasing(xs: Seq[Int]) = xs.sliding(2).foreach(v => v(0) should be <= v(1))
+  property("Rngable.iterate") {
+    // TODO ToMoreFunctorOps.when?
+    forAll((rng: StdGen) => {
+      val $ = Rngable.iterate(1)(e => Rngable.BooleanEv.map(b => e + (if (b) 1 else 0)))
+          .map(_ take 10)
+          .mkRandom(rng)
+      val vector = $.toVector
+      vector.size shouldReturn 10
+      verifyIncreasing(vector)
+      vector.last should be <= 10
+      vector shouldReturn $.toVector
+    })
+  }
+
   property("Rngable.iterateOptionally") {
-    val $ = Rngable.iterateOptionally(1)(
-      e => if (e >= 10) Rngable.pure(None) else Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0)))
-    ).mkRandom(StdGen fromSeed 0)
-    $.toVector shouldReturn Vector(
-      1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10)
-    $.toVector shouldReturn Vector(
-      1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10)
+    forAll((rng: StdGen) => {
+      val $ = Rngable.iterateOptionally(1)(
+        e => if (e >= 10) Rngable.pure(None) else Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0)))
+      ).mkRandom(rng)
+      val vector = $.toVector
+      verifyIncreasing(vector)
+      vector.last shouldReturn 10
+      vector(vector.length - 2) shouldReturn 9
+      vector shouldReturn $.toVector
+    })
   }
   property("Rngable.iterateOptionally on infinite") {
-    val $ = Rngable.iterateOptionally(1)(e => Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0))))
-        .map(_.take(20))
-        .mkRandom(StdGen fromSeed 0)
-    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8)
-    $.toVector shouldReturn Vector(1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8)
+    forAll((rng: StdGen) => {
+      val $ = Rngable.iterateOptionally(1)(e => Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0))))
+          .map(_.take(20))
+          .mkRandom(rng)
+      val vector = $.toVector
+      verifyIncreasing(vector)
+      vector.size shouldReturn 20
+      vector shouldReturn $.toVector
+    })
   }
 }
