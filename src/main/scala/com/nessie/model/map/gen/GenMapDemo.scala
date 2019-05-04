@@ -1,15 +1,17 @@
 package com.nessie.model.map.gen
 
+import com.google.inject.Guice
 import com.nessie.common.rng.Rngable.ToRngableOps
-import com.nessie.gm.GameState
-import com.nessie.model.map.BattleMap
-import com.nessie.view.zirconview.ZirconViewFactory
+import com.nessie.common.rng.StdGen
+import com.nessie.gm.{GameState, IterativeViewFactory}
+import net.codingwell.scalaguice.InjectorExtensions._
 
 private object GenMapDemo extends ToRngableOps {
   def main(args: Array[String]): Unit = {
-    showMap(DemoConfigGitIgnore.iterations.iterator)
-  }
-  private def showMap(i: Iterator[BattleMap]): Unit = {
-    ZirconViewFactory.createWithIterator(ZirconCustomizer, i map GameState.fromMap)
+    val injector = Guice.createInjector(GenMapDemoModule.module)
+    val generator = injector.instance[MapGenerator]
+    val viewFactory = injector.instance[IterativeViewFactory]
+    val gen = injector.instance[StdGen]
+    viewFactory.create(generator.iterativeGenerator.mkRandom(gen).map(GameState.fromMap).iterator)
   }
 }

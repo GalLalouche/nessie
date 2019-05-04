@@ -14,7 +14,7 @@ object CellularAutomataGenerator extends MapGenerator {
   override def iterativeGenerator: Rngable[LazyIterable[BattleMap]] = {
     val Width = 50
     val Height = 50
-    val initialProbability: Percentage = 0.55
+    val initialProbability: Percentage = 0.52
     val battleMap = VectorBattleMap(Width, Height)
 
     for {
