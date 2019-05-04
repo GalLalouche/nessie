@@ -1,7 +1,8 @@
 package com.nessie.view.zirconview
 
-import com.nessie.gm.{GameState, GameStateChange, NoOp, View}
+import com.nessie.gm.{GameState, GameStateChange, NoOp, PlayerInput, View}
 import com.nessie.model.map.MapPoint
+import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
 import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
@@ -16,7 +17,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, iterator: Iterator[Ga
         .build())
 
   private val screen = Screens.createScreenFor(tileGrid)
-  private val propertiesPane = PropertiesPane.create(_
+  private val propertiesPane = PropertiesPanel.create(_
       .withSize(20, 80)
       .withAlignmentWithin(screen, ComponentAlignment.TOP_LEFT)
   )
@@ -28,7 +29,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, iterator: Iterator[Ga
     screen.draw(mapView, mapViewPosition)
     def toGridCoordinates(me: MouseAction): Option[MapPoint] =
       me.getPosition.withInverseRelative(mapViewPosition).toMapPoint(state.map)
-    screen.onMouseMoved(toGridCoordinates(_) |> propertiesPane.update)
+    screen.onMouseMoved(toGridCoordinates(_) |> propertiesPane.update(state.map))
   }
   private val nextButton =
     Components.button().withText("next").withAlignmentWithin(screen, ComponentAlignment.TOP_RIGHT).build()
@@ -38,5 +39,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, iterator: Iterator[Ga
   screen.addComponent(nextButton)
   screen.display()
 
-  override def playerInput = ???
+  override def playerInput = new PlayerInput {
+    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = ???
+  }
 }

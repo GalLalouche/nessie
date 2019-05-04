@@ -12,5 +12,6 @@ class ZirconViewFactory extends IterativeViewFactory {
   }
   override def create(states: Iterator[GameState]): View =
     new ZirconView(zirconViewCustomizer, states) <| (_.updateState(NoOp, states.next()))
-  override def create(): View = create(Iterator.empty)
+  override def create(): View =
+    new ZirconView(zirconViewCustomizer, Iterator.empty)
 }
