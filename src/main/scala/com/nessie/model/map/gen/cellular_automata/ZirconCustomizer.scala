@@ -8,7 +8,7 @@ object ZirconCustomizer extends ZirconViewCustomizer {
   override def mapCustomizer = new ZirconMapCustomizer {
     override def getTile = {
       case Empty(_) => Tiles.newBuilder().withCharacter('-')
-      case Wall(_) => Tiles.newBuilder().withCharacter('#')
+      case Wall(_) => Tiles.newBuilder().withCharacter('*')
     }
   }
 }

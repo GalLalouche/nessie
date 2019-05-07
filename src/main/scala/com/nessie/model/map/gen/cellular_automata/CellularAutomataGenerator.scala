@@ -1,14 +1,14 @@
 package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.common.rng.Rngable
-import com.nessie.model.map.{BattleMap, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, FullWall, MapPoint, VectorBattleMap}
 import com.nessie.model.map.gen.MapGenerator
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.Percentage
 import common.rich.collections.LazyIterable
 
-object CellularAutomataGenerator extends MapGenerator {
+private object CellularAutomataGenerator extends MapGenerator {
   override def generator: Rngable[BattleMap] = iterativeGenerator.map(_.last)
 
   override def iterativeGenerator: Rngable[LazyIterable[BattleMap]] = {
@@ -54,4 +54,10 @@ object CellularAutomataGenerator extends MapGenerator {
           .map(new MapIterator(_, n + 1))
     }
   }
+
+  override def canonize(currentMap: BattleMap): BattleMap =
+    currentMap.foldPoints((map, next) => map(next) match {
+      case Empty(_) => map.remove(next)
+      case Wall(_) => map.replace(next, FullWall)
+    })
 }

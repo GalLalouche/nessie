@@ -1,17 +1,14 @@
 package com.nessie.view.zirconview
 
 import com.google.inject.Inject
-import com.nessie.gm.{GameState, IterativeViewFactory, NoOp, View}
+import com.nessie.gm.{DebugMapStepper, DebugViewFactory, View}
 import common.rich.RichT._
 
-class ZirconViewFactory extends IterativeViewFactory {
-  private var zirconViewCustomizer = ZirconViewCustomizer.Null
-  @Inject(optional = true)
-  private def setApiKey(c: ZirconViewCustomizer): Unit = {
-    this.zirconViewCustomizer = c
+class ZirconViewFactory extends DebugViewFactory {
+  @Inject(optional = true) private var zirconViewCustomizer = ZirconViewCustomizer.Null
+  override def create(stepper: DebugMapStepper): View = {
+    new ZirconView(zirconViewCustomizer, stepper) <| (_.nextSmallStep())
   }
-  override def create(states: Iterator[GameState]): View =
-    new ZirconView(zirconViewCustomizer, states) <| (_.updateState(NoOp, states.next()))
   override def create(): View =
-    new ZirconView(zirconViewCustomizer, Iterator.empty)
+    new ZirconView(zirconViewCustomizer, DebugMapStepper.Null)
 }

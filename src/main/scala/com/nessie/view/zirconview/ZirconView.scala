@@ -1,15 +1,16 @@
 package com.nessie.view.zirconview
 
-import com.nessie.gm.{GameState, GameStateChange, NoOp, PlayerInput, View}
+import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, NoOp, PlayerInput, View}
 import com.nessie.model.map.MapPoint
 import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
-import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
+import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
 import org.hexworks.zircon.api.input.MouseAction
 
-private class ZirconView(customizer: ZirconViewCustomizer, iterator: Iterator[GameState]) extends View {
+private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: DebugMapStepper) extends View {
+  private var hoverFov: Boolean = false
   private val tileGrid = SwingApplications.startTileGrid(
     AppConfigs.newConfig()
         .withSize(Sizes.create(100, 80))
@@ -21,6 +22,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, iterator: Iterator[Ga
       .withSize(20, 80)
       .withAlignmentWithin(screen, ComponentAlignment.TOP_LEFT)
   )
+  screen.addComponent(propertiesPane.component)
 
   override def updateState(change: GameStateChange, state: GameState): Unit = {
     val mapView = ZirconMap.createGraphics(state.map, customizer.mapCustomizer)
@@ -31,15 +33,26 @@ private class ZirconView(customizer: ZirconViewCustomizer, iterator: Iterator[Ga
       me.getPosition.withInverseRelative(mapViewPosition).toMapPoint(state.map)
     screen.onMouseMoved(toGridCoordinates(_) |> propertiesPane.update(state.map))
   }
-  private val nextButton =
-    Components.button().withText("next").withAlignmentWithin(screen, ComponentAlignment.TOP_RIGHT).build()
-  screen.addComponent(propertiesPane.component)
-  nextButton.onMouseClicked(_ => updateState(NoOp, iterator.next()))
+  val panel = DebugButtonBuilder(
+    _.withAlignmentWithin(screen, ComponentAlignment.TOP_RIGHT),
+    "Small Step" -> (() => nextSmallStep()),
+    "Large Step" -> (() => nextLargeStep()),
+  )
+  screen.addComponent(panel)
 
-  screen.addComponent(nextButton)
   screen.display()
 
   override def playerInput = new PlayerInput {
     override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = ???
+  }
+
+  def nextSmallStep(): Unit = {
+    stepper = stepper.nextSmallStep().get
+    updateState(NoOp, GameState.fromMap(stepper.currentMap))
+  }
+
+  private def nextLargeStep(): Unit = {
+    stepper = stepper.nextBigStep().get
+    updateState(NoOp, GameState.fromMap(stepper.currentMap))
   }
 }
