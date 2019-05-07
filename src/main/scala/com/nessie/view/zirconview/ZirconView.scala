@@ -5,12 +5,11 @@ import com.nessie.model.map.MapPoint
 import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
-import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
+import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
 import org.hexworks.zircon.api.input.MouseAction
 
 private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: DebugMapStepper) extends View {
-  private var hoverFov: Boolean = false
   private val tileGrid = SwingApplications.startTileGrid(
     AppConfigs.newConfig()
         .withSize(Sizes.create(100, 80))
@@ -35,8 +34,8 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   }
   val panel = DebugButtonBuilder(
     _.withAlignmentWithin(screen, ComponentAlignment.TOP_RIGHT),
-    "Small Step" -> (() => nextSmallStep()),
-    "Large Step" -> (() => nextLargeStep()),
+    OnBuildWrapper(Components.button.withText("Small Step"))(_.onMouseClicked(_ => nextSmallStep())),
+    OnBuildWrapper(Components.button.withText("Big Step"))(_.onMouseClicked(_ => nextBigStep())),
   )
   screen.addComponent(panel)
 
@@ -51,7 +50,12 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     updateState(NoOp, GameState.fromMap(stepper.currentMap))
   }
 
-  private def nextLargeStep(): Unit = {
+  private def nextBigStep(): Unit = {
+    stepper = stepper.nextBigStep().get
+    updateState(NoOp, GameState.fromMap(stepper.currentMap))
+  }
+
+  private def toggleFov(): Unit = {
     stepper = stepper.nextBigStep().get
     updateState(NoOp, GameState.fromMap(stepper.currentMap))
   }

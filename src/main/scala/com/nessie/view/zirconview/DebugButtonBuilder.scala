@@ -1,31 +1,29 @@
 package com.nessie.view.zirconview
 
 import common.rich.RichT._
+import common.rich.collections.RichIterator._
 import org.hexworks.zircon.api.{Components, Positions, Sizes}
-import org.hexworks.zircon.api.component.{Button, Component, Panel}
+import org.hexworks.zircon.api.component.{Component, Panel}
+
+import scala.collection.JavaConverters._
 
 private object DebugButtonBuilder {
   type ButtonProperties = (String, () => Any)
-  private def aux(above: Component, bps: List[ButtonProperties]): List[Button] = bps match {
-    case Nil => Nil
-    case (name, action) :: tail =>
-      val next = Components.button()
-          .withText(name)
-          .withPosition(Positions.zero().relativeToBottomOf(above))
-          .build()
-      next.onMouseClicked(_ => action())
-      next :: aux(next, tail)
-  }
-  def apply(p: Placer, bps: ButtonProperties*): Panel = {
+  def apply(p: Placer, bps: OnBuildWrapper[_ <: Component, _]*): Panel = {
     val $ = Components.panel
         .withTitle("Debug")
         .withSize(Sizes.create(20, 80))
         .wrapWithBox(true)
         .<|(p)
         .build
-    // FIXME hack for placing buttons correctly
-    val header = Components.header().withText("Not displayed").build()
-    aux(header, bps.toList).foreach($.addComponent)
+    bps.foreach {ob =>
+      val children = $.getChildren.iterator.asScala
+      val position =
+      // TODO RichIterator.lastOption
+        if (children.isEmpty) Positions.zero else Positions.create(-1, 0).relativeToBottomOf(children.last)
+      ob.cb.withPosition(position)
+      $.addComponent(ob.build())
+    }
     $
   }
 }

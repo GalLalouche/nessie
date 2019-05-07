@@ -10,6 +10,5 @@ private object ZirconUtils {
       $.withRelativeX(-other.getX).withRelativeY(-other.getY)
     def toMapPoint(map: BattleMap): Option[MapPoint] =
       MapPoint(x = $.getX, y = $.getY).opt.filter(map.isInBounds)
-
   }
 }
