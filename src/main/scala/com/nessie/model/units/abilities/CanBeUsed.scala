@@ -1,8 +1,8 @@
 package com.nessie.model.units.abilities
 
 import com.nessie.common.graph.RichUndirected._
-import common.rich.primitives.RichBoolean._
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
+import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 
 object CanBeUsed {
@@ -31,5 +31,7 @@ object CanBeUsed {
       }
       composite(differentOwner, inRange(range))
   }
+  def getUsablePoints(a: UnitAbility)(map: BattleMap, source: MapPoint): Iterable[MapPoint] =
+    map.points.filter(apply(a)(map, source, _))
   def negate: UnitAbility => (BattleMap, MapPoint, MapPoint) => Boolean = u => apply(u)(_, _, _).isFalse
 }

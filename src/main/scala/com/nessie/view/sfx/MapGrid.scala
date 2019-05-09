@@ -71,8 +71,8 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
 
   def nextState(u: CombatUnit)(gs: GameState): PromiseZ[GameStateChange] = {
     def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
-      cells.filterKeys(CanBeUsed(moveAbility)(map, location, _))
-          .values
+      CanBeUsed.getUsablePoints(moveAbility)(map, location)
+          .map(cells)
           .foreach(_.setBaseColor("green"))
       cells(location).setBaseColor("blue")
     }
