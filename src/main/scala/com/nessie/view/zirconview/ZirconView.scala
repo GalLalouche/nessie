@@ -17,10 +17,16 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     PropertiesPanel.create(PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_LEFT))
   screen.addComponent(propertiesPanel.component)
 
+  private val instructions = InstructionsPanel.create(PanelPlacer.sizeAndAlignment(
+    screen.getWidth - propertiesPanel.component.getWidth, 10, screen, ComponentAlignment.BOTTOM_RIGHT)
+  )
+  screen.addComponent(instructions.component)
+
   private val debugPanel: DebugButtonPanel =
     DebugButtonPanel.create(stepper, this,
-      PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_RIGHT))
+      PanelPlacer.sizeAndAlignment(20, 50, screen, ComponentAlignment.TOP_RIGHT))
   screen.addComponent(debugPanel.component)
+
   screen.display()
 
   private var map: Option[ZirconMap] = None
