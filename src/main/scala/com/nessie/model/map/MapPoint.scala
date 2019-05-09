@@ -1,6 +1,10 @@
 package com.nessie.model.map
 
+import common.rich.primitives.RichDouble._
+
 case class MapPoint(x: Int, y: Int) {
+  def euclideanDistanceTo(p: MapPoint): Double = ((x - p.x).sq + (y - p.y).sq).sqrt
+
   def manhattanDistanceTo(unitLocation: MapPoint): Int =
     Math.abs(x - unitLocation.x) + Math.abs(y - unitLocation.y)
 

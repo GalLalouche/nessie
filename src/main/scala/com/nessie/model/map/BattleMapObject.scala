@@ -1,3 +1,5 @@
 package com.nessie.model.map
 
-trait BattleMapObject
+trait BattleMapObject {
+  def obstructsVision: Boolean = false
+}
