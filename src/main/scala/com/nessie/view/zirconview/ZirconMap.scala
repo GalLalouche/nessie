@@ -10,12 +10,11 @@ import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.{Symbols, TileGraphics}
 
 // This map has to be mutable, since Redrawing the same graphics causes nasty refresh bugs in Zircon :\
-private class ZirconMap(private var currentMap: BattleMap, c: ZirconMapCustomizer) {
-  val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder()
-      .withSize(Sizes.create(currentMap.width, currentMap.height))
-      .build()
-  updateTiles()
-
+private class ZirconMap(
+    private var currentMap: BattleMap,
+    c: ZirconMapCustomizer,
+    val graphics: TileGraphics,
+) {
   private def updateTiles(): Unit = updateTiles(true.const)
   private def updateTiles(isVisible: MapPoint => Boolean): Unit = synchronized {
     currentMap.objects.map {
@@ -53,5 +52,10 @@ private object ZirconMap {
       .withCharacter(' ')
       .withBackgroundColor(ANSITileColor.BLACK)
       .buildCharacterTile()
-  def create(map: BattleMap, c: ZirconMapCustomizer) = new ZirconMap(map, c)
+  def create(map: BattleMap, c: ZirconMapCustomizer) = {
+    val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder()
+        .withSize(Sizes.create(map.width, map.height))
+        .build()
+    new ZirconMap(map, c, graphics).<|(_.updateTiles())
+  }
 }
