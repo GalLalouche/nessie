@@ -1,12 +1,9 @@
 package com.nessie.view.zirconview
 
-import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, NoOp, PlayerInput, View}
+import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, PlayerInput, View}
 import com.nessie.model.units.CombatUnit
-import common.rich.RichT._
-import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
-import org.hexworks.zircon.api.component.{CheckBox, ComponentAlignment}
-
-import scala.collection.JavaConverters._
+import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
+import org.hexworks.zircon.api.component.ComponentAlignment
 
 private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: DebugMapStepper) extends View {
   private val tileGrid = SwingApplications.startTileGrid(
@@ -20,34 +17,11 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     PropertiesPanel.create(PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_LEFT))
   screen.addComponent(propertiesPanel.component)
 
-  val panel = DebugButtonBuilder(
-    _.withAlignmentWithin(screen, ComponentAlignment.TOP_RIGHT),
-    OnBuildWrapper(Components.button.withText("Small Step"))(_.onMouseClicked(_ => nextSmallStep())),
-    OnBuildWrapper(Components.button.withText("Big Step"))(_.onMouseClicked(_ => nextBigStep())),
-    OnBuildWrapper.noOp(Components.checkBox.withText("Hover FOV")),
-  )
-  private def isHoverFovChecked: Boolean = panel.getChildren.iterator.asScala
-      .flatMap(_.safeCast[CheckBox])
-      .find(_.getText == "Hover FOV")
-      .get
-      .isChecked
-  screen.addComponent(panel)
-
+  private val debugPanel: DebugButtonPanel =
+    DebugButtonPanel.create(stepper, this,
+      PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_RIGHT))
+  screen.addComponent(debugPanel.component)
   screen.display()
-
-  override def playerInput = new PlayerInput {
-    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = ???
-  }
-
-  def nextSmallStep(): Unit = {
-    stepper = stepper.nextSmallStep().get
-    updateState(NoOp, GameState.fromMap(stepper.currentMap))
-  }
-
-  private def nextBigStep(): Unit = {
-    stepper = stepper.nextBigStep().get
-    updateState(NoOp, GameState.fromMap(stepper.currentMap))
-  }
 
   private var map: Option[ZirconMap] = None
   override def updateState(change: GameStateChange, state: GameState): Unit = {
@@ -57,7 +31,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
       val $ = ZirconMap.create(state.map, customizer.mapCustomizer)
       $.mouseEvents(screen, mapViewPosition).foreach(gc => {
         propertiesPanel.update($.getCurrentBattleMap)(gc)
-        if (isHoverFovChecked) {
+        if (debugPanel.isHoverFovChecked) {
           $.drawFov(gc)
           drawMap()
         }
@@ -70,4 +44,10 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     }
     drawMap()
   }
+
+  override def playerInput = new PlayerInput {
+    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = ???
+  }
+
+  def nextSmallStep(): Unit = debugPanel.nextSmallStep()
 }
