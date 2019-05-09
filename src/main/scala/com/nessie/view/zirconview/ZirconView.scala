@@ -5,7 +5,6 @@ import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
 import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
-import org.hexworks.zircon.api.builder.component.PanelBuilder
 import org.hexworks.zircon.api.component.{CheckBox, ComponentAlignment}
 
 import scala.collection.JavaConverters._
@@ -18,13 +17,12 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
         .build())
 
   private val screen = Screens.createScreenFor(tileGrid)
-  private val propertiesPane = PropertiesPanel.create(
-    PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_LEFT)
-  )
-  screen.addComponent(propertiesPane.component)
+  private val propertiesPanel =
+    PropertiesPanel.create(PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_LEFT))
+  screen.addComponent(propertiesPanel.component)
 
   private var map: Option[ZirconMap] = None
-  private val mapViewPosition = Positions.create(0, 1).relativeToRightOf(propertiesPane.component)
+  private val mapViewPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
   private def drawMap(): Unit = screen.draw(map.get.graphics, mapViewPosition)
   override def updateState(change: GameStateChange, state: GameState): Unit = map match {
     case None =>
@@ -34,7 +32,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
       // TODO convert InputEmitter to ObservableFactory
       screen.onMouseMoved(me => {
         val gc = me.getPosition.withInverseRelative(mapViewPosition).toMapPoint(newMap.map)
-        propertiesPane.update(newMap.map)(gc)
+        propertiesPanel.update(newMap.map)(gc)
         gc.filter(isHoverFovChecked.const) |> newMap.drawFov
         drawMap()
       })

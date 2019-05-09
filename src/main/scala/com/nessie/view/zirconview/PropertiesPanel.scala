@@ -5,25 +5,20 @@ import com.nessie.model.units.{CombatUnit, PlayerUnit}
 import com.nessie.model.units.inventory.Equipment
 import com.nessie.model.units.stats.Stats
 import common.rich.RichT._
-import org.hexworks.zircon.api.{Components, Positions}
-import org.hexworks.zircon.api.builder.component.{PanelBuilder, TextBoxBuilder}
-import org.hexworks.zircon.api.component.{Component, Panel}
+import org.hexworks.zircon.api.builder.component.TextBoxBuilder
+import org.hexworks.zircon.api.component.Component
 
-private class PropertiesPanel private(panel: Panel) {
+private class PropertiesPanel private(panel: TextBoxPanel) {
   def update(map: BattleMap)(mp: Option[MapPoint]): Unit = {
     panel.clear()
-    mp.foreach(mp => panel.addComponent({
-      val textBox = Components.textBox()
-          .withContentWidth(panel.getWidth - 2)
-          .addHeader(mp.toString)
-      map(mp).safeCast[CombatUnitObject].map(_.unit).foreach(PropertiesPanel.addUnitProperties(textBox))
-      textBox
-          .withPosition(Positions.zero().relativeToTopOf(panel))
-          .build()
-    }))
-    panel.applyColorTheme(ZirconConstants.Theme)
+    mp.foreach {mp =>
+      panel.update {textBox =>
+        textBox.addHeader(mp.toString)
+        map(mp).safeCast[CombatUnitObject].map(_.unit).foreach(PropertiesPanel.addUnitProperties(textBox))
+      }
+    }
   }
-  def component: Component = panel
+  def component: Component = panel.component
 }
 
 private object PropertiesPanel {
@@ -42,11 +37,6 @@ private object PropertiesPanel {
     tb.addHeader(s"${u.hitPoints.currentHp}/${u.hitPoints.maxHp}")
     u.safeCast[PlayerUnit].foreach(pu => {parseStats(pu.stats); parseEquipment(pu.equipment)})
   }
-  def create(panelPlacer: PanelPlacer): PropertiesPanel = new PropertiesPanel(Components
-      .panel()
-      .withTitle("Properties pane")
-      .wrapWithBox(true)
-      .|>(panelPlacer)
-      .<|(_.applyColorTheme(ZirconConstants.Theme))
-  )
+
+  def create(panelPlacer: PanelPlacer) = new PropertiesPanel(TextBoxPanel("Properties", panelPlacer))
 }
