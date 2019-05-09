@@ -7,7 +7,11 @@ import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
 import org.hexworks.zircon.api.{DrawSurfaces, Sizes, Tiles}
 import org.hexworks.zircon.api.color.ANSITileColor
+import org.hexworks.zircon.api.data.Position
 import org.hexworks.zircon.api.graphics.{Symbols, TileGraphics}
+import org.hexworks.zircon.api.screen.Screen
+import rx.lang.scala.Observable
+import rx.lang.scala.subjects.PublishSubject
 
 // This map has to be mutable, since Redrawing the same graphics causes nasty refresh bugs in Zircon :\
 private class ZirconMap(
@@ -32,8 +36,7 @@ private class ZirconMap(
             else
               Unrevealed
             )
-    }
-        .foreach((graphics.setTileAt _).tupled)
+    }.foreach((graphics.setTileAt _).tupled)
   }
 
   def drawFov(mp: Option[MapPoint]): Unit =
@@ -43,7 +46,14 @@ private class ZirconMap(
     updateTiles()
   }
 
-  def map: BattleMap = synchronized {currentMap}
+  def getCurrentBattleMap: BattleMap = synchronized {currentMap}
+
+  def mouseEvents(screen: Screen, position: Position): Observable[Option[MapPoint]] = {
+    // TODO extract common template: create a subject, an action to update it, return the subject
+    val $ = PublishSubject[Option[MapPoint]]()
+    screen.onMouseMoved($ onNext _.getPosition.withInverseRelative(position).toMapPoint(getCurrentBattleMap))
+    $
+  }
 }
 
 private object ZirconMap {

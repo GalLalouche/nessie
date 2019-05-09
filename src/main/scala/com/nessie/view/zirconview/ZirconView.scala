@@ -2,7 +2,6 @@ package com.nessie.view.zirconview
 
 import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, NoOp, PlayerInput, View}
 import com.nessie.model.units.CombatUnit
-import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
 import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.{CheckBox, ComponentAlignment}
@@ -21,25 +20,6 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     PropertiesPanel.create(PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_LEFT))
   screen.addComponent(propertiesPanel.component)
 
-  private var map: Option[ZirconMap] = None
-  private val mapViewPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
-  private def drawMap(): Unit = screen.draw(map.get.graphics, mapViewPosition)
-  override def updateState(change: GameStateChange, state: GameState): Unit = map match {
-    case None =>
-      val newMap = ZirconMap.create(state.map, customizer.mapCustomizer)
-      map = Some(newMap)
-      drawMap()
-      // TODO convert InputEmitter to ObservableFactory
-      screen.onMouseMoved(me => {
-        val gc = me.getPosition.withInverseRelative(mapViewPosition).toMapPoint(newMap.map)
-        propertiesPanel.update(newMap.map)(gc)
-        gc.filter(isHoverFovChecked.const) |> newMap.drawFov
-        drawMap()
-      })
-    case Some(value) =>
-      value.update(state.map)
-      drawMap()
-  }
   val panel = DebugButtonBuilder(
     _.withAlignmentWithin(screen, ComponentAlignment.TOP_RIGHT),
     OnBuildWrapper(Components.button.withText("Small Step"))(_.onMouseClicked(_ => nextSmallStep())),
@@ -67,5 +47,27 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   private def nextBigStep(): Unit = {
     stepper = stepper.nextBigStep().get
     updateState(NoOp, GameState.fromMap(stepper.currentMap))
+  }
+
+  private var map: Option[ZirconMap] = None
+  override def updateState(change: GameStateChange, state: GameState): Unit = {
+    val mapViewPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
+    def drawMap(): Unit = screen.draw(map.get.graphics, mapViewPosition)
+    def createNewMap(state: GameState): ZirconMap = {
+      val $ = ZirconMap.create(state.map, customizer.mapCustomizer)
+      $.mouseEvents(screen, mapViewPosition).foreach(gc => {
+        propertiesPanel.update($.getCurrentBattleMap)(gc)
+        if (isHoverFovChecked) {
+          $.drawFov(gc)
+          drawMap()
+        }
+      })
+      $
+    }
+    map match {
+      case None => map = Some(createNewMap(state))
+      case Some(value) => value.update(state.map)
+    }
+    drawMap()
   }
 }
