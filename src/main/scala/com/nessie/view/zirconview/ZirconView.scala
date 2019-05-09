@@ -5,6 +5,7 @@ import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
 import org.hexworks.zircon.api.{AppConfigs, Components, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
+import org.hexworks.zircon.api.builder.component.PanelBuilder
 import org.hexworks.zircon.api.component.{CheckBox, ComponentAlignment}
 
 import scala.collection.JavaConverters._
@@ -17,9 +18,8 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
         .build())
 
   private val screen = Screens.createScreenFor(tileGrid)
-  private val propertiesPane = PropertiesPanel.create(_
-      .withSize(20, 80)
-      .withAlignmentWithin(screen, ComponentAlignment.TOP_LEFT)
+  private val propertiesPane = PropertiesPanel.create(
+    PanelPlacer.sizeAndAlignment(20, 80, screen, ComponentAlignment.TOP_LEFT)
   )
   screen.addComponent(propertiesPane.component)
 

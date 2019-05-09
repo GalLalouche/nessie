@@ -10,7 +10,6 @@ import org.hexworks.zircon.api.builder.component.{PanelBuilder, TextBoxBuilder}
 import org.hexworks.zircon.api.component.{Component, Panel}
 
 private class PropertiesPanel private(panel: Panel) {
-  panel.applyColorTheme(ZirconConstants.Theme)
   def update(map: BattleMap)(mp: Option[MapPoint]): Unit = {
     panel.clear()
     mp.foreach(mp => panel.addComponent({
@@ -43,11 +42,11 @@ private object PropertiesPanel {
     tb.addHeader(s"${u.hitPoints.currentHp}/${u.hitPoints.maxHp}")
     u.safeCast[PlayerUnit].foreach(pu => {parseStats(pu.stats); parseEquipment(pu.equipment)})
   }
-  def create(panelBuilder: PanelBuilder => Any): PropertiesPanel = new PropertiesPanel(Components
+  def create(panelPlacer: PanelPlacer): PropertiesPanel = new PropertiesPanel(Components
       .panel()
       .withTitle("Properties pane")
       .wrapWithBox(true)
-      .<|(panelBuilder)
-      .build()
+      .|>(panelPlacer)
+      .<|(_.applyColorTheme(ZirconConstants.Theme))
   )
 }
