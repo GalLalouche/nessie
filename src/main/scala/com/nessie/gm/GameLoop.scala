@@ -1,15 +1,17 @@
 package com.nessie.gm
 
+import com.google.inject.Guice
 import com.nessie.model.map._
 import com.nessie.model.units._
-import com.nessie.view.sfx.ScalaFxViewFactory
+import com.nessie.view.ViewModule
+import net.codingwell.scalaguice.InjectorExtensions._
 
 /**
  * The game loop is the main application entry point. It runs a while(true) loop (hence the name), and fetches
  * the next state from the game master.
  */
-private object GameLoop {
-  private def createInitialState = GameState.fromMap(
+object GameLoop {
+  private def DemoState = GameState.fromMap(
     DictBattleMap(5, 5)
         .place(MapPoint(0, 0), CombatUnitObject(Warrior.create))
         .place(MapPoint(0, 1), CombatUnitObject(Archer.create))
@@ -19,11 +21,14 @@ private object GameLoop {
   )
 
   def main(args: Array[String]): Unit = {
-    val guiFactory: ViewFactory = ScalaFxViewFactory
-    val view = guiFactory.create()
-    val gameMaster: Iterator[(GameStateChange, GameState)] =
-      GameMaster.initiate(createInitialState, view.playerInput)
+    val view = Guice.createInjector(ViewModule).instance[ViewFactory].create()
+    initialize(view, DemoState)
+  }
+
+  // TODO make stoppbable
+  def initialize(view: View, currentState: GameState): Unit = {
+    val iterator = GameMaster.initiate(currentState, view.playerInput)
     while (true)
-      (view.updateState _).tupled(gameMaster.next())
+      (view.updateState _).tupled(iterator.next())
   }
 }
