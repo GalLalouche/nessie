@@ -1,6 +1,5 @@
-package com.nessie.view.sfx
+package com.nessie.common
 
-import com.nessie.view.sfx.PromiseZ._
 import common.rich.RichT._
 import rx.lang.scala.subjects.ReplaySubject
 import rx.lang.scala.Subscriber
@@ -9,8 +8,10 @@ import scalaz.{-\/, \/, \/-}
 import scalaz.concurrent.Task
 
 /** Because god forbid ScalaZ have a proper Promise. */
-// TODO move to common
-private class PromiseZ[A] {
+// TODO move to ScalaCommon
+class PromiseZ[A] {
+  import PromiseZ._
+
   private type Value = Throwable \/ A
   private val ps = ReplaySubject[Value]()
   private var value: Value = _
@@ -35,10 +36,10 @@ private class PromiseZ[A] {
   }
 }
 
-private object PromiseZ {
+object PromiseZ {
   // TODO move to ScalaCommon
   private def singleTimeSubscriber[A](f: A => Any): Subscriber[A] = new Subscriber[A]() {
-    override def onNext(value: A): Unit = {
+   override def onNext(value: A): Unit = {
       f(value)
       unsubscribe()
     }

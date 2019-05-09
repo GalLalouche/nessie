@@ -1,4 +1,4 @@
-package com.nessie.view.sfx
+package com.nessie.common
 
 import common.AuxSpecs
 import org.scalatest.{FreeSpec, OneInstancePerTest}

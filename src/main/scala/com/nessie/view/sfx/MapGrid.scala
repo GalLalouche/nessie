@@ -2,6 +2,7 @@ package com.nessie.view.sfx
 
 import java.io.IOException
 
+import com.nessie.common.PromiseZ
 import com.nessie.gm.{GameState, GameStateChange}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
