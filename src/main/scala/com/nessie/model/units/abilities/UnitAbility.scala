@@ -5,6 +5,7 @@ sealed trait UnitAbility {
 }
 
 case class MoveAbility(range: Int) extends UnitAbility {
+  require(range >= 0)
   override val name = "Move to"
 }
 

@@ -1,6 +1,7 @@
 package com.nessie.view.sfx
 
-import com.nessie.gm.{GameState, GameStateChange, NoOp, PlayerInput, View}
+import com.nessie.gm.{GameState, GameStateChange, PlayerInput, TurnAction, View}
+import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
@@ -72,7 +73,7 @@ private class ScalaFxView(customizer: ScalaFxViewCustomizer, i: Option[Iterator[
   }
 
   val playerInput = new PlayerInput {
-    override def nextState(u: CombatUnit)(gs: GameState): Task[GameStateChange] = {
+    override def nextState(u: CombatUnit)(gs: GameState): Task[TurnAction] = {
       if (hasClosed)
         throw new IllegalStateException("The gui has been closed")
       mapGrid.nextState(u)(gs).toTask

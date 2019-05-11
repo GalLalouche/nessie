@@ -1,6 +1,7 @@
 package com.nessie.view.sfx
 
-import com.nessie.gm.{GameState, NoOp, View, ViewFactory}
+import com.nessie.gm.{GameState, View, ViewFactory}
+import com.nessie.gm.GameStateChange.NoOp
 import common.rich.RichT._
 import javafx.embed.swing.JFXPanel
 import scalafx.application.Platform

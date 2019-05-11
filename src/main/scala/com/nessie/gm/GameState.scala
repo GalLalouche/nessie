@@ -14,8 +14,7 @@ import scalaz.std.OptionInstances
 case class GameState(
     map: BattleMap,
     eq: EventQueue[Event],
-    // TODO less hackish
-    midMovement: Option[Movement], // True after a unit has moved but not taken an action yet.
+    currentTurn: Option[ComposedTurn], // True after a unit has moved but not finished its turn yet.
 ) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
@@ -47,7 +46,7 @@ object GameState {
     val eq = units.foldLeft(new EventQueue[Event]) {
       (agg, next) => agg.add(UnitTurn(next), 1.0 / next.moveAbility.range)
     }
-    GameState(map, eq, midMovement = None)
+    GameState(map, eq, currentTurn = None)
   }
   def unitSetter(original: CombatUnit): Setter[GameState, CombatUnit] =
     Setter[GameState, CombatUnit](replacer => _.mapUnit(original, replacer))

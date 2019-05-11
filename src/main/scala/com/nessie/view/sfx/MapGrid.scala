@@ -3,7 +3,7 @@ package com.nessie.view.sfx
 import java.io.IOException
 
 import com.nessie.common.PromiseZ
-import com.nessie.gm.{GameState, GameStateChange}
+import com.nessie.gm.{GameState, GameStateChange, TurnAction}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
@@ -50,9 +50,9 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     }
   }
 
-  private def getMove(source: MapPoint, gs: GameState): PromiseZ[GameStateChange] = {
-    val $ = PromiseZ[GameStateChange]()
-    val menuEvents = PublishSubject[GameStateChange]()
+  private def getMove(source: MapPoint, gs: GameState): PromiseZ[TurnAction] = {
+    val $ = PromiseZ[TurnAction]()
+    val menuEvents = PublishSubject[TurnAction]()
     val menuFactory = new ActionMenuFactory(source, gs, menuEvents)
     def createMenu(node: Node, destination: MapPoint): Unit =
       menuFactory(destination).show(node, Side.Bottom, 0, 0)
@@ -69,7 +69,7 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     $
   }
 
-  def nextState(u: CombatUnit)(gs: GameState): PromiseZ[GameStateChange] = {
+  def nextState(u: CombatUnit)(gs: GameState): PromiseZ[TurnAction] = {
     def highlight(location: MapPoint, moveAbility: MoveAbility): Unit = {
       CanBeUsed.getUsablePoints(moveAbility)(map, location)
           .map(cells)
@@ -77,7 +77,7 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
       cells(location).setBaseColor("blue")
     }
     val unitLocation = CombatUnitObject.findIn(u, gs.map).get
-    highlight(unitLocation, u.moveAbility)
+    highlight(unitLocation, gs.currentTurn.get.remainingMovementAbility)
     getMove(unitLocation, gs)
   }
 

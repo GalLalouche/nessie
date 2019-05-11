@@ -1,6 +1,7 @@
 package com.nessie.view.zirconview
 
-import com.nessie.gm.{DebugMapStepper, GameState, NoOp, View}
+import com.nessie.gm.{DebugMapStepper, GameState, View}
+import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.view.zirconview.DebugButtonPanel.StepperWrapper
 import common.rich.collections.RichIterator._
 import common.rich.RichT._
