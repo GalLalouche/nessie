@@ -6,7 +6,6 @@ object Skeleton {
   def create: Monster = new Monster(
     HitPoints.fullHp(5),
     CombatUnitMetadata("Skeleton"),
-  ) {
-    override val abilities = Vector(MoveAbility(3), MeleeAttack(2))
-  }
+    Vector(MoveAbility(3), MeleeAttack(2)),
+  )
 }

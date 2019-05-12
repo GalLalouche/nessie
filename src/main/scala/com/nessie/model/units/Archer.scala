@@ -11,10 +11,8 @@ object Archer {
     Stats(1, 2, 3),
     Equipment()
         .equip(DemoItems.bow)
-        .equip(DemoItems.leatherArmor)
-
-  ) {
-    override val abilities = Vector(MoveAbility(3), MeleeAttack(1), RangedAttack(3, 3))
-  }
+        .equip(DemoItems.leatherArmor),
+    Vector(MoveAbility(3), MeleeAttack(1), RangedAttack(3, 3)),
+  )
 }
 
