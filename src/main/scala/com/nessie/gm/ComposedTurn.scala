@@ -8,6 +8,7 @@ import monocle.macros.Lenses
 sealed trait ComposedTurn {
   def unit: CombatUnit
   def append(m: Movement): ComposedTurn
+  def +(m: Movement): ComposedTurn = append(m)
   // TODO specify order
   def movements: Seq[Movement]
   def totalMovement: Int = movements.view.map(_.manhattanDistance).sum
@@ -30,6 +31,7 @@ case class PreAction(unit: CombatUnit, movements: List[Movement]) extends Compos
   require(remainingMovement >= 0)
   override def append(movement: Movement): PreAction = PreAction.movements.modify(movement :: _)(this)
   def append(attack: Attack): PostAction = PostAction(unit, movements, attack, Nil)
+  def +(attack: Attack): PostAction = append(attack)
   override def canAppendAction: Boolean = true
 }
 object PreAction {
