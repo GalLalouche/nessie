@@ -2,8 +2,8 @@ package com.nessie.gm
 
 import com.nessie.gm.TurnAction.EndTurn
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
-import com.nessie.model.units.{CombatUnit, Owner}
 import com.nessie.model.units.abilities.{AbilityToTurnAction, CanBeUsed}
+import com.nessie.model.units.{CombatUnit, Owner}
 import common.rich.RichT._
 
 /** A dead simple AI that runs up to the nearest player and punches them in face. */
@@ -20,13 +20,13 @@ private object CatcherAI extends AI {
     val unitLocation = CombatUnitObject.findIn(u, map).get
     val attack: Option[TurnAction] = {
       val attackAbility = u.attackAbility
-      map.points
-          .find(CanBeUsed(attackAbility)(map, unitLocation, _))
+      CanBeUsed.getUsablePoints(attackAbility)(map, unitLocation)
+          .headOption
           .map(AbilityToTurnAction(attackAbility)(unitLocation, _))
     }.filter(currentTurn.canAppendAction.const)
     lazy val moveOrEnd: TurnAction = {
       val moveAbility = currentTurn.remainingMovementAbility
-      val moveLocations = map.points.filter(CanBeUsed(moveAbility)(map, unitLocation, _))
+      val moveLocations = CanBeUsed.getUsablePoints(moveAbility)(map, unitLocation)
       if (moveLocations.isEmpty) EndTurn else moveLocations
           .minBy(distanceToPlayer(map, _))
           .mapTo(AbilityToTurnAction(moveAbility)(unitLocation, _))

@@ -31,6 +31,8 @@ object CanBeUsed {
       }
       composite(differentOwner, inRange(range))
   }
+  // TODO implement more efficiently for ranges
+  // TODO There's a different between a ranged ability like magic missile and movement range.
   def getUsablePoints(a: UnitAbility)(map: BattleMap, source: MapPoint): Iterable[MapPoint] =
     map.points.filter(apply(a)(map, source, _))
   def negate: UnitAbility => (BattleMap, MapPoint, MapPoint) => Boolean = u => apply(u)(_, _, _).isFalse
