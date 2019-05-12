@@ -2,10 +2,11 @@ package com.nessie.common.graph
 
 import com.nessie.common.graph.RichUndirected._
 import common.AuxSpecs
+import common.rich.RichTuple._
 import common.rich.collections.RichTraversableOnce._
-import org.scalatest.{FreeSpec, OneInstancePerTest}
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.time.Span
+import org.scalatest.{FreeSpec, OneInstancePerTest}
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
 import scalax.collection.immutable.Graph
@@ -56,13 +57,21 @@ class RichUndirectedTest extends FreeSpec with AuxSpecs with TimeLimitedTests wi
         }
         "3" in {
           val vertices = 1 to 100
-          val edges = vertices.unorderedPairs.map(e => e._1 ~ e._2).toList
+          val edges = vertices.unorderedPairs.map(_.reduce(_ ~ _)).toVector
           Graph.from(vertices, edges).distances(1) shouldReturn (Map(1 -> 0) ++ (2 to 100).map(_ -> 1).toMap)
         }
       }
     }
+    "maxDistance" in {
+      val vertices = 1 to 100
+      val edges = vertices.sliding(2).map(e => e(0) ~ e(1)).toVector
+      Graph.from(vertices, edges).distances(1, 3) shouldReturn Map(1 -> 0, 2 -> 1, 3 -> 2, 4 -> 3)
+    }
   }
-  "map edges" in {
+  "mapNodes" in {
     Graph("foo" ~ "bazz", "bazz" ~ "foobar").mapNodes(_.length) shouldReturn Graph(3 ~ 4, 4 ~ 6)
+  }
+  "removeNodes" in {
+    Graph("foo" ~ "bazz", "bazz" ~ "foobar").removeNodes(Set("foo")) shouldReturn Graph("bazz" ~ "foobar", "bazz")
   }
 }

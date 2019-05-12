@@ -1,16 +1,16 @@
 package com.nessie.common.graph
 
-import scala.annotation.tailrec
-import scala.collection.immutable.Queue
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
-import scalax.collection.GraphPredef.Param
+
+import scala.annotation.tailrec
+import scala.collection.immutable.Queue
 
 object RichUndirected {
   implicit class richUndirected[A]($: Graph[A, UnDiEdge]) {
     private def neighbors(t: A): Traversable[A] = $.get(t).diSuccessors.map(_.value)
 
-    private def distances(source: A, destination: Option[A]): Map[A, Int] = {
+    private def distances(source: A, destination: Option[A], maxDistance: Option[Int]): Map[A, Int] = {
       require($.nodes.contains(source), "No node equal to " + source)
       destination.foreach(d => require($.nodes.contains(d), "No node equal to " + d))
 
@@ -18,7 +18,7 @@ object RichUndirected {
       def aux(queue: Queue[(A, Int)], result: Map[A, Int]): Map[A, Int] = queue.dequeueOption match {
         case None => result
         case Some(((next, d), tail)) =>
-          if (result.contains(next))
+          if (result.contains(next) || maxDistance.exists(_ < d))
             aux(tail, result)
           else {
             val nextResult = result + (next -> d)
@@ -32,12 +32,11 @@ object RichUndirected {
     }
 
     def distance(source: A, destination: A): Option[Int] =
-      distances(source, Some(destination)).get(destination)
+      distances(source, destination = Some(destination), maxDistance = None).get(destination)
 
-    def distances(source: A): Map[A, Int] = distances(source, None)
-    // TODO optimize
+    def distances(source: A): Map[A, Int] = distances(source, destination = None, maxDistance = None)
     def distances(source: A, maxDistance: Int): Map[A, Int] =
-      distances(source, None).filter(_._2 <= maxDistance)
+      distances(source, destination = None, maxDistance = Some(maxDistance))
 
     def outerNodes: Iterable[A] = $.nodes
     def outerEdges: Iterable[UnDiEdge[A]] = $.edges
@@ -48,7 +47,6 @@ object RichUndirected {
       Graph.from(mappedNodes, mappedEdges)
     }
 
-    def removeNodes(xs: Traversable[A]): Graph[A, UnDiEdge] =
-      $ -- Graph.from(xs, Nil)
+    def removeNodes(xs: Traversable[A]): Graph[A, UnDiEdge] = $ -- Graph.from(xs, Nil)
   }
 }
