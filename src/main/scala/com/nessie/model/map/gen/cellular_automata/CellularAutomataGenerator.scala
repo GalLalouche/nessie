@@ -24,11 +24,7 @@ private object CellularAutomataGenerator extends MapGenerator {
           map.place(mp, next)
         }
       })
-    } yield {
-      val iterator = new MapIterator(initialMap, 1)
-      // TODO iterateOptionally in LazyIterable
-      LazyIterable.iterate(Option(iterator))(_.get.next).takeWhile(_.isDefined).map(_.get.map)
-    }
+    } yield LazyIterable.iterateOptionally(new MapIterator(initialMap, 1))(_.next).map(_.map)
   }
 
   private class MapIterator(val map: BattleMap, n: Int) {
