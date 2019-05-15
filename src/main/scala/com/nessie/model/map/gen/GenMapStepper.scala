@@ -26,8 +26,7 @@ private class GenMapStepper @Inject()(
     override def nextBigStep(): Option[DebugMapStepper] = None
   }
   def genStepper: DebugMapStepper =
-  // TODO fix LazyIterable toStream
-    new FirstStepper(mapGenerator.iterativeGenerator.map(_.toStream.toStream).mkRandom(s1))
+    new FirstStepper(mapGenerator.iterativeGenerator.map(_.toStream).mkRandom(s1))
 }
 
 private object GenMapStepper {
