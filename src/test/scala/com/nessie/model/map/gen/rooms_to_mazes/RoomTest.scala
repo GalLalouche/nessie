@@ -3,15 +3,18 @@ package com.nessie.model.map.gen.rooms_to_mazes
 import com.nessie.model.map.MapPoint
 import common.AuxSpecs
 import org.scalatest.FreeSpec
+import org.scalatest.Inspectors._
 
 class RoomTest extends FreeSpec with AuxSpecs {
-  // _____
-  // _____
-  // _xxx_
-  // _xxx_
-  // _xxx_
-  // _xxx_
-  // _____
+  //  01234
+  // 0_____
+  // 1_____
+  // 2_xxx_
+  // 3_xxx_
+  // 4_xxx_
+  // 5_xxx_
+  // 6_____
+  // 7_____
   private val $ = Room(x = 1, y = 2, w = 3, h = 4)
   "pointNotInRectangle" in {
     $.pointInRectangle(MapPoint(1, 2)) shouldReturn true
@@ -96,5 +99,24 @@ class RoomTest extends FreeSpec with AuxSpecs {
       MapPoint(3, 4),
       MapPoint(3, 5),
     )
+  }
+
+  "distanceTo" - {
+    "same room returns 0" in {
+      forAll($.mapPoints) {$ distanceTo _ shouldReturn 0}
+    }
+    "adjacent returns 1" in {
+      $ distanceTo MapPoint(2, 1) shouldReturn 1
+      $ distanceTo MapPoint(0, 4) shouldReturn 1
+      $ distanceTo MapPoint(4, 3) shouldReturn 1
+      $ distanceTo MapPoint(2, 6) shouldReturn 1
+    }
+    "non-adjacent" in {
+      $ distanceTo MapPoint(2, 0) shouldReturn 2
+      $ distanceTo MapPoint(0, 1) shouldReturn 2
+      $ distanceTo MapPoint(0, 7) shouldReturn 3
+      $ distanceTo MapPoint(6, 4) shouldReturn 3
+      $ distanceTo MapPoint(7, 6) shouldReturn 5
+    }
   }
 }
