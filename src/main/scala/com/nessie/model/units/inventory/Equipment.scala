@@ -1,6 +1,10 @@
 package com.nessie.model.units.inventory
 
-class Equipment private(equippedItems: Map[EquipSlot, EquippableItem]) {
+import com.nessie.common.EnumUtils._
+import scalaz.syntax.ToFunctorOps
+
+class Equipment private(equippedItems: Map[EquipSlot, EquippableItem])
+    extends ToFunctorOps {
   def apply(es: EquipSlot): Option[EquippableItem] = equippedItems get es
   def equip(item: EquippableItem): Equipment = {
     val defaults = EquipSlot.default(item.equipType)
@@ -19,9 +23,7 @@ class Equipment private(equippedItems: Map[EquipSlot, EquippableItem]) {
     else new Equipment(equippedItems - es)
   // used by lenses
   def strip = Equipment()
-  // TODO MoreIndexedSeqInstances
-  def allSlots: Seq[(EquipSlot, Option[EquippableItem])] =
-    EquipSlot.values.map(e => e -> equippedItems.get(e))
+  def allSlots: Seq[(EquipSlot, Option[EquippableItem])] = EquipSlot.values.fproduct(equippedItems.get)
 }
 
 object Equipment {
