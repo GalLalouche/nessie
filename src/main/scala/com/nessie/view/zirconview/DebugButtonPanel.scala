@@ -5,8 +5,10 @@ import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.view.zirconview.DebugButtonPanel.StepperWrapper
 import common.rich.collections.RichIterator._
 import common.rich.RichT._
+import common.rich.func.ToMoreFoldableOps
 import org.hexworks.zircon.api.{Components, Positions}
 import org.hexworks.zircon.api.component.{CheckBox, Component, Panel}
+import scalaz.std.OptionInstances
 
 import scala.collection.JavaConverters._
 
@@ -21,7 +23,8 @@ private class DebugButtonPanel private(stepperWrapper: StepperWrapper, panel: Pa
       .isChecked
 }
 
-private object DebugButtonPanel {
+private object DebugButtonPanel
+    extends ToMoreFoldableOps with OptionInstances {
   private[this] def buildPanel(pp: PanelPlacer, bps: OnBuildWrapper[_ <: Component, _]*): Panel = {
     val $ = Components.panel
         .withTitle("Debug")
@@ -29,10 +32,10 @@ private object DebugButtonPanel {
         .<|(pp)
         .build
     bps.foreach {obBuildWrapper =>
-      val children = $.getChildren.iterator.asScala
-      val position =
-      // TODO RichIterator.lastOption
-        if (children.isEmpty) Positions.zero else Positions.create(-1, 0).relativeToBottomOf(children.last)
+      val position = $.getChildren
+          .iterator.asScala
+          .lastOption
+          .mapHeadOrElse(Positions.create(-1, 0).relativeToBottomOf, Positions.zero)
       obBuildWrapper.cb.withPosition(position)
       $.addComponent(obBuildWrapper.build())
     }
