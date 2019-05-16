@@ -11,6 +11,10 @@ private class InstructionsPanel private(panel: TextBoxPanel) {
           .addListItem("Use the mouse to perform actions like attack")
           .addListItem("Press enter to end turn if you have movement squares remaining")
     )
+    case Instructions.BasicInput => panel.update(
+      _.addHeader("Input")
+          .addListItem("Press m to toggle movement mode")
+    )
   }
   def push(i: Instructions): Unit = synchronized {
     stack = i :: stack

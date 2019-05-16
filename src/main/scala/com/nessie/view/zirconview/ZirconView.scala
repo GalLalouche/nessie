@@ -2,6 +2,7 @@ package com.nessie.view.zirconview
 
 import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, PlayerInput, View}
 import com.nessie.model.units.CombatUnit
+import com.nessie.view.zirconview.input.ZirconPlayerInput
 import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
 
@@ -51,8 +52,19 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     drawMap()
   }
 
+  private def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
+
+  screen.display()
+
   override def playerInput = new PlayerInput {
-    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = ???
+    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = {
+      new ZirconPlayerInput(
+        screen,
+        map.get,
+        instructions,
+        screenDrawer = drawMap,
+      ).nextState(currentlyPlayingUnit, gs)
+    }
   }
 
   def nextSmallStep(): Unit = debugPanel.nextSmallStep()
