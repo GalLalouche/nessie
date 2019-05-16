@@ -3,7 +3,7 @@ package com.nessie.view.sfx
 import java.io.IOException
 
 import com.nessie.common.PromiseZ
-import com.nessie.gm.{GameState, GameStateChange, TurnAction}
+import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
@@ -56,13 +56,13 @@ private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
     val menuFactory = new ActionMenuFactory(source, gs, menuEvents)
     def createMenu(node: Node, destination: MapPoint): Unit =
       menuFactory(destination).show(node, Side.Bottom, 0, 0)
-    val subscription = mouseEvents
+    val gridClickSubscription = mouseEvents
         .filter(_._1.eventType == MouseEvent.MouseClicked)
         .map(TuplePLenses.tuple2First.modify(_.source.asInstanceOf[jfxs.Node].toScalaNode))
         .subscribe((createMenu _).tupled)
 
     menuEvents.subscribe(e => {
-      subscription.unsubscribe
+      gridClickSubscription.unsubscribe
       $.fulfill(e)
     })
     lastPromise = $

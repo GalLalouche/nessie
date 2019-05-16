@@ -1,11 +1,11 @@
 package com.nessie.view.sfx
 
+import common.rich.RichObservable
 import javafx.event.{Event, EventType}
 import rx.lang.scala.Observable
-import rx.lang.scala.subjects.PublishSubject
 import scalafx.application.Platform.runLater
-import scalafx.scene.{Node => SNode}
 import scalafx.scene.input.MouseEvent
+import scalafx.scene.{Node => SNode}
 
 private object RichNode {
   implicit class richNode[N](node: N)(implicit ev: NodeLike[N]) {
@@ -15,11 +15,8 @@ private object RichNode {
     def setFontWeight(style: String): Unit = runLater(n.setStyle(Styles.fontWeight(style)))
     def setFontSize(size: Int): Unit = runLater(n.setStyle(Styles.fontSize(size)))
 
-    def toObservable[T <: Event](eventType: EventType[T]): Observable[T] = {
-      val $ = PublishSubject[T]()
-      n.addEventHandler[T](eventType, $.onNext)
-      $
-    }
+    def toObservable[T <: Event](eventType: EventType[T]): Observable[T] =
+      RichObservable.register(f => n.addEventHandler[T](eventType, f.apply))
     def mouseEvents: Observable[MouseEvent] = toObservable(MouseEvent.Any).map(new MouseEvent(_))
 
     def toScalaNode: SNode = n

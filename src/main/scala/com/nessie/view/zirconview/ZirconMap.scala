@@ -1,17 +1,18 @@
 package com.nessie.view.zirconview
 
-import com.nessie.model.map.{BattleMap, CombatUnitObject, EmptyMapObject, FullWall, MapPoint}
 import com.nessie.model.map.fov.FovCalculator
+import com.nessie.model.map.{BattleMap, CombatUnitObject, EmptyMapObject, FullWall, MapPoint}
 import com.nessie.view.zirconview.ZirconMap._
 import com.nessie.view.zirconview.ZirconUtils._
+import common.rich.RichObservable
 import common.rich.RichT._
-import org.hexworks.zircon.api.{DrawSurfaces, Sizes, Tiles}
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.data.Position
 import org.hexworks.zircon.api.graphics.{Symbols, TileGraphics}
+import org.hexworks.zircon.api.input.MouseAction
 import org.hexworks.zircon.api.screen.Screen
+import org.hexworks.zircon.api.{DrawSurfaces, Sizes, Tiles}
 import rx.lang.scala.Observable
-import rx.lang.scala.subjects.PublishSubject
 
 // This map has to be mutable, since Redrawing the same graphics causes nasty refresh bugs in Zircon :\
 private class ZirconMap(
@@ -48,12 +49,9 @@ private class ZirconMap(
 
   def getCurrentBattleMap: BattleMap = synchronized {currentMap}
 
-  def mouseEvents(screen: Screen, position: Position): Observable[Option[MapPoint]] = {
-    // TODO extract common template: create a subject, an action to update it, return the subject
-    val $ = PublishSubject[Option[MapPoint]]()
-    screen.onMouseMoved($ onNext _.getPosition.withInverseRelative(position).toMapPoint(getCurrentBattleMap))
-    $
-  }
+  def mouseEvents(screen: Screen, position: Position): Observable[Option[MapPoint]] =
+    RichObservable.register[MouseAction](f => f(_))
+        .map(_.getPosition.withInverseRelative(position).toMapPoint(getCurrentBattleMap))
 }
 
 private object ZirconMap {
