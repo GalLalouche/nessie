@@ -3,11 +3,11 @@ package com.nessie.model.map
 import com.nessie.common.graph.RichUndirected._
 import common.rich.RichT._
 import common.rich.RichTuple._
-import scalax.collection.GraphPredef._
 import common.rich.func.{MoreIterableInstances, MoreSetInstances}
 import common.rich.primitives.RichBoolean._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
+import scalax.collection.GraphPredef._
 import scalaz.syntax.ToFunctorOps
 
 /** An map of a given level without between-objects, so walls and its ilks taken up a full tile. */
@@ -53,6 +53,7 @@ abstract class BattleMap(val width: Int, val height: Int)
 
   /**
    * Moves an object from one location to another
+   *
    * @param src The location of the object
    * @throws MapEmptyException If the map empty at src
    */
@@ -61,6 +62,7 @@ abstract class BattleMap(val width: Int, val height: Int)
     new {
       /**
        * Moves an object to the location
+       *
        * @param dst The location to move to
        * @return The modified controller
        * @throws MapOccupiedException If there's already an object at dst
@@ -80,9 +82,14 @@ abstract class BattleMap(val width: Int, val height: Int)
   lazy val toPointGraph: Graph[MapPoint, UnDiEdge] = toObjectGraph.mapNodes(_._1)
 
   lazy val toFullGraph: Graph[MapPoint, UnDiEdge] = Graph.from(
-    points,
-    // TODO implement more efficiently
-    points.fproduct(neighbors).flatMap {case (x, xs) => xs.map(x ~ _)}.toSet,
+    nodes = points,
+    edges = for {
+      x <- 0 until width
+      y <- 0 until height
+      point = MapPoint(x, y)
+      neighbor <- Vector(point.go(Direction.Down), point.go(Direction.Right))
+      if isInBounds(neighbor)
+    } yield point ~ neighbor,
   )
 
   def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
@@ -93,5 +100,5 @@ abstract class BattleMap(val width: Int, val height: Int)
   def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
   def neighborsAndDiagonals(mp: MapPoint): Iterable[MapPoint] = mp.neighborsAndDiagonals.filter(isInBounds)
   def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] =
-    if (this(mp).canMoveThrough) neighbors(mp).filter((apply _).andThen(_.canMoveThrough)) else Nil
+    if (this (mp).canMoveThrough) neighbors(mp).filter((apply _).andThen(_.canMoveThrough)) else Nil
 }

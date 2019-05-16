@@ -69,21 +69,50 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
         .place(MapPoint(0, 1), FullWall)
         .toObjectGraph
     val node00 = MapPoint(0, 0) -> EmptyMapObject
-    val node10 = MapPoint(1, 0) -> EmptyMapObject
     val node01 = MapPoint(0, 1) -> FullWall
-    val node11 = MapPoint(1, 1) -> EmptyMapObject
     val node02 = MapPoint(0, 2) -> EmptyMapObject
+    val node10 = MapPoint(1, 0) -> EmptyMapObject
+    val node11 = MapPoint(1, 1) -> EmptyMapObject
     val node12 = MapPoint(1, 2) -> EmptyMapObject
     g.nodes.map(_.value) shouldSetEqual Seq(
       node00,
-      node10,
       node01,
-      node11,
       node02,
+      node10,
+      node11,
       node12,
     )
     g.edges.map(_.toOuter) shouldSetEqual Seq(
       UnDiEdge(node00, node10),
+      UnDiEdge(node10, node11),
+      UnDiEdge(node11, node12),
+      UnDiEdge(node12, node02),
+    )
+  }
+
+  "toFullGraph" in {
+    val g = createBattleMap(width = 2, height = 3)
+        .place(MapPoint(0, 1), FullWall)
+        .toFullGraph
+    val node00 = MapPoint(0, 0)
+    val node01 = MapPoint(0, 1)
+    val node02 = MapPoint(0, 2)
+    val node10 = MapPoint(1, 0)
+    val node11 = MapPoint(1, 1)
+    val node12 = MapPoint(1, 2)
+    g.nodes.map(_.value) shouldSetEqual Seq(
+      node00,
+      node01,
+      node02,
+      node10,
+      node11,
+      node12,
+    )
+    g.edges.map(_.toOuter) shouldSetEqual Seq(
+      UnDiEdge(node00, node01),
+      UnDiEdge(node00, node10),
+      UnDiEdge(node01, node02),
+      UnDiEdge(node01, node11),
       UnDiEdge(node10, node11),
       UnDiEdge(node11, node12),
       UnDiEdge(node12, node02),
