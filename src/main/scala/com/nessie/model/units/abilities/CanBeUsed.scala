@@ -2,8 +2,8 @@ package com.nessie.model.units.abilities
 
 import com.nessie.common.graph.RichUndirected._
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
-import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
+import common.rich.primitives.RichBoolean._
 
 object CanBeUsed {
   private type Constraint = (BattleMap, MapPoint, MapPoint) => Boolean
@@ -12,7 +12,10 @@ object CanBeUsed {
     override def apply(map: BattleMap, src: MapPoint, dst: MapPoint) = all.forall(_ (map, src, dst))
   }
   private def inRange(range: Int): Constraint = (map, src, dst) =>
-    map.toPointGraph.distance(src, dst).exists(d => d > 0 && d <= range)
+    if (range == 1) src.manhattanDistanceTo(dst) <= 1 && map(dst).canMoveThrough && map(src).canMoveThrough
+    else map.toPointGraph.distance(src, dst).exists(d => d > 0 && d <= range)
+  private def allInRange(map: BattleMap, src: MapPoint)(range: Int): Iterable[MapPoint] =
+    map.toPointGraph.distances(src, range).keysIterator.filter(_ != src).toVector
   private def emptyDst: Constraint = (map, _, dst) => map.isEmptyAt(dst)
   private def differentOwner: Constraint = (map, src, dst) => {
     def getOwner(point: MapPoint) = map(point).safeCast[CombatUnitObject].map(_.unit.owner)
@@ -22,6 +25,7 @@ object CanBeUsed {
     } yield sOwner != dOwner) getOrElse false
   }
   // Ideally a would be anonymous, but then the object CanBeUsed can't be used as a pure function
+  // TODO Right now ranged attacks use BFS, which should only be applied to movement.
   def apply(a: UnitAbility): (BattleMap, MapPoint, MapPoint) => Boolean = a match {
     case MoveAbility(range) => composite(inRange(range), emptyDst)
     case d: DamageAbility =>
@@ -31,9 +35,15 @@ object CanBeUsed {
       }
       composite(differentOwner, inRange(range))
   }
-  // TODO implement more efficiently for ranges
-  // TODO There's a different between a ranged ability like magic missile and movement range.
-  def getUsablePoints(a: UnitAbility)(map: BattleMap, source: MapPoint): Iterable[MapPoint] =
-    map.points.filter(apply(a)(map, source, _))
+  def getUsablePoints(a: UnitAbility)(map: BattleMap, source: MapPoint): Iterable[MapPoint] = {
+    val inRange = allInRange(map, source) _
+    a match {
+      case MoveAbility(range) => inRange(range).filter(map.isEmptyAt)
+      case d: DamageAbility => inRange(d match {
+        case MeleeAttack(_) => 1
+        case RangedAttack(_, r) => r
+      }).filter(differentOwner(map, source, _))
+    }
+  }
   def negate: UnitAbility => (BattleMap, MapPoint, MapPoint) => Boolean = u => apply(u)(_, _, _).isFalse
 }
