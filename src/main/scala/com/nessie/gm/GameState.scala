@@ -14,7 +14,7 @@ import scalaz.std.OptionInstances
 case class GameState(
     map: BattleMap,
     eq: EventQueue[Event],
-    currentTurn: Option[ComposedTurn], // True after a unit has moved but not finished its turn yet.
+    currentTurn: Option[ComposedTurn], // Is defined when it's time for a unit to take its turn.
 ) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
