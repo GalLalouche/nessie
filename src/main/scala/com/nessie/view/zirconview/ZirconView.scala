@@ -30,12 +30,12 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   screen.display()
 
   private var map: Option[ZirconMap] = None
+  private val mapGridPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
   override def updateState(change: GameStateChange, state: GameState): Unit = {
-    val mapViewPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
-    def drawMap(): Unit = screen.draw(map.get.graphics, mapViewPosition)
+    def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
     def createNewMap(state: GameState): ZirconMap = {
-      val $ = ZirconMap.create(state.map, customizer.mapCustomizer)
-      $.mouseEvents(screen, mapViewPosition).foreach(gc => {
+      val $ = ZirconMap.create(state.map, customizer.mapCustomizer, mapGridPosition)
+      $.mouseEvents(screen).foreach(gc => {
         propertiesPanel.update($.getCurrentBattleMap)(gc)
         if (debugPanel.isHoverFovChecked) {
           $.drawFov(gc)

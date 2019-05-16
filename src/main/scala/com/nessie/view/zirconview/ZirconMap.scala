@@ -1,17 +1,15 @@
 package com.nessie.view.zirconview
 
-import com.nessie.model.map.fov.FovCalculator
 import com.nessie.model.map.{BattleMap, CombatUnitObject, EmptyMapObject, FullWall, MapPoint}
+import com.nessie.model.map.fov.FovCalculator
 import com.nessie.view.zirconview.ZirconMap._
 import com.nessie.view.zirconview.ZirconUtils._
-import common.rich.RichObservable
 import common.rich.RichT._
+import org.hexworks.zircon.api.{DrawSurfaces, Layers, Positions, Sizes, Tiles}
 import org.hexworks.zircon.api.color.ANSITileColor
-import org.hexworks.zircon.api.data.Position
-import org.hexworks.zircon.api.graphics.{Symbols, TileGraphics}
-import org.hexworks.zircon.api.input.MouseAction
+import org.hexworks.zircon.api.data.{Position, Size, Tile}
+import org.hexworks.zircon.api.graphics.{Layer, Symbols, TileGraphics}
 import org.hexworks.zircon.api.screen.Screen
-import org.hexworks.zircon.api.{DrawSurfaces, Sizes, Tiles}
 import rx.lang.scala.Observable
 
 // This map has to be mutable, since Redrawing the same graphics causes nasty refresh bugs in Zircon :\
@@ -19,12 +17,15 @@ private class ZirconMap(
     private var currentMap: BattleMap,
     c: ZirconMapCustomizer,
     val graphics: TileGraphics,
+    mapGridPosition: Position,
 ) {
+  private def toPosition(mp: MapPoint): Position = Positions.create(mp.x, mp.y)
+  def size: Size = graphics.getSize
   private def updateTiles(): Unit = updateTiles(true.const)
   private def updateTiles(isVisible: MapPoint => Boolean): Unit = synchronized {
     currentMap.objects.map {
       case (mp, obj) =>
-        mp.toPosition -> (
+        toPosition(mp) -> (
             if (isVisible(mp))
               c.getTile.lift(obj).getOrElse(obj match {
                 case EmptyMapObject => Tiles.newBuilder().withCharacter(Symbols.INTERPUNCT)
@@ -49,9 +50,18 @@ private class ZirconMap(
 
   def getCurrentBattleMap: BattleMap = synchronized {currentMap}
 
-  def mouseEvents(screen: Screen, position: Position): Observable[Option[MapPoint]] =
-    RichObservable.register[MouseAction](f => f(_))
-        .map(_.getPosition.withInverseRelative(position).toMapPoint(getCurrentBattleMap))
+  def mouseEvents(screen: Screen): Observable[Option[MapPoint]] =
+    screen.mouseActions
+        .map(_.getPosition.|>(MapGridPoint.fromPosition(mapGridPosition, size)).map(_.mapPoint))
+
+  def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(toPosition)
+      .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
+  def toMapGridPoint: MapPoint => MapGridPoint = MapGridPoint.withMapGridPosition(mapGridPosition, size)
+  def buildLayer: Layer = Layers.newBuilder()
+      .withOffset(mapGridPosition)
+      .withSize(graphics.getSize)
+      .build
+  def tileAt(mapPoint: MapPoint): Tile = graphics.getTileAt(toPosition(mapPoint)).get.asInstanceOf[Tile]
 }
 
 private object ZirconMap {
@@ -60,10 +70,10 @@ private object ZirconMap {
       .withCharacter(' ')
       .withBackgroundColor(ANSITileColor.BLACK)
       .buildCharacterTile()
-  def create(map: BattleMap, c: ZirconMapCustomizer) = {
+  def create(map: BattleMap, c: ZirconMapCustomizer, mapGridPosition: Position) = {
     val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder()
         .withSize(Sizes.create(map.width, map.height))
         .build()
-    new ZirconMap(map, c, graphics).<|(_.updateTiles())
+    new ZirconMap(map, c, graphics, mapGridPosition).<|(_.updateTiles())
   }
 }
