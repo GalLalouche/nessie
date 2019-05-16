@@ -30,7 +30,6 @@ abstract class BattleMap(val width: Int, val height: Int)
   def isBorder(p: MapPoint): Boolean = p.x == 0 || p.y == 0 || p.x == width - 1 || p.y == height - 1
 
   def apply(p: MapPoint): BattleMapObject
-  private def isPassable(mp: MapPoint): Boolean = BattleMap.isPassable(this (mp))
 
   private def checkBounds(p: MapPoint): Unit =
     if (p.x >= width || p.y >= height)
@@ -94,11 +93,5 @@ abstract class BattleMap(val width: Int, val height: Int)
   def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
   def neighborsAndDiagonals(mp: MapPoint): Iterable[MapPoint] = mp.neighborsAndDiagonals.filter(isInBounds)
   def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] =
-    if (isPassable(mp)) neighbors(mp).filter((apply _).andThen(BattleMap.isPassable)) else Nil
-}
-
-object BattleMap {
-  // TODO replace with a method on BattleMapObject
-  // TODO add overloads implemented using simple ints, for performance?
-  private def isPassable(o: BattleMapObject): Boolean = o neq FullWall
+    if (this(mp).canMoveThrough) neighbors(mp).filter((apply _).andThen(_.canMoveThrough)) else Nil
 }
