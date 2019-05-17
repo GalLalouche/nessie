@@ -33,7 +33,7 @@ private[zirconview] class ZirconPlayerInput(
       CanBeUsed.getUsablePoints(currentlyPlayingUnit.moveAbility)(gs.map, location).toSet
     mapGrid.highlightMovable(movableLocations)
     screenDrawer()
-    screen.keyboardActions.filter(_.getCharacter == 'm').foreach(_ => movementPlayerInput.toggleActive())
+    screen.simpleKeyStrokes().filter(_ == 'M').foreach(_ => movementPlayerInput.toggleActive())
     promise.toTask
   }
 }

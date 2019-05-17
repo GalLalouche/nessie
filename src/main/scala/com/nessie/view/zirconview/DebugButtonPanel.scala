@@ -3,14 +3,16 @@ package com.nessie.view.zirconview
 import com.nessie.gm.{DebugMapStepper, GameState, View}
 import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.view.zirconview.DebugButtonPanel.StepperWrapper
+import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.collections.RichIterator._
 import common.rich.RichT._
 import common.rich.func.ToMoreFoldableOps
 import org.hexworks.zircon.api.{Components, Positions}
 import org.hexworks.zircon.api.component.{CheckBox, Component, Panel}
-import scalaz.std.OptionInstances
 
 import scala.collection.JavaConverters._
+
+import scalaz.std.OptionInstances
 
 private class DebugButtonPanel private(stepperWrapper: StepperWrapper, panel: Panel) {
   def component: Component = panel
@@ -57,8 +59,10 @@ private object DebugButtonPanel
     val wrapper = new StepperWrapper(stepper, view)
     val panel = buildPanel(
       panelPlacer,
-      OnBuildWrapper(Components.button.withText("Small Step"))(_.onMouseClicked(_ => wrapper.nextSmallStep())),
-      OnBuildWrapper(Components.button.withText("Big Step"))(_.onMouseClicked(_ => wrapper.nextBigStep())),
+      OnBuildWrapper(Components.button.withText("Small Step"))(
+        _.mouseClicks().foreach(_ => wrapper.nextSmallStep())),
+      OnBuildWrapper(Components.button.withText("Big Step"))(
+        _.mouseClicks().foreach(_ => wrapper.nextBigStep())),
       OnBuildWrapper.noOp(Components.checkBox.withText("Hover FOV")),
     )
     panel.applyColorTheme(ZirconConstants.Theme)

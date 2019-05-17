@@ -14,7 +14,7 @@ autoCompilerPlugins := true
 
 val MonocleVersion = "1.5.0"
 val ScalaZVersion = "7.2.15"
-val ZirconVersion = "2018.12.25-XMAS"
+val ZirconVersion = "2019.0.22-PREVIEW"
 val GuiceVersion = "4.2.2"
 
 lazy val nessie = (project in file("."))
@@ -33,8 +33,10 @@ lazy val nessie = (project in file("."))
         "com.typesafe.akka" %% "akka-testkit" % "2.5.4" % "test",
         "com.zenjava" % "javafx-maven-plugin" % "8.8.3",
         "io.reactivex" %% "rxscala" % "0.26.4",
-        "org.hexworks.zircon" % "zircon.core-jvm" % ZirconVersion,
-        "org.hexworks.zircon" % "zircon.jvm.swing" % ZirconVersion,
+        "com.github.Hexworks.zircon" % "zircon.core" % ZirconVersion,
+        "com.github.Hexworks.zircon" % "zircon.core-jvm" % ZirconVersion,
+        "com.github.Hexworks.zircon" % "zircon.core-metadata" % ZirconVersion,
+        "com.github.Hexworks.zircon" % "zircon.jvm.swing" % ZirconVersion,
         "org.me" %% "scalacommon" % "1.0" changing(),
         "org.mockito" % "mockito-all" % "1.9.5" % "test",
         "org.scala-graph" %% "graph-core" % "1.12.5",

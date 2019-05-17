@@ -29,15 +29,15 @@ private class MovementPlayerInput(
         .withForegroundColor(ANSITileColor.BRIGHT_MAGENTA)
     val $ = mapGrid.buildLayer
     $.setTileAt(currentLocation.relativePosition, movingUnitTile)
-    val onActive = screen.keyboardActions.filter(_ => isCurrentlyActive)
+    val onActive = screen.simpleKeyStrokes().filter(_ => isCurrentlyActive)
     onActive
-        .filter(MovementKeys contains _.getCharacter)
-        .map(_.getCharacter match {
-          case 'w' => Direction.Up
-          case 'a' => Direction.Left
-          case 's' => Direction.Down
-          case 'd' => Direction.Right
-        })
+        .filter(MovementKeys.contains(_))
+        .map {
+          case 'W' => Direction.Up
+          case 'A' => Direction.Left
+          case 'S' => Direction.Down
+          case 'D' => Direction.Right
+        }
         // (_) is necessary in order to get the current variable value.
         .oMap(currentLocation.go(_))
         .foreach {newLocation =>
@@ -46,7 +46,7 @@ private class MovementPlayerInput(
           $.setTileAt(currentLocation.relativePosition, movingUnitTile)
         }
     onActive
-        .filter(_.getCharacter == ' ')
+        .filter(_ == ' ')
         .foreach(_ => {
           // TODO check valid move location
           if (currentLocation != initialLocation)
@@ -67,5 +67,5 @@ private class MovementPlayerInput(
 }
 
 private object MovementPlayerInput {
-  private val MovementKeys: String = "wasd"
+  private val MovementKeys: String = "WASD"
 }

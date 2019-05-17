@@ -1,12 +1,16 @@
 package com.nessie.view.zirconview
 
+import ch.qos.logback.classic.Level
 import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, PlayerInput, View}
 import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.input.ZirconPlayerInput
 import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
+import org.slf4j.LoggerFactory
 
 private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: DebugMapStepper) extends View {
+  LoggerFactory.getLogger("org.hexworks").asInstanceOf[ch.qos.logback.classic.Logger].setLevel(Level.WARN)
+
   private val tileGrid = SwingApplications.startTileGrid(
     AppConfigs.newConfig()
         .withSize(Sizes.create(100, 80))
@@ -57,14 +61,13 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   screen.display()
 
   override def playerInput = new PlayerInput {
-    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = {
+    override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) =
       new ZirconPlayerInput(
         screen,
         map.get,
         instructions,
         screenDrawer = drawMap,
       ).nextState(currentlyPlayingUnit, gs)
-    }
   }
 
   def nextSmallStep(): Unit = debugPanel.nextSmallStep()

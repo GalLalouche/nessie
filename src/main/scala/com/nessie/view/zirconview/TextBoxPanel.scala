@@ -1,9 +1,9 @@
 package com.nessie.view.zirconview
 
 import common.rich.RichT._
-import org.hexworks.zircon.api.Components
 import org.hexworks.zircon.api.builder.component.TextBoxBuilder
 import org.hexworks.zircon.api.component.{Component, Panel}
+import org.hexworks.zircon.api.Components
 
 private class TextBoxPanel private(panel: Panel) {
   def update(tbb: TextBoxBuilder => Any): Unit = {

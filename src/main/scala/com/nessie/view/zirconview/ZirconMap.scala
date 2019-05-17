@@ -51,7 +51,7 @@ private class ZirconMap(
   def getCurrentBattleMap: BattleMap = synchronized {currentMap}
 
   def mouseEvents(screen: Screen): Observable[Option[MapPoint]] =
-    screen.mouseActions
+    screen.mouseActions()
         .map(_.getPosition.|>(MapGridPoint.fromPosition(mapGridPosition, size)).map(_.mapPoint))
 
   def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(toPosition)

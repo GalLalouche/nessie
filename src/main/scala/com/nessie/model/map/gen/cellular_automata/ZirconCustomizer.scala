@@ -2,7 +2,6 @@ package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.view.zirconview.{ZirconMapCustomizer, ZirconViewCustomizer}
 import org.hexworks.zircon.api.Tiles
-import org.hexworks.zircon.api.graphics.Symbols
 
 object ZirconCustomizer extends ZirconViewCustomizer {
   override def mapCustomizer = new ZirconMapCustomizer {
