@@ -48,4 +48,7 @@ private object ZirconUtils {
   implicit class RichKeyCode(private val $: KeyCode) extends AnyVal {
     def getChar: Char = $.toChar.get.toChar
   }
+  implicit class RichColorTheme(private val $: ColorTheme) extends AnyVal {
+    def toData: ColorThemeData = ColorThemeData.from($)
+  }
 }
