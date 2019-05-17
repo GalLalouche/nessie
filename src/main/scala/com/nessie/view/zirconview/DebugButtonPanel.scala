@@ -4,7 +4,6 @@ import com.nessie.gm.{DebugMapStepper, GameState, View}
 import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.view.zirconview.DebugButtonPanel.StepperWrapper
 import com.nessie.view.zirconview.ZirconUtils._
-import common.rich.collections.RichIterator._
 import common.rich.RichT._
 import common.rich.func.ToMoreFoldableOps
 import org.hexworks.zircon.api.{Components, Positions}
@@ -27,22 +26,14 @@ private class DebugButtonPanel private(stepperWrapper: StepperWrapper, panel: Pa
 
 private object DebugButtonPanel
     extends ToMoreFoldableOps with OptionInstances {
-  private[this] def buildPanel(pp: PanelPlacer, bps: OnBuildWrapper[_ <: Component, _]*): Panel = {
-    val $ = Components.panel
+  private[this] def buildPanel(pp: PanelPlacer, bps: OnBuildWrapper[_ <: Component, _]*): Panel =
+    Components.panel
         .withTitle("Debug")
         .wrapWithBox(true)
         .<|(pp)
         .build
-    bps.foreach {obBuildWrapper =>
-      val position = $.getChildren
-          .iterator.asScala
-          .lastOption
-          .mapHeadOrElse(Positions.create(-1, 0).relativeToBottomOf, Positions.zero)
-      obBuildWrapper.cb.withPosition(position)
-      $.addComponent(obBuildWrapper.build())
-    }
-    $
-  }
+        .<|(_.addComponents(bps, Positions.zero, Positions.create(-1, 0)))
+
   private class StepperWrapper(private var stepper: DebugMapStepper, view: View) {
     def nextSmallStep(): Unit = {
       stepper = stepper.nextSmallStep().get

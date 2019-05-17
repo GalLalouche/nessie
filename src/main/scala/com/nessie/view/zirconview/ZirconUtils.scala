@@ -1,19 +1,29 @@
 package com.nessie.view.zirconview
 
+import com.nessie.common.PromiseZ
 import common.rich.RichObservable
+import common.rich.collections.RichIterator._
 import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
 import monocle.Lens
 import org.hexworks.cobalt.datatypes.Maybe
-import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component}
+import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
+import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.data.{Position, Tile}
 import org.hexworks.zircon.api.graphics.DrawSurface
+import org.hexworks.zircon.api.screen.Screen
+import org.hexworks.zircon.api.Positions
 import org.hexworks.zircon.api.uievent.{ComponentEvent, ComponentEventType, KeyboardEvent, KeyboardEventType, KeyCode, MouseEvent, MouseEventType, Processed, UIEventPhase, UIEventSource}
 import rx.lang.scala.Observable
 
+import scala.collection.JavaConverters._
+
+import scalaz.concurrent.Task
+import scalaz.std.OptionInstances
 
 private object ZirconUtils
-    extends ToMoreMonadPlusOps with MoreObservableInstances {
+    extends ToMoreFoldableOps with OptionInstances
+        with ToMoreMonadPlusOps with MoreObservableInstances {
   implicit class RichPosition(private val $: Position) extends AnyVal {
     def withInverseRelative(other: Position): Position =
       $.withRelativeX(-other.getX).withRelativeY(-other.getY)
@@ -50,7 +60,7 @@ private object ZirconUtils
   }
 
   implicit class RichMaybe[A](private val $: Maybe[A]) extends AnyVal {
-    def toOption: Option[A] = if ($.isEmpty) None else Some($.get)
+    def toOption: Option[A] = if ($.isEmpty) None else Option($.get)
   }
   implicit class RichKeyCode(private val $: KeyCode) extends AnyVal {
     def getChar: Char = $.toChar.get.toChar
@@ -63,6 +73,32 @@ private object ZirconUtils
         f()
         Processed.INSTANCE
       })
+  }
+
+  implicit class RichContainer(private val $: Container) extends AnyVal {
+    def addComponents(
+        bps: Seq[OnBuildWrapper[_ <: Component, _]],
+        initialPosition: Position = Positions.create(0, 1),
+        relativePosition: Position = Positions.create(-1, -1),
+    ): Unit = {
+      bps.foreach {obBuildWrapper =>
+        val position = $.getChildren
+            .iterator.asScala
+            .lastOption
+            .mapHeadOrElse(relativePosition.relativeToBottomOf, initialPosition)
+        obBuildWrapper.cb.withPosition(position)
+        $.addComponent(obBuildWrapper.build())
+      }
+    }
+  }
+
+  implicit class RichScreen(private val $: Screen) extends AnyVal {
+    def openModalTask[A](m: Modal[ModalResultWrapper[A]]): Task[A] = {
+      val promise = PromiseZ[A]()
+      m.onClosed(promise fulfill _.value)
+      $.openModal(m)
+      promise.toTask
+    }
   }
 
   implicit class RichColorTheme(private val $: ColorTheme) extends AnyVal {

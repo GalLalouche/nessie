@@ -8,8 +8,10 @@ import com.nessie.model.units.abilities.CanBeUsed
 import com.nessie.view.zirconview.{Instructions, InstructionsPanel, ZirconMap}
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
+import org.hexworks.zircon.api.graphics.Layer
 import org.hexworks.zircon.api.screen.Screen
 
+import scalaz.{-\/, \/-}
 import scalaz.concurrent.Task
 
 private[zirconview] class ZirconPlayerInput(
@@ -21,19 +23,26 @@ private[zirconview] class ZirconPlayerInput(
   def nextState(currentlyPlayingUnit: CombatUnit, gs: GameState): Task[TurnAction] = {
     val promise = PromiseZ[TurnAction]()
     val location = CombatUnitObject.findIn(currentlyPlayingUnit, gs.map).get
-    val movementPlayerInput: MovementPlayerInput = new MovementPlayerInput(
-      screen = screen,
+    val popupMenu = new PopupMenu(mapGrid, gs, location, screen)
+    def consumeMenuAction(a: MenuAction): Unit = a match {
+      case MenuAction.Cancelled => ()
+      case MenuAction.Action(a) => promise.fulfill(a)
+    }
+    val wasdLayer: Layer = WasdLayer.create(
+      screen.simpleKeyStrokes(),
       mapGrid = mapGrid,
-      instructionsPanel = instructionsPanel,
-      promise = promise,
+      observer = popupMenu.openMenu(_).unsafePerformAsync {
+        case -\/(a) => ???
+        case \/-(b) => consumeMenuAction(b)
+      },
       initialLocation = mapGrid.toMapGridPoint(location),
     )
     instructionsPanel.push(Instructions.BasicInput)
+    screen.pushLayer(wasdLayer)
     val movableLocations =
       CanBeUsed.getUsablePoints(currentlyPlayingUnit.moveAbility)(gs.map, location).toSet
     mapGrid.highlightMovable(movableLocations)
     screenDrawer()
-    screen.simpleKeyStrokes().filter(_ == 'M').foreach(_ => movementPlayerInput.toggleActive())
     promise.toTask
   }
 }

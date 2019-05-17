@@ -5,15 +5,10 @@ import org.hexworks.zircon.api.component.Component
 private class InstructionsPanel private(panel: TextBoxPanel) {
   private var stack: List[Instructions] = List[Instructions]()
   def update(i: Instructions): Unit = i match {
-    case Instructions.Movement => panel.update(
-      _.addHeader("Movement")
-          .addListItem("Use the WASD keys to move the selected unit; press space to confirm movement")
-          .addListItem("Use the mouse to perform actions like attack")
-          .addListItem("Press enter to end turn if you have movement squares remaining")
-    )
     case Instructions.BasicInput => panel.update(
       _.addHeader("Input")
-          .addListItem("Press m to toggle movement mode")
+          .addListItem("Use the WASD keys to select target cell; press space to popup a menu")
+          .addListItem("Press enter to end turn if you have movement squares remaining")
     )
   }
   def push(i: Instructions): Unit = synchronized {
