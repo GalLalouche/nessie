@@ -2,9 +2,9 @@ package com.nessie.view.sfx
 
 import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.gm.TurnAction.EndTurn
-import com.nessie.model.map.{CombatUnitObject, MapPoint}
-import com.nessie.model.units.abilities.{AbilityToTurnAction, CanBeUsed, MoveAbility, UnitAbility}
-import common.rich.primitives.RichBoolean._
+import com.nessie.model.map.MapPoint
+import com.nessie.model.units.abilities.{AbilityToTurnAction, UnitAbility}
+import com.nessie.view.ActionMenuHelper
 import rx.lang.scala.Observer
 import scalafx.Includes._
 import scalafx.event.ActionEvent
@@ -17,20 +17,16 @@ private class ActionMenuFactory(
   // FIXME this should check the currentTurn state to change the movement range etc.
   def apply(destination: MapPoint): ContextMenu = {
     val $ = new ContextMenu()
-    val currentTurn = gs.currentTurn.get
-    def toItem(unitAbility: UnitAbility): MenuItem =
-      new MenuItem(unitAbility.name) {
-        // TODO extract this check elsewhere, something similar to CanBeUsed
-        disable = CanBeUsed.negate(unitAbility)(gs.map, source, destination) ||
-            (unitAbility.isInstanceOf[MoveAbility] && currentTurn.remainingMovement == 0 ||
-                currentTurn.canAppendAction.isFalse)
+    def toItem(unitAbility: UnitAbility, disabled: Boolean): MenuItem =
+      new MenuItem() {
+        disable = disabled
         onAction = (_: ActionEvent) => {
           $.hide()
           observer onNext AbilityToTurnAction(unitAbility)(source, destination)
         }
       }
-    gs.map(source).asInstanceOf[CombatUnitObject].unit.abilities
-        .map(toItem)
+    ActionMenuHelper.usableAbilities(gs)(src = source, dst = destination)
+        .map((toItem _).tupled)
         .foreach($.items.+=(_))
     $.items += new MenuItem("Cancel") {onAction = (_: ActionEvent) => $.hide()}
     $.items += new MenuItem("End turn") {
