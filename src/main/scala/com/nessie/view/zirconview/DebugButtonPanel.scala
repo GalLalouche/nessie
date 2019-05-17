@@ -59,10 +59,8 @@ private object DebugButtonPanel
     val wrapper = new StepperWrapper(stepper, view)
     val panel = buildPanel(
       panelPlacer,
-      OnBuildWrapper(Components.button.withText("Small Step"))(
-        _.mouseClicks().foreach(_ => wrapper.nextSmallStep())),
-      OnBuildWrapper(Components.button.withText("Big Step"))(
-        _.mouseClicks().foreach(_ => wrapper.nextBigStep())),
+      OnBuildWrapper(Components.button.withText("Small Step"))(_.onActivation(() => wrapper.nextSmallStep())),
+      OnBuildWrapper(Components.button.withText("Big Step"))(_.onActivation(() => wrapper.nextBigStep())),
       OnBuildWrapper.noOp(Components.checkBox.withText("Hover FOV")),
     )
     panel.applyColorTheme(ZirconConstants.Theme)
