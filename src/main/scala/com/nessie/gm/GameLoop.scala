@@ -25,7 +25,7 @@ object GameLoop {
     initialize(view, DemoState)
   }
 
-  // TODO make stoppbable
+  // TODO make stoppable
   def initialize(view: View, currentState: GameState): Unit = {
     val iterator = GameMaster.initiate(currentState, view.playerInput)
     while (true)

@@ -3,13 +3,15 @@ package com.nessie.view.zirconview
 import org.hexworks.zircon.api.component.Component
 
 private class InstructionsPanel private(panel: TextBoxPanel) {
-  private var stack: List[Instructions] = List[Instructions]()
-  def update(i: Instructions): Unit = i match {
-    case Instructions.BasicInput => panel.update(
-      _.addHeader("Input")
-          .addListItem("Use the WASD keys to select target cell; press space to popup a menu")
-          .addListItem("Press enter to end turn if you have movement squares remaining")
-    )
+  private var stack: List[Instructions] = Nil
+  def update(i: Instructions): Unit = synchronized {
+    i match {
+      case Instructions.BasicInput => panel.update(
+        _.addHeader("Input")
+            .addListItem("Use the WASD keys to select target cell; press space to popup a menu")
+            .addListItem("Press enter to end turn if you have movement squares remaining")
+      )
+    }
   }
   def push(i: Instructions): Unit = synchronized {
     stack = i :: stack
@@ -19,7 +21,7 @@ private class InstructionsPanel private(panel: TextBoxPanel) {
     if (stack.nonEmpty) stack = stack.tail
     if (stack.nonEmpty) update(stack.head) else clear()
   }
-  def clear(): Unit = panel.clear()
+  def clear(): Unit = synchronized {panel.clear()}
   def component: Component = panel.component
 }
 

@@ -101,6 +101,10 @@ private object ZirconUtils
     }
   }
 
+  implicit class RichModal[A](private val $: Modal[ModalResultWrapper[A]]) extends AnyVal {
+    def close(result: A): Unit = $.close(ModalResultWrapper(result))
+  }
+
   implicit class RichColorTheme(private val $: ColorTheme) extends AnyVal {
     def toData: ColorThemeData = ColorThemeData.from($)
   }

@@ -19,13 +19,13 @@ import scalaz.concurrent.Task
 
 private class PopupMenu(mapGrid: ZirconMap, gs: GameState, source: MapPoint, screen: Screen) {
   def openMenu(destination: MapPoint): Task[MenuAction] = {
-    val panel: Panel = Components.panel()
+    val panel: Panel = Components.panel
         .withTitle("Actions")
         .withSize(20, 10)
-        .withPosition(Positions.zero())
+        .withPosition(Positions.zero)
         .wrapWithBox(true)
         .wrapWithShadow(true)
-        .build()
+        .build
     val modal: Modal[ModalResultWrapper[MenuAction]] = ModalBuilder
         .newBuilder()
         .withParentSize(panel.getSize.plus(Sizes.create(1, 1)))
@@ -41,14 +41,14 @@ private class PopupMenu(mapGrid: ZirconMap, gs: GameState, source: MapPoint, scr
               b.applyColorTheme(DisabledTheme)
             } else
               b.applyColorTheme(EnabledTheme)
-            b.onActivation(() => modal.close(ModalResultWrapper(MenuAction.Action(
-              AbilityToTurnAction(ua)(src = source, dst = destination)))))
+            b.onActivation(() => modal.close(MenuAction.Action(
+              AbilityToTurnAction(ua)(src = source, dst = destination))))
           })
       }
     )
 
     modal.keyCodes().filter(_ == KeyCode.ESCAPE).foreach {
-      _ => modal.close(ModalResultWrapper(MenuAction.Cancelled))
+      _ => modal.close(MenuAction.Cancelled)
     }
     screen.openModalTask(modal)
   }

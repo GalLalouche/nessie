@@ -12,10 +12,10 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   LoggerFactory.getLogger("org.hexworks").asInstanceOf[ch.qos.logback.classic.Logger].setLevel(Level.WARN)
 
   private val tileGrid = SwingApplications.startTileGrid(
-    AppConfigs.newConfig()
+    AppConfigs.newConfig
         .withSize(Sizes.create(100, 80))
-        .withDefaultTileset(CP437TilesetResources.wanderlust16x16())
-        .build())
+        .withDefaultTileset(CP437TilesetResources.wanderlust16x16)
+        .build)
 
   private val screen = Screens.createScreenFor(tileGrid)
   private val propertiesPanel =
@@ -36,7 +36,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
 
   private var map: Option[ZirconMap] = None
   private val mapGridPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
-  override def updateState(change: GameStateChange, state: GameState): Unit = {
+  override def updateState(change: GameStateChange, state: GameState): Unit = synchronized {
     def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
     def createNewMap(state: GameState): ZirconMap = {
       val $ = ZirconMap.create(state.map, customizer.mapCustomizer, mapGridPosition)
@@ -55,6 +55,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     }
     drawMap()
   }
+
 
   private def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
 

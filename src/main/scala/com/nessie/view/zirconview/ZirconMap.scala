@@ -21,28 +21,29 @@ private class ZirconMap(
 ) {
   private def toPosition(mp: MapPoint): Position = Positions.create(mp.x, mp.y)
   def size: Size = graphics.getSize
-  private def updateTiles(): Unit = updateTiles(true.const)
+  private def updateTiles(): Unit = synchronized {updateTiles(true.const)}
   private def updateTiles(isVisible: MapPoint => Boolean): Unit = synchronized {
     currentMap.objects.map {
       case (mp, obj) =>
         toPosition(mp) -> (
             if (isVisible(mp))
               c.getTile.lift(obj).getOrElse(obj match {
-                case EmptyMapObject => Tiles.newBuilder().withCharacter(Symbols.INTERPUNCT)
-                case FullWall => Tiles.newBuilder().withCharacter('#')
-                case CombatUnitObject(u) => Tiles.newBuilder().withCharacter(u.metadata.name.head)
+                case EmptyMapObject => Tiles.newBuilder.withCharacter(Symbols.INTERPUNCT)
+                case FullWall => Tiles.newBuilder.withCharacter('#')
+                case CombatUnitObject(u) => Tiles.newBuilder.withCharacter(u.metadata.name.head)
               })
                   .withBackgroundColor(theme.getSecondaryBackgroundColor)
                   .withForegroundColor(theme.getSecondaryForegroundColor)
-                  .build()
+                  .build
             else
               Unrevealed
             )
     }.foreach((graphics.setTileAt _).tupled)
   }
 
-  def drawFov(mp: Option[MapPoint]): Unit =
+  def drawFov(mp: Option[MapPoint]): Unit = synchronized {
     mp.fold(updateTiles())(FovCalculator(currentMap).getVisiblePointsFrom(_, 10).toSet |> updateTiles)
+  }
   def update(map: BattleMap): Unit = synchronized {
     currentMap = map
     updateTiles()
@@ -57,7 +58,7 @@ private class ZirconMap(
   def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(toPosition)
       .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
   def toMapGridPoint: MapPoint => MapGridPoint = MapGridPoint.withMapGridPosition(mapGridPosition, size)
-  def buildLayer: Layer = Layers.newBuilder()
+  def buildLayer: Layer = Layers.newBuilder
       .withOffset(mapGridPosition)
       .withSize(graphics.getSize)
       .build
@@ -66,14 +67,14 @@ private class ZirconMap(
 
 private object ZirconMap {
   private val theme = ZirconConstants.Theme
-  private val Unrevealed = Tiles.newBuilder()
+  private val Unrevealed = Tiles.newBuilder
       .withCharacter(' ')
       .withBackgroundColor(ANSITileColor.BLACK)
-      .buildCharacterTile()
+      .buildCharacterTile
   def create(map: BattleMap, c: ZirconMapCustomizer, mapGridPosition: Position) = {
-    val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder()
+    val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder
         .withSize(Sizes.create(map.width, map.height))
-        .build()
+        .build
     new ZirconMap(map, c, graphics, mapGridPosition).<|(_.updateTiles())
   }
 }
