@@ -7,8 +7,8 @@ import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.CanBeUsed
 import com.nessie.view.zirconview.{Instructions, InstructionsPanel, ZirconMap}
 import com.nessie.view.zirconview.ZirconUtils._
+import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, ToMoreMonadPlusOps}
-import org.hexworks.zircon.api.graphics.Layer
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent.KeyCode
 
@@ -26,7 +26,7 @@ private[zirconview] class ZirconPlayerInput(
   def nextState(currentlyPlayingUnit: CombatUnit, gs: GameState): Task[TurnAction] = {
     val promise = PromiseZ[TurnAction]()
     val location = CombatUnitObject.findIn(currentlyPlayingUnit, gs.map).get
-    val popupMenu = new PopupMenu(mapGrid, gs, location, screen)
+    val popupMenu = new PopupMenu(mapGrid, gs, location)
     val endTurnSub = screen.keyCodes().filter(_ == KeyCode.ENTER).head.subscribe {_ =>
       promise fulfill TurnAction.EndTurn
     }
@@ -38,7 +38,7 @@ private[zirconview] class ZirconPlayerInput(
     val wasdLayer: WasdLayer = WasdLayer.create(
       screen.simpleKeyStrokes(),
       mapGrid = mapGrid,
-      observer = popupMenu.openMenu(_).unsafePerformAsync {
+      observer = popupMenu.openMenu(_).|>(screen.modalTask).unsafePerformAsync {
         case -\/(a) => ???
         case \/-(b) => consumeMenuAction(b)
       },

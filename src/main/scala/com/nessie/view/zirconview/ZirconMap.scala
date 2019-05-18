@@ -18,7 +18,7 @@ private class ZirconMap(
     c: ZirconMapCustomizer,
     val graphics: TileGraphics,
     mapGridPosition: Position,
-) {
+) extends MapPointConverter {
   private def toPosition(mp: MapPoint): Position = Positions.create(mp.x, mp.y)
   def size: Size = graphics.getSize
   private def updateTiles(): Unit = synchronized {updateTiles(true.const)}
@@ -52,8 +52,7 @@ private class ZirconMap(
   def getCurrentBattleMap: BattleMap = synchronized {currentMap}
 
   def mouseEvents(screen: Screen): Observable[Option[MapPoint]] =
-    screen.mouseActions()
-        .map(_.getPosition.|>(MapGridPoint.fromPosition(mapGridPosition, size)).map(_.mapPoint))
+    screen.mouseActions().map(_.getPosition |> fromAbsolutePosition)
 
   def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(toPosition)
       .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
@@ -63,6 +62,9 @@ private class ZirconMap(
       .withSize(graphics.getSize)
       .build
   def tileAt(mapPoint: MapPoint): Tile = graphics.getTileAt(toPosition(mapPoint)).get.asInstanceOf[Tile]
+  override def toAbsolutePosition(mp: MapPoint) = toMapGridPoint(mp).absolutePosition
+  override def fromAbsolutePosition(p: Position) =
+    MapGridPoint.fromPosition(mapGridPosition, size)(p).map(_.mapPoint)
 }
 
 private object ZirconMap {

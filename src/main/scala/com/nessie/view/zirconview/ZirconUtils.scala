@@ -93,7 +93,7 @@ private object ZirconUtils
   }
 
   implicit class RichScreen(private val $: Screen) extends AnyVal {
-    def openModalTask[A](m: Modal[ModalResultWrapper[A]]): Task[A] = {
+    def modalTask[A](m: Modal[ModalResultWrapper[A]]): Task[A] = {
       val promise = PromiseZ[A]()
       m.onClosed(promise fulfill _.value)
       $.openModal(m)

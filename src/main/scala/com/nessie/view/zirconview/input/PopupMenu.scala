@@ -3,7 +3,7 @@ package com.nessie.view.zirconview.input
 import com.nessie.gm.GameState
 import com.nessie.model.map.MapPoint
 import com.nessie.model.units.abilities.AbilityToTurnAction
-import com.nessie.view.zirconview.{ModalResultWrapper, OnBuildWrapper, ZirconConstants, ZirconMap}
+import com.nessie.view.zirconview.{MapPointConverter, OnBuildWrapper, ZirconConstants}
 import com.nessie.view.zirconview.input.PopupMenu._
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.ActionMenuHelper
@@ -11,14 +11,10 @@ import org.hexworks.zircon.api.{Components, Positions, Sizes}
 import org.hexworks.zircon.api.builder.component.ModalBuilder
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.component.{ColorTheme, Panel}
-import org.hexworks.zircon.api.component.modal.Modal
-import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent.KeyCode
 
-import scalaz.concurrent.Task
-
-private class PopupMenu(mapGrid: ZirconMap, gs: GameState, source: MapPoint, screen: Screen) {
-  def openMenu(destination: MapPoint): Task[MenuAction] = {
+private class PopupMenu(mpc: MapPointConverter, gs: GameState, source: MapPoint) {
+  def openMenu(destination: MapPoint): WrappedModal[MenuAction] = {
     val panel: Panel = Components.panel
         .withTitle("Actions")
         .withSize(20, 10)
@@ -26,31 +22,31 @@ private class PopupMenu(mapGrid: ZirconMap, gs: GameState, source: MapPoint, scr
         .wrapWithBox(true)
         .wrapWithShadow(true)
         .build
-    val modal: Modal[ModalResultWrapper[MenuAction]] = ModalBuilder
+    val $: WrappedModal[MenuAction] = ModalBuilder
         .newBuilder()
         .withParentSize(panel.getSize.plus(Sizes.create(1, 1)))
-        .withPosition(mapGrid.toMapGridPoint(destination).absolutePosition)
+        .withPosition(mpc.toAbsolutePosition(destination))
         .withComponent(panel)
         .build()
     panel.addComponents(
       ActionMenuHelper.usableAbilities(gs)(source, destination).map {
         case (ua, disabled) =>
-          val $ = Components.button.withText(ua.name)
-          OnBuildWrapper($)(b => {
+          OnBuildWrapper(Components.button.withText(ua.name))(b => {
             if (disabled) {
+              b.disable()
               b.applyColorTheme(DisabledTheme)
             } else
               b.applyColorTheme(EnabledTheme)
-            b.onActivation(() => modal.close(MenuAction.Action(
+            b.onActivation(() => $.close(MenuAction.Action(
               AbilityToTurnAction(ua)(src = source, dst = destination))))
           })
       }
     )
 
-    modal.keyCodes().filter(_ == KeyCode.ESCAPE).foreach {
-      _ => modal.close(MenuAction.Cancelled)
+    $.keyCodes().filter(_ == KeyCode.ESCAPE).foreach {
+      _ => $.close(MenuAction.Cancelled)
     }
-    screen.openModalTask(modal)
+    $
   }
 }
 
