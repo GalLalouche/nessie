@@ -1,5 +1,6 @@
 package com.nessie.view.zirconview
 
+import com.nessie.gm.GameState
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.units.{CombatUnit, PlayerUnit}
 import com.nessie.model.units.inventory.Equipment
@@ -9,14 +10,21 @@ import org.hexworks.zircon.api.builder.component.TextBoxBuilder
 import org.hexworks.zircon.api.component.Component
 
 private class PropertiesPanel private(panel: TextBoxPanel) {
-  def update(map: BattleMap)(mp: Option[MapPoint]): Unit = {
-    panel.clear()
+  def update(map: BattleMap)(mp: Option[MapPoint]): Unit = synchronized {
+    clear()
     mp.foreach {mp =>
       panel.update {textBox =>
         textBox.addHeader(mp.toString)
         map(mp).safeCast[CombatUnitObject].map(_.unit).foreach(PropertiesPanel.addUnitProperties(textBox))
       }
     }
+  }
+  def clear(): Unit = synchronized {
+    panel.clear()
+  }
+  val highlighter: MapPointHighlighter = new MapPointHighlighter {
+    override def apply(gs: GameState, mp: MapPoint): Unit = update(gs.map)(Some(mp))
+    override def clear(): Unit = PropertiesPanel.this.clear()
   }
   def component: Component = panel.component
 }

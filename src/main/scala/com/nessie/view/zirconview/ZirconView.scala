@@ -68,6 +68,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
         map.get,
         instructions,
         screenDrawer = drawMap,
+        highlighter = propertiesPanel.highlighter,
       ).nextState(currentlyPlayingUnit, gs)
   }
 

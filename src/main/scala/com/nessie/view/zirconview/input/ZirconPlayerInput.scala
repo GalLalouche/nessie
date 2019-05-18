@@ -5,7 +5,7 @@ import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.CanBeUsed
-import com.nessie.view.zirconview.{Instructions, InstructionsPanel, ZirconMap}
+import com.nessie.view.zirconview.{Instructions, InstructionsPanel, MapPointHighlighter, ZirconMap}
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, ToMoreMonadPlusOps}
@@ -20,6 +20,7 @@ private[zirconview] class ZirconPlayerInput(
     mapGrid: ZirconMap,
     instructionsPanel: InstructionsPanel,
     screenDrawer: () => Unit,
+    highlighter: MapPointHighlighter,
 ) extends ToMoreMonadPlusOps with MoreObservableInstances
     with ToMoreFunctorOps {
   // TODO create a single-time consumable data structure: can add and fold, which clears
@@ -35,17 +36,18 @@ private[zirconview] class ZirconPlayerInput(
       case MenuAction.Action(a) =>
         promise.fulfill(a)
     }
-    val wasdLayer: WasdLayer = WasdLayer.create(
+    val movementLayer: MovementLayer = MovementLayer.create(
       screen.simpleKeyStrokes(),
-      mapGrid = mapGrid,
-      observer = popupMenu.openMenu(_).|>(screen.modalTask).unsafePerformAsync {
+      layer = mapGrid.buildLayer,
+      menuOpener = popupMenu.openMenu(_).|>(screen.modalTask).unsafePerformAsync {
         case -\/(a) => ???
         case \/-(b) => consumeMenuAction(b)
       },
       initialLocation = mapGrid.toMapGridPoint(location),
+      highlighter = highlighter(gs, _)
     )
     instructionsPanel.push(Instructions.BasicInput)
-    screen.pushLayer(wasdLayer.layer)
+    screen.pushLayer(movementLayer.layer)
     val movableLocations =
       CanBeUsed.getUsablePoints(currentlyPlayingUnit.moveAbility)(gs.map, location).toSet
     mapGrid.highlightMovable(movableLocations)
@@ -53,7 +55,7 @@ private[zirconview] class ZirconPlayerInput(
     promise.toTask.listen {_ =>
       screen.popLayer()
       endTurnSub.unsubscribe()
-      wasdLayer.clear()
+      movementLayer.clear()
     }
   }
 }
