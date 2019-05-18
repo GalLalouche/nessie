@@ -1,13 +1,14 @@
 package com.nessie.gm
 
+import com.google.common.annotations.VisibleForTesting
 import com.nessie.gm.TurnAction.EndTurn
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
-import com.nessie.model.units.abilities.{AbilityToTurnAction, CanBeUsed}
 import com.nessie.model.units.{CombatUnit, Owner}
+import com.nessie.model.units.abilities.{AbilityToTurnAction, CanBeUsed}
 import common.rich.RichT._
 
 /** A dead simple AI that runs up to the nearest player and punches them in face. */
-private object CatcherAI extends AI {
+private class CatcherAI @VisibleForTesting() private[gm](c: AbilityToTurnActionConverter) extends AI {
   //TODO cache
   private def distanceToPlayer(map: BattleMap, point: MapPoint): Int = map.objects
       .flatMap(e => e._2.safeCast[CombatUnitObject].map(e._1 -> _))
@@ -22,16 +23,21 @@ private object CatcherAI extends AI {
       val attackAbility = u.attackAbility
       CanBeUsed.getUsablePoints(attackAbility)(map, unitLocation)
           .headOption
-          .map(AbilityToTurnAction(attackAbility)(unitLocation, _))
+          .map(c(attackAbility)(unitLocation, _))
     }.filter(currentTurn.canAppendAction.const)
-    lazy val moveOrEnd: TurnAction = {
-      val moveAbility = currentTurn.remainingMovementAbility
-      val moveLocations = CanBeUsed.getUsablePoints(moveAbility)(map, unitLocation)
-      if (moveLocations.isEmpty) EndTurn else moveLocations
-          .minBy(distanceToPlayer(map, _))
-          .mapTo(AbilityToTurnAction(moveAbility)(unitLocation, _))
-    }
+    lazy val moveOrEnd: TurnAction =
+      if (distanceToPlayer(map, unitLocation) == 1)
+        EndTurn
+      else {
+        val moveAbility = currentTurn.remainingMovementAbility
+        val moveLocations = CanBeUsed.getUsablePoints(moveAbility)(map, unitLocation)
+        if (moveLocations.isEmpty) EndTurn else moveLocations
+            .minBy(distanceToPlayer(map, _))
+            .mapTo(c(moveAbility)(unitLocation, _))
+      }
     attack.getOrElse(moveOrEnd)
   }
 }
+
+private object CatcherAI extends CatcherAI(AbilityToTurnAction)
 
