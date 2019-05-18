@@ -8,8 +8,8 @@ private class InstructionsPanel private(panel: TextBoxPanel) {
     i match {
       case Instructions.BasicInput => panel.update(
         _.addHeader("Input")
-            .addListItem("Use the WASD keys to select target cell; press space to popup a menu")
-            .addListItem("Press enter to end turn if you have movement squares remaining")
+            .addListItem("Use the WASD/HJKL keys to select target cell; press space to popup a menu")
+            .addListItem("Press enter to end turn")
       )
     }
   }

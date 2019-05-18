@@ -5,21 +5,27 @@ import com.nessie.view.zirconview.{MapGridPoint, SimpleKeyboardEvents, ZirconMap
 import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.Layer
+import rx.lang.scala.Subscription
 
-private object WasdLayer extends ToMoreMonadPlusOps with MoreObservableInstances {
+private class WasdLayer(val layer: Layer, subscriptions: Subscription*) {
+  def clear(): Unit = subscriptions.foreach(_.unsubscribe())
+}
+
+private object WasdLayer
+    extends ToMoreMonadPlusOps with MoreObservableInstances {
   def create(
       keyboardEvents: SimpleKeyboardEvents,
       mapGrid: ZirconMap,
       observer: MapPoint => Any,
       initialLocation: MapGridPoint,
-  ): Layer = {
+  ): WasdLayer = {
     var currentLocation = initialLocation
     val movingUnitTile = mapGrid.tileAt(currentLocation.mapPoint).createCopy
         .withBackgroundColor(ANSITileColor.BRIGHT_CYAN)
         .withForegroundColor(ANSITileColor.BRIGHT_MAGENTA)
     val $ = mapGrid.buildLayer
     $.setTileAt(currentLocation.relativePosition, movingUnitTile)
-    keyboardEvents
+    val movementSubscriptions = keyboardEvents
         .filter(MovementKeys.contains(_))
         .map {
           case 'W' | 'K' => Direction.Up
@@ -29,13 +35,14 @@ private object WasdLayer extends ToMoreMonadPlusOps with MoreObservableInstances
         }
         // (_) is necessary in order to get the current variable value.
         .oMap(currentLocation.go(_))
-        .foreach {newLocation =>
+        .subscribe {newLocation =>
           currentLocation = newLocation
           $.clear()
           $.setTileAt(currentLocation.relativePosition, movingUnitTile)
         }
-    keyboardEvents.filter(_ == 'I').foreach(_ => {observer(currentLocation.mapPoint)})
-    $
+    val openMenuSubscription =
+      keyboardEvents.filter(_ == ' ').subscribe(_ => {observer(currentLocation.mapPoint)})
+    new WasdLayer($, movementSubscriptions, openMenuSubscription)
   }
 
   private val MovementKeys = "WASDHJKL"
