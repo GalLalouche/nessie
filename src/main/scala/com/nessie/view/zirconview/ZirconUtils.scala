@@ -12,7 +12,7 @@ import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.data.{Position, Tile}
 import org.hexworks.zircon.api.graphics.DrawSurface
 import org.hexworks.zircon.api.screen.Screen
-import org.hexworks.zircon.api.{Positions, TileColors}
+import org.hexworks.zircon.api.Positions
 import org.hexworks.zircon.api.color.TileColor
 import org.hexworks.zircon.api.uievent.{ComponentEvent, ComponentEventType, KeyboardEvent, KeyboardEventType, KeyCode, MouseEvent, MouseEventType, Processed, UIEventPhase, UIEventSource}
 import rx.lang.scala.Observable

@@ -25,8 +25,6 @@ private object MovementLayer
     var currentLocation = initialLocation
     val movingUnitTile = Tiles.newBuilder
         .withBackgroundColor(ANSITileColor.BRIGHT_CYAN.toData.multiplyAlphaBy(0.5))
-        .withModifiers()
-        .withForegroundColor(ANSITileColor.BRIGHT_MAGENTA)
         .build
     layer.setTileAt(currentLocation.relativePosition, movingUnitTile)
     val movementSubscriptions = keyboardEvents

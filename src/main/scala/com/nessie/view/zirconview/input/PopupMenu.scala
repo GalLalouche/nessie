@@ -31,7 +31,7 @@ private class PopupMenu(mpc: MapPointConverter, gs: GameState, source: MapPoint)
     panel.addComponents(
       ActionMenuHelper.usableAbilities(gs)(source, destination).map {
         case (ua, disabled) =>
-          OnBuildWrapper(Components.button.withText(ua.name))(b => {
+          OnBuildWrapper(Components.button.withText(ua.name)) {b =>
             if (disabled) {
               b.disable()
               b.applyColorTheme(DisabledTheme)
@@ -39,7 +39,7 @@ private class PopupMenu(mpc: MapPointConverter, gs: GameState, source: MapPoint)
               b.applyColorTheme(EnabledTheme)
             b.onActivation(() => $.close(MenuAction.Action(
               AbilityToTurnAction(ua)(src = source, dst = destination))))
-          })
+          }
       }
     )
 
