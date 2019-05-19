@@ -2,25 +2,26 @@ package com.nessie.view.zirconview
 
 import com.nessie.common.PromiseZ
 import common.rich.RichObservable
-import common.rich.collections.RichIterator._
+import common.rich.RichObservable.Unsubscribable
 import common.rich.RichT._
+import common.rich.collections.RichIterator._
 import common.rich.func.{MoreObservableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
 import monocle.Lens
 import org.hexworks.cobalt.datatypes.Maybe
-import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
+import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
+import org.hexworks.zircon.api.Positions
+import org.hexworks.zircon.api.color.TileColor
 import org.hexworks.zircon.api.component.modal.Modal
+import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
 import org.hexworks.zircon.api.data.{Position, Tile}
 import org.hexworks.zircon.api.graphics.DrawSurface
 import org.hexworks.zircon.api.screen.Screen
-import org.hexworks.zircon.api.Positions
-import org.hexworks.zircon.api.color.TileColor
-import org.hexworks.zircon.api.uievent.{ComponentEvent, ComponentEventType, KeyboardEvent, KeyboardEventType, KeyCode, MouseEvent, MouseEventType, Processed, UIEventPhase, UIEventSource}
+import org.hexworks.zircon.api.uievent._
 import rx.lang.scala.Observable
-
-import scala.collection.JavaConverters._
-
 import scalaz.concurrent.Task
 import scalaz.std.OptionInstances
+
+import scala.collection.JavaConverters._
 
 private object ZirconUtils
     extends ToMoreFoldableOps with OptionInstances
@@ -33,23 +34,20 @@ private object ZirconUtils
   def tileLens(p: Position): Lens[DrawSurface, Tile] =
     Lens[DrawSurface, Tile](_.getTileAt(p).get)(t => _.applyAndReturn(_.setTileAt(p, t)))
 
+  private implicit val UnsubscribableZircon: Unsubscribable[Subscription] = _.cancel(CancelledByHand.INSTANCE)
+  private def handleEvent[A](f: A => Any)(a: A, p: UIEventPhase): UIEventResponse = {
+    if (p == UIEventPhase.TARGET)
+      f(a)
+    Processed.INSTANCE
+  }
   implicit class RichUIEventSource(private val $: UIEventSource) extends AnyVal {
     def mouseActions(t: MouseEventType): Observable[MouseEvent] =
-      RichObservable.register(f => $.onMouseEvent(t, (mouseEvent: MouseEvent, uiEventPhase: UIEventPhase) => {
-        if (uiEventPhase == UIEventPhase.TARGET)
-          f(mouseEvent)
-        Processed.INSTANCE
-      }))
+      RichObservable.registerUnsubscribable(f => $.onMouseEvent(t, handleEvent(f)))
     def mouseActions(): MouseEvents = RichObservable.concat(MouseEventType.values.map(mouseActions))
     def mouseClicks(): MouseEvents = mouseActions(MouseEventType.MOUSE_CLICKED)
 
     def keyboardActions(t: KeyboardEventType = KeyboardEventType.KEY_PRESSED): KeyboardEvents =
-      RichObservable.register(f =>
-        $.onKeyboardEvent(t, (keyboardEvent: KeyboardEvent, uiEventPhase: UIEventPhase) => {
-          if (uiEventPhase == UIEventPhase.TARGET)
-            f(keyboardEvent)
-          Processed.INSTANCE
-        }))
+      RichObservable.registerUnsubscribable(f => $.onKeyboardEvent(t, handleEvent(f)))
     def keyCodes(): KeyCodes = keyboardActions().map(_.getCode)
     def simpleKeyStrokes(): SimpleKeyboardEvents = keyboardActions().oMap(_.getCode.getOChar)
   }
