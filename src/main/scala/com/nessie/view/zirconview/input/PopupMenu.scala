@@ -33,7 +33,7 @@ private class PopupMenu(mpc: MapPointConverter, gs: GameState, source: MapPoint)
         case (ua, disabled) =>
           OnBuildWrapper(Components.button.withText(ua.name)) {b =>
             if (disabled) {
-              b.disable()
+              b.getDisabledProperty.setValue(true)
               b.applyColorTheme(DisabledTheme)
             } else
               b.applyColorTheme(EnabledTheme)

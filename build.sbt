@@ -14,7 +14,7 @@ autoCompilerPlugins := true
 
 val MonocleVersion = "1.5.0"
 val ScalaZVersion = "7.2.15"
-val ZirconVersion = "2019.0.22-PREVIEW"
+val ZirconVersion = "2019.1.0-PREVIEW"
 val GuiceVersion = "4.2.2"
 
 lazy val nessie = (project in file("."))
