@@ -15,10 +15,14 @@ private class MovementLayer(val layer: Layer, subscriptions: Subscription*) {
 
 private object MovementLayer
     extends ToMoreMonadPlusOps with MoreObservableInstances {
+  sealed trait MovementLayerAction
+  case object OpenActionMenu extends MovementLayerAction
+  case object Move extends MovementLayerAction
+  type MovementLayerListener = MapPoint => MovementLayerAction => Unit
   def create(
       keyboardEvents: SimpleKeyboardEvents,
       layer: Layer,
-      menuOpener: MapPoint => Any,
+      listener: MovementLayerListener,
       initialLocation: MapGridPoint,
       highlighter: MapPoint => Any,
   ): MovementLayer = {
@@ -44,7 +48,11 @@ private object MovementLayer
           layer.setTileAt(currentLocation.relativePosition, movingUnitTile)
         }
     val openMenuSubscription =
-      keyboardEvents.filter(_ == ' ').subscribe(_ => {menuOpener(currentLocation.mapPoint)})
+      keyboardEvents.collect({
+        case ' ' => OpenActionMenu
+        case 'M' => Move
+        // (_) is necessary in order to get the current variable value.
+      }).subscribe(listener(currentLocation.mapPoint)(_))
     new MovementLayer(layer, movementSubscriptions, openMenuSubscription)
   }
 

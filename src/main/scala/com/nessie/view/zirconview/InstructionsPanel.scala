@@ -8,7 +8,9 @@ private class InstructionsPanel private(panel: TextBoxPanel) {
     i match {
       case Instructions.BasicInput => panel.update(
         _.addHeader("Input")
-            .addListItem("Use the WASD/HJKL keys to select target cell; press space to popup a menu")
+            .addListItem("Use the WASD/HJKL keys to select target cell")
+            .addListItem("press space to popup a menu at location")
+            .addListItem("press 'M' to to move to location")
             .addListItem("Press enter to end turn")
       )
     }
