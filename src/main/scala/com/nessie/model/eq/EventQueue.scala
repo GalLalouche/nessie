@@ -75,3 +75,7 @@ class EventQueue[A] private(
     }
   }
 }
+
+object EventQueue {
+  def empty[A]: EventQueue[A] = new EventQueue[A]()
+}

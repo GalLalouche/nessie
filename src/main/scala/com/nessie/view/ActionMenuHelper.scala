@@ -3,22 +3,23 @@ package com.nessie.view
 import com.nessie.gm.GameState
 import com.nessie.model.map.{CombatUnitObject, MapPoint}
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility, UnitAbility}
+import common.rich.RichT._
 import common.rich.primitives.RichBoolean._
 
-import scalaz.std.VectorInstances
+import scalaz.std.{OptionInstances, VectorInstances}
 import scalaz.syntax.ToFunctorOps
 
-// TODO test
 private object ActionMenuHelper
-    extends ToFunctorOps with VectorInstances {
-  type Disabled = Boolean
-  def usableAbilities(gs: GameState)(src: MapPoint, dst: MapPoint): Seq[(UnitAbility, Disabled)] = {
+    extends ToFunctorOps with VectorInstances with OptionInstances {
+  type IsDisabled = Boolean
+  def usableAbilities(gs: GameState)(src: MapPoint, dst: MapPoint): Seq[(UnitAbility, IsDisabled)] = {
     val unitTurn = gs.currentTurn.get
-    val abilities = gs.map(src).asInstanceOf[CombatUnitObject].unit.abilities
-    abilities.toVector.fproduct(u => {
-      CanBeUsed.negate(u)(gs.map, src, dst) ||
-          (u.isInstanceOf[MoveAbility] && unitTurn.remainingMovement == 0 ||
-              unitTurn.canAppendAction.isFalse)
-    })
+    gs.map(src).asInstanceOf[CombatUnitObject].unit
+        .abilities.toVector
+        .map(_.mapIf(_.isInstanceOf[MoveAbility]).to(unitTurn.remainingMovementAbility))
+        .fproduct(ability => {
+          CanBeUsed.negate(ability)(gs.map, src, dst) ||
+              ability.isInstanceOf[MoveAbility].isFalse && unitTurn.canAppendAction.isFalse
+        })
   }
 }
