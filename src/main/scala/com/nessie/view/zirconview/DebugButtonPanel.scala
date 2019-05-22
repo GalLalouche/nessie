@@ -30,8 +30,7 @@ private object DebugButtonPanel
     Components.panel
         .withTitle("Debug")
         .wrapWithBox(true)
-        .<|(pp)
-        .build
+        .|>(pp)
         .<|(_.addComponents(bps, Positions.zero, Positions.create(-1, 0)))
 
   private class StepperWrapper(private var stepper: DebugMapStepper, view: View) {
