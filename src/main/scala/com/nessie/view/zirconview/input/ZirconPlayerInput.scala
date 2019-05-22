@@ -45,7 +45,8 @@ private[zirconview] class ZirconPlayerInput(
     )
     instructionsPanel.push(Instructions.BasicInput)
     screen.pushLayer(movementLayer.layer)
-    mapGrid.highlightMovable(CanBeUsed.getUsablePoints(currentlyPlayingUnit.moveAbility)(gs.map, location))
+    mapGrid.highlightMovable(
+      CanBeUsed.getUsablePoints(gs.currentTurn.get.remainingMovementAbility)(gs.map, location))
     screenDrawer()
     promise.toTask.listen {_ =>
       screen.popLayer()
