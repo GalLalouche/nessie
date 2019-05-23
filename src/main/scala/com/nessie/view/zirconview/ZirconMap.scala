@@ -27,14 +27,14 @@ private class ZirconMap(
       case (mp, obj) =>
         toPosition(mp) -> (
             if (isVisible(mp))
-              c.getTile.lift(obj).getOrElse(obj match {
+              c.getTile.lift(obj).getOrElse((obj match {
                 case EmptyMapObject => Tiles.newBuilder.withCharacter(Symbols.INTERPUNCT)
                 case FullWall => Tiles.newBuilder.withCharacter('#')
                 case CombatUnitObject(u) => Tiles.newBuilder.withCharacter(u.metadata.name.head)
               })
                   .withBackgroundColor(theme.getSecondaryBackgroundColor)
                   .withForegroundColor(theme.getSecondaryForegroundColor)
-                  .build
+              ).build
             else
               Unrevealed
             )

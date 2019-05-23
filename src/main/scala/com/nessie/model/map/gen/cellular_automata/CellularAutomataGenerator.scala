@@ -10,8 +10,8 @@ import common.rich.collections.LazyIterable
 
 private object CellularAutomataGenerator extends MapGenerator {
   val initialMap = {
-    val Width = 50
-    val Height = 50
+    val Width = 80
+    val Height = 70
     VectorBattleMap(Width, Height)
   }
   override def iterativeGenerator: Rngable[LazyIterable[BattleMap]] = {

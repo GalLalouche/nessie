@@ -13,7 +13,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
 
   private val tileGrid = SwingApplications.startTileGrid(
     AppConfigs.newConfig
-        .withSize(Sizes.create(100, 80))
+        .withSize(Sizes.create(140, 85))
         .withDefaultTileset(CP437TilesetResources.wanderlust16x16)
         .build)
 
