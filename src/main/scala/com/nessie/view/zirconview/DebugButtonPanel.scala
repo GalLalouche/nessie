@@ -23,15 +23,11 @@ private class DebugButtonPanel private(
   def component: Component = panel
   smallStepButton.onActivation(() => nextSmallStep())
   def nextSmallStep(): Unit = {
-    if (smallStepButton.isEnabled.isFalse) // Because disable buttons can be still be clicked on for some reason!
-      return
     stepperWrapper.nextSmallStep()
     smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep.isFalse)
   }
   bigStepButton.onActivation(() => nextBigStep())
   def nextBigStep(): Unit = {
-    if (bigStepButton.isEnabled.isFalse)
-      return
     stepperWrapper.nextBigStep()
     bigStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextBigStep.isFalse)
     smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep.isFalse)
