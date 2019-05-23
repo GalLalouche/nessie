@@ -1,5 +1,6 @@
 package com.nessie.model.map
 
+import com.nessie.common.graph.Metric
 import common.rich.primitives.RichDouble._
 
 case class MapPoint(x: Int, y: Int) {
@@ -29,4 +30,7 @@ object MapPoint {
   def apply(t: (Int, Int)): MapPoint = MapPoint(t._1, t._2)
 
   implicit val OrderingEv: Ordering[MapPoint] = Ordering.by(e => e.x -> e.y)
+  implicit object MetricEv extends Metric[MapPoint] {
+    override def distance(a1: MapPoint, a2: MapPoint): Double = a1.manhattanDistanceTo(a2)
+  }
 }
