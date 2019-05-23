@@ -10,6 +10,7 @@ import monocle.Lens
 import org.hexworks.cobalt.datatypes.Maybe
 import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.Positions
+import org.hexworks.zircon.api.behavior.Disablable
 import org.hexworks.zircon.api.color.TileColor
 import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
@@ -18,9 +19,9 @@ import org.hexworks.zircon.api.graphics.DrawSurface
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent._
 import rx.lang.scala.Observable
+
 import scalaz.concurrent.Task
 import scalaz.std.OptionInstances
-
 import scala.collection.JavaConverters._
 
 private object ZirconUtils
@@ -74,6 +75,11 @@ private object ZirconUtils
       })
   }
 
+  implicit class RichDisablable(private val $: Disablable) extends AnyVal {
+    def disable(): Unit = $.getDisabledProperty.setValue(true)
+    def enable(): Unit = $.getDisabledProperty.setValue(false)
+  }
+
   implicit class RichContainer(private val $: Container) extends AnyVal {
     def addComponents(
         bps: Seq[OnBuildWrapper[_ <: Component, _]],
@@ -89,6 +95,10 @@ private object ZirconUtils
         $.addComponent(obBuildWrapper.build())
       }
     }
+
+    def find(p: Component => Boolean): Option[Component] = $.getChildren.iterator.asScala.find(p)
+    def collect[A](pf: PartialFunction[Component, A]): Iterator[A] =
+      $.getChildren.iterator.asScala.collect(pf)
   }
 
   implicit class RichScreen(private val $: Screen) extends AnyVal {
