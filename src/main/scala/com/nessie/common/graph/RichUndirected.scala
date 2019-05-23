@@ -33,7 +33,7 @@ object RichUndirected {
 
     def distance(source: A, destination: A): Option[Int] =
       distances(source, destination = Some(destination), maxDistance = None).get(destination)
-
+    def areConnected(source: A, destination: A): Boolean = distance(source, destination).isDefined
     def distances(source: A): Map[A, Int] = distances(source, destination = None, maxDistance = None)
     def distances(source: A, maxDistance: Int): Map[A, Int] =
       distances(source, destination = None, maxDistance = Some(maxDistance))
@@ -48,5 +48,8 @@ object RichUndirected {
     }
 
     def removeNodes(xs: Traversable[A]): Graph[A, UnDiEdge] = $ -- Graph.from(xs, Nil)
+
+    def stronglyConnectedComponents: Iterable[Iterable[A]] =
+      $.strongComponentTraverser().map(_.nodes.map(_.toOuter)).toIterable
   }
 }
