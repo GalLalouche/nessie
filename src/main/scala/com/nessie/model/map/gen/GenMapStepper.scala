@@ -19,11 +19,13 @@ private class GenMapStepper @Inject()(
       s.tail.opt.filter(_.nonEmpty).map(new FirstStepper(_))
     override def nextBigStep(): Option[DebugMapStepper] =
       Some(new SecondStepper(mapGenerator.canonize(currentMap)))
+    override def canonize: BattleMap = mapGenerator.canonize(currentMap)
   }
   class SecondStepper(map: BattleMap) extends DebugMapStepper {
     override def currentMap: BattleMap = mobPlacer.place(map).mkRandom(s2)
     override def nextSmallStep(): Option[DebugMapStepper] = None
     override def nextBigStep(): Option[DebugMapStepper] = None
+    override def canonize: BattleMap = currentMap
   }
   def genStepper: DebugMapStepper =
     new FirstStepper(mapGenerator.iterativeGenerator.map(_.toStream).mkRandom(s1))
