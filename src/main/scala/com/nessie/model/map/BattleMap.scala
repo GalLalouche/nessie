@@ -8,6 +8,7 @@ import common.rich.primitives.RichBoolean._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
+
 import scalaz.syntax.ToFunctorOps
 
 /** An map of a given level without between-objects, so walls and its ilks taken up a full tile. */
@@ -21,7 +22,8 @@ abstract class BattleMap(val width: Int, val height: Int)
 
   def size: Int = width * height
   def replace(p: MapPoint, o: BattleMapObject): BattleMap = remove(p).place(p, o)
-  def replaceSafely(p: MapPoint, o: BattleMapObject): BattleMap = removeSafely(p).place(p, o)
+  def replaceSafely(p: MapPoint, o: BattleMapObject): BattleMap =
+    removeSafely(p).mapIf(o neq EmptyMapObject).to(_.place(p, o))
 
   def points: Iterable[MapPoint] = for (y <- 0 until height; x <- 0 until width) yield MapPoint(x, y)
   def objects: Iterable[(MapPoint, BattleMapObject)] = points fproduct apply

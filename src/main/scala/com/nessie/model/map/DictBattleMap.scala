@@ -11,4 +11,5 @@ class DictBattleMap private(
 
 object DictBattleMap {
   def apply(width: Int, height: Int) = new DictBattleMap(Map(), width = width, height = height)
+  def parser: BattleMapParser = BattleMapParser.fromPoints(apply)
 }

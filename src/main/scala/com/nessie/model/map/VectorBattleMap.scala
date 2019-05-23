@@ -22,4 +22,6 @@ object VectorBattleMap {
     width = width,
     height = height,
   )
+
+  def parser: BattleMapParser = BattleMapParser.fromPoints(VectorBattleMap.apply)
 }
