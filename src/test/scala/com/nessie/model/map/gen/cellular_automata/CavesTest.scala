@@ -12,7 +12,7 @@ class CavesTest extends FreeSpec with AuxSpecs {
         |*****
         |_____""".stripMargin)
     val caves = Caves.from(map)
-    caves.caves.map(_.mapPoints.toSet) shouldSetEqual Vector(
+    caves.caves.map(_.mapPoints.toSet) shouldMultiSetEqual Vector(
       Set(
         MapPoint(0, 0),
         MapPoint(0, 1),

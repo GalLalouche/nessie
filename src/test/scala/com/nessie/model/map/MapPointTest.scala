@@ -17,7 +17,7 @@ class MapPointTest extends FreeSpec with AuxSpecs {
       val p = MapPoint(5, 5)
       val $ = p.neighborsAndDiagonals
       $.size shouldReturn 8
-      $ shouldSetEqual Vector(
+      $ shouldMultiSetEqual Vector(
         4 -> 4,
         4 -> 5,
         4 -> 6,
@@ -32,7 +32,7 @@ class MapPointTest extends FreeSpec with AuxSpecs {
       val p = MapPoint(0, 0)
       val $ = p.neighborsAndDiagonals
       $.size shouldReturn 3
-      $ shouldSetEqual Vector(
+      $ shouldMultiSetEqual Vector(
         0 -> 1,
         1 -> 0,
         1 -> 1,

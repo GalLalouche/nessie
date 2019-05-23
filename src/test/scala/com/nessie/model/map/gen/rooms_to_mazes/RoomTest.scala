@@ -85,7 +85,7 @@ class RoomTest extends FreeSpec with AuxSpecs {
 
   "mapPoints" in {
     $.mapPoints.size shouldReturn 12
-    $.mapPoints shouldSetEqual Vector(
+    $.mapPoints shouldMultiSetEqual Vector(
       MapPoint(1, 2),
       MapPoint(1, 3),
       MapPoint(1, 4),

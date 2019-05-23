@@ -55,7 +55,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
   }
 
   "neighborsAndDiagonals" in {
-    createBattleMap(2, 3).neighborsAndDiagonals(MapPoint(1, 1)) shouldSetEqual Vector(
+    createBattleMap(2, 3).neighborsAndDiagonals(MapPoint(1, 1)) shouldMultiSetEqual Vector(
       0 -> 0,
       0 -> 1,
       0 -> 2,
@@ -74,7 +74,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     val node10 = MapPoint(1, 0) -> EmptyMapObject
     val node11 = MapPoint(1, 1) -> EmptyMapObject
     val node12 = MapPoint(1, 2) -> EmptyMapObject
-    g.nodes.map(_.value) shouldSetEqual Seq(
+    g.nodes.map(_.value) shouldMultiSetEqual Seq(
       node00,
       node01,
       node02,
@@ -82,7 +82,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
       node11,
       node12,
     )
-    g.edges.map(_.toOuter) shouldSetEqual Seq(
+    g.edges.map(_.toOuter) shouldMultiSetEqual Seq(
       UnDiEdge(node00, node10),
       UnDiEdge(node10, node11),
       UnDiEdge(node11, node12),
@@ -100,7 +100,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     val node10 = MapPoint(1, 0)
     val node11 = MapPoint(1, 1)
     val node12 = MapPoint(1, 2)
-    g.nodes.map(_.value) shouldSetEqual Seq(
+    g.nodes.map(_.value) shouldMultiSetEqual Seq(
       node00,
       node01,
       node02,
@@ -108,7 +108,7 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
       node11,
       node12,
     )
-    g.edges.map(_.toOuter) shouldSetEqual Seq(
+    g.edges.map(_.toOuter) shouldMultiSetEqual Seq(
       UnDiEdge(node00, node01),
       UnDiEdge(node00, node10),
       UnDiEdge(node01, node02),

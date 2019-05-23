@@ -19,7 +19,7 @@ class DfsTraversalTest extends FreeSpec with AuxSpecs {
   "branching" in {
     val $ = DfsTraversal(Graph(1 ~ 2, 2 ~ 3, 3 ~ 4, 1 ~ 5, 1 ~ 6, 7 ~ 8), 2).mkRandom(StdGen.fromSeed(0))
         .toVector
-    $ shouldSetEqual 1.to(6)
+    $ shouldMultiSetEqual 1.to(6)
     $.size shouldReturn 6
     $.head shouldReturn 2
   }

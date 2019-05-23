@@ -70,7 +70,7 @@ class CanBeUsedTest extends FreeSpec with AuxSpecs {
       CanBeUsed.getUsablePoints(meleeAttack)(map, MapPoint(0, 0)) shouldReturn Vector(MapPoint(0, 1))
     }
     "range" in {
-      CanBeUsed.getUsablePoints(MoveAbility(2))(map, MapPoint(0, 0)) shouldSetEqual Vector(
+      CanBeUsed.getUsablePoints(MoveAbility(2))(map, MapPoint(0, 0)) shouldMultiSetEqual Vector(
         MapPoint(0, 2),
         MapPoint(2, 0),
       )
