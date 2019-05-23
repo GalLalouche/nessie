@@ -1,10 +1,10 @@
 package com.nessie.view.zirconview
 
 import com.nessie.gm.{DebugMapStepper, GameState, View}
-import common.rich.primitives.RichBoolean._
 import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.view.zirconview.DebugButtonPanel.StepperWrapper
 import com.nessie.view.zirconview.ZirconUtils._
+import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.func.ToMoreFoldableOps
 import org.hexworks.zircon.api.{Components, Positions}
@@ -54,11 +54,18 @@ private object DebugButtonPanel
       stepper = stepper.nextSmallStep().get
       view.updateState(NoOp, GameState.fromMap(stepper.currentMap))
     }
+    def finishCurrentStep(): Unit = {
+      stepper = stepper.finishCurrentStep()
+      view.updateState(NoOp, GameState.fromMap(stepper.currentMap))
+    }
 
     def hasNextBigStep: Boolean = stepper.nextBigStep().isDefined
     def nextBigStep(): Unit = {
       stepper = stepper.nextBigStep().get
       view.updateState(NoOp, GameState.fromMap(stepper.currentMap))
+    }
+    def canonize(): Unit = {
+      view.updateState(NoOp, GameState.fromMap(stepper.canonize))
     }
   }
 
@@ -67,7 +74,11 @@ private object DebugButtonPanel
     val panel = buildPanel(
       panelPlacer,
       OnBuildWrapper.noOp(Components.button.withText("Small Step")),
+      OnBuildWrapper(Components.button.withText("Finish Step"))(
+        _.onActivation(() => wrapper.finishCurrentStep())),
       OnBuildWrapper.noOp(Components.button.withText("Big Step")),
+      OnBuildWrapper(Components.button.withText("Canonize"))(
+        _.onActivation(() => wrapper.canonize())),
       OnBuildWrapper.noOp(Components.checkBox.withText("Hover FOV")),
     )
     panel.applyColorTheme(ZirconConstants.Theme)

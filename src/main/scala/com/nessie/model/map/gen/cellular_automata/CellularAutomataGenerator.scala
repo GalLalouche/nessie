@@ -1,7 +1,7 @@
 package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.common.rng.Rngable
-import com.nessie.model.map.{BattleMap, FullWall, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, MapPoint, VectorBattleMap}
 import com.nessie.model.map.gen.MapGenerator
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
@@ -9,17 +9,17 @@ import common.Percentage
 import common.rich.collections.LazyIterable
 
 private object CellularAutomataGenerator extends MapGenerator {
-  override def generator: Rngable[BattleMap] = iterativeGenerator.map(_.last)
-
-  override def iterativeGenerator: Rngable[LazyIterable[BattleMap]] = {
+  val initialMap = {
     val Width = 50
     val Height = 50
+    VectorBattleMap(Width, Height)
+  }
+  override def iterativeGenerator: Rngable[LazyIterable[BattleMap]] = {
     val initialProbability: Percentage = 0.52
-    val battleMap = VectorBattleMap(Width, Height)
 
     for {
       initialMap <- Rngable.fromRandom(random => {
-        battleMap.foldPoints {(map, mp) =>
+        initialMap.foldPoints {(map, mp) =>
           val next = if (initialProbability.roll(random)) Empty(0) else Wall(0)
           map.place(mp, next)
         }
@@ -50,10 +50,5 @@ private object CellularAutomataGenerator extends MapGenerator {
           .map(new MapIterator(_, n + 1))
     }
   }
-
-  override def canonize(currentMap: BattleMap): BattleMap =
-    currentMap.foldPoints((map, next) => map(next) match {
-      case Empty(_) => map.remove(next)
-      case Wall(_) => map.replace(next, FullWall)
-    })
+  override def canonize(map: BattleMap) = AutomataGeneration.canonize(map)
 }
