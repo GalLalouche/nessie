@@ -12,6 +12,7 @@ private class InstructionsPanel private(panel: TextBoxPanel) {
             .addListItem("press space to popup a menu at location")
             .addListItem("press 'M' to to move to location")
             .addListItem("Press enter to end turn")
+            .addListItem("Use the arrow keys to scroll the map; shift/ctrl scrolls farther")
       )
     }
   }

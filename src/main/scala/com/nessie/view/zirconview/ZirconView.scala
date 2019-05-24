@@ -2,10 +2,13 @@ package com.nessie.view.zirconview
 
 import ch.qos.logback.classic.Level
 import com.nessie.gm.{DebugMapStepper, GameState, GameStateChange, PlayerInput, View}
+import com.nessie.model.map.Direction
 import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.input.ZirconPlayerInput
+import com.nessie.view.zirconview.ZirconUtils._
 import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
+import org.hexworks.zircon.api.uievent.KeyCode
 import org.slf4j.LoggerFactory
 
 private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: DebugMapStepper) extends View {
@@ -13,7 +16,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
 
   private val tileGrid = SwingApplications.startTileGrid(
     AppConfigs.newConfig
-        .withSize(Sizes.create(140, 85))
+        .withSize(Sizes.create(100, 80))
         .withDefaultTileset(CP437TilesetResources.wanderlust16x16)
         .build)
 
@@ -39,7 +42,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   override def updateState(change: GameStateChange, state: GameState): Unit = synchronized {
     def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
     def createNewMap(state: GameState): ZirconMap = {
-      val $ = ZirconMap.create(state.map, customizer.mapCustomizer, mapGridPosition)
+      val $ = ZirconMap.create(state.map, customizer.mapCustomizer, mapGridPosition, Sizes.create(50, 50))
       $.mouseEvents(screen).foreach(gc => {
         propertiesPanel.update($.getCurrentBattleMap)(gc)
         if (debugPanel.isHoverFovChecked) {
@@ -56,11 +59,20 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     drawMap()
   }
 
-
   private def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
 
   screen.display()
 
+  private val ArrowKeys: Map[KeyCode, Direction] = Map(
+    KeyCode.UP -> Direction.Up,
+    KeyCode.DOWN -> Direction.Down,
+    KeyCode.LEFT -> Direction.Left,
+    KeyCode.RIGHT -> Direction.Right,
+  )
+  screen.keyboardActions().oMap(ke => ArrowKeys.get(ke.getCode).strengthL(ke)).foreach {case (ke, d) =>
+    map.get.scroll(n = if (ke.getCtrlDown) 10 else if (ke.getShiftDown) 5 else 1, direction = d)
+    drawMap()
+  }
   override def playerInput = new PlayerInput {
     override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) =
       new ZirconPlayerInput(
