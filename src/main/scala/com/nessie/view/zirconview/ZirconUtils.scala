@@ -12,24 +12,33 @@ import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.Positions
 import org.hexworks.zircon.api.behavior.Disablable
 import org.hexworks.zircon.api.color.TileColor
-import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
-import org.hexworks.zircon.api.data.{Position, Tile}
+import org.hexworks.zircon.api.component.modal.Modal
+import org.hexworks.zircon.api.data.{Position, Size, Tile}
 import org.hexworks.zircon.api.graphics.DrawSurface
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent._
 import rx.lang.scala.Observable
-import scalaz.concurrent.Task
-import scalaz.std.OptionInstances
 
 import scala.collection.JavaConverters._
+
+import scalaz.concurrent.Task
+import scalaz.std.OptionInstances
 
 private object ZirconUtils
     extends ToMoreFoldableOps with OptionInstances
         with ToMoreMonadPlusOps with MoreObservableInstances {
+  implicit class RichSize(private val $: Size) extends AnyVal {
+    @inline def width: Int = $.getWidth
+    @inline def height: Int = $.getWidth
+  }
   implicit class RichPosition(private val $: Position) extends AnyVal {
     def withInverseRelative(other: Position): Position =
       $.withRelativeX(-other.getX).withRelativeY(-other.getY)
+    @inline def x: Int = $.getX
+    @inline def y: Int = $.getY
+    def inSizedContainer(p: Position, size: Size): Boolean =
+      $.x >= p.x & $.y >= p.y && $.x < p.x + size.width && $.y < p.y + size.height
   }
 
   def tileLens(p: Position): Lens[DrawSurface, Tile] =
