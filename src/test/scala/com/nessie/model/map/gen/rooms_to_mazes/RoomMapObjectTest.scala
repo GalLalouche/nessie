@@ -1,6 +1,6 @@
 package com.nessie.model.map.gen.rooms_to_mazes
 
-import com.nessie.model.map.{BattleMap, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, VectorGrid}
 import common.AuxSpecs
 import org.scalatest.FreeSpec
 
@@ -8,7 +8,7 @@ class RoomMapObjectTest extends FreeSpec with AuxSpecs {
   private def addRoom(map: BattleMap, room: Room, index: Int): BattleMap =
     room.mapPoints.foldLeft(map)(_.place(_, RoomMapObject(index)))
   "getRooms" - {
-    val $ = VectorBattleMap(20, 18)
+    val $ = BattleMap.create(VectorGrid, 20, 18)
     "noRooms returns an empty map" in {
       RoomMapObject.getRooms($) shouldBe 'empty
     }

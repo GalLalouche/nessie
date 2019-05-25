@@ -3,7 +3,7 @@ package com.nessie.gm
 import com.nessie.gm.GameStateChange.ActionTaken
 import com.nessie.gm.TurnAction.{ActualAction, MovementAction}
 import com.nessie.model.eq.EventQueue
-import com.nessie.model.map.{CombatUnitObject, EmptyMapObject, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, CombatUnitObject, EmptyMapObject, MapPoint, VectorGrid}
 import com.nessie.model.units.{Warrior, Zombie}
 import common.AuxSpecs
 import org.scalatest.FreeSpec
@@ -16,7 +16,7 @@ class ApplyAbilityTest extends FreeSpec with AuxSpecs {
       val unitObject = CombatUnitObject(unit)
       val action = PreAction.empty(unit)
       val gs = GameState(
-        map = VectorBattleMap(5, 5)
+        map = BattleMap.create(VectorGrid, 5, 5)
             .place(MapPoint(0, 1), unitObject)
             .place(MapPoint(0, 2), CombatUnitObject(enemy)),
         eq = new EventQueue[Event]().add(UnitTurn(unit), withDelay = 1.0),

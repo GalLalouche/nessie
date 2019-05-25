@@ -12,7 +12,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
  */
 object GameLoop {
   private def DemoState = GameState.fromMap(
-    DictBattleMap(5, 5)
+    BattleMap.create(VectorGrid, 5, 5)
         .place(MapPoint(0, 0), CombatUnitObject(Warrior.create))
         .place(MapPoint(0, 1), CombatUnitObject(Archer.create))
         .place(MapPoint(1, 0), FullWall)

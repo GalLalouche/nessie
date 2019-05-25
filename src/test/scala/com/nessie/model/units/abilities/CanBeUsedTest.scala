@@ -1,6 +1,6 @@
 package com.nessie.model.units.abilities
 
-import com.nessie.model.map.{CombatUnitObject, MapPoint, NonEmptyBattleMapObject, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint, NonEmptyBattleMapObject, VectorGrid}
 import com.nessie.model.units.{Archer, Skeleton, Warrior, Zombie}
 import common.AuxSpecs
 import org.scalatest.FreeSpec
@@ -8,7 +8,7 @@ import org.scalatest.FreeSpec
 class CanBeUsedTest extends FreeSpec with AuxSpecs {
   private val meleeAttack = MeleeAttack(5)
   "Movement" - {
-    val map = VectorBattleMap(2, 2).place(MapPoint(1, 1), NonEmptyBattleMapObject)
+    val map = BattleMap.create(VectorGrid, 2, 2).place(MapPoint(1, 1), NonEmptyBattleMapObject)
     "destination is occupied returns false" in {
       CanBeUsed(MoveAbility(2))(map, MapPoint(0, 0), MapPoint(1, 1)) shouldReturn false
     }
@@ -18,7 +18,7 @@ class CanBeUsedTest extends FreeSpec with AuxSpecs {
   }
 
   "Attacks" - {
-    val map = VectorBattleMap(3, 3)
+    val map = BattleMap.create(VectorGrid, 3, 3)
         .place(MapPoint(0, 0), CombatUnitObject(Archer.create))
         .place(MapPoint(1, 0), CombatUnitObject(Warrior.create))
         .place(MapPoint(1, 1), CombatUnitObject(Skeleton.create))
@@ -57,7 +57,7 @@ class CanBeUsedTest extends FreeSpec with AuxSpecs {
   }
 
   "getUsablePoints" - {
-    val map = VectorBattleMap(3, 3)
+    val map = BattleMap.create(VectorGrid, 3, 3)
         .place(MapPoint(0, 0), CombatUnitObject(Archer.create))
         .place(MapPoint(1, 0), CombatUnitObject(Warrior.create))
         .place(MapPoint(1, 1), CombatUnitObject(Skeleton.create))
@@ -78,7 +78,7 @@ class CanBeUsedTest extends FreeSpec with AuxSpecs {
   }
 
   "negate" in {
-    val map = VectorBattleMap(2, 2).place(MapPoint(1, 1), NonEmptyBattleMapObject)
+    val map = BattleMap.create(VectorGrid, 2, 2).place(MapPoint(1, 1), NonEmptyBattleMapObject)
     CanBeUsed.negate(MoveAbility(2))(map, MapPoint(0, 0), MapPoint(1, 1)) shouldReturn true
   }
 }

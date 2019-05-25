@@ -2,7 +2,7 @@ package com.nessie.gm
 
 import com.nessie.gm.TurnAction.EndTurn
 import com.nessie.model.eq.EventQueue
-import com.nessie.model.map.{CombatUnitObject, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint, VectorGrid}
 import com.nessie.model.units.{Skeleton, Warrior}
 import common.AuxSpecs
 import org.mockito.Mockito
@@ -11,7 +11,7 @@ import org.scalatest.mockito.MockitoSugar
 
 class CatcherAITest extends FreeSpec with AuxSpecs with MockitoSugar with OneInstancePerTest {
   private val unit = Skeleton.create
-  private val map = VectorBattleMap(2, 2)
+  private val map = BattleMap.create(VectorGrid, 2, 2)
       .place(MapPoint(0, 0), CombatUnitObject(unit))
       .place(MapPoint(0, 1), CombatUnitObject(Warrior.create))
   private val converter = mock[AbilityToTurnActionConverter]

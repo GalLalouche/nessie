@@ -2,7 +2,7 @@ package com.nessie.view
 
 import com.nessie.gm.{Attack, GameState, Movement, PostAction, PreAction}
 import com.nessie.model.eq.EventQueue
-import com.nessie.model.map.{CombatUnitObject, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint, VectorGrid}
 import com.nessie.model.units.{Skeleton, Warrior}
 import com.nessie.model.units.abilities.{DamageAbility, MoveAbility}
 import common.rich.collections.RichTraversableOnce._
@@ -16,7 +16,7 @@ class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
   "getUsablePoints" - {
     "preAction can attack" in {
       val unit = Warrior.create
-      val map = VectorBattleMap(5, 5)
+      val map = BattleMap.create(VectorGrid, 5, 5)
           .place(MapPoint(3, 2), CombatUnitObject(unit))
           .place(MapPoint(3, 3), CombatUnitObject(Skeleton.create))
       val turn = PreAction.empty(unit)
@@ -28,7 +28,7 @@ class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
     }
     "Can move after action" in {
       val unit = Warrior.create
-      val map = VectorBattleMap(5, 5).place(MapPoint(3, 2), CombatUnitObject(unit))
+      val map = BattleMap.create(VectorGrid, 5, 5).place(MapPoint(3, 2), CombatUnitObject(unit))
       val turn = PostAction.apply(unit, Nil, mock[Attack], Nil)
       val gs = GameState(map, EventQueue.empty, Some(turn))
       ActionMenuHelper
@@ -43,7 +43,7 @@ class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
     "Can only move remaining amount" in {
       val unit = Warrior.create
       assert(unit.moveAbility.range == 3)
-      val map = VectorBattleMap(5, 5).place(MapPoint(3, 2), CombatUnitObject(unit))
+      val map = BattleMap.create(VectorGrid, 5, 5).place(MapPoint(3, 2), CombatUnitObject(unit))
       val turn = PreAction.empty(unit)
           .append(Movement(MapPoint(1, 2), MapPoint(2, 2)))
           .append(mock[Attack])

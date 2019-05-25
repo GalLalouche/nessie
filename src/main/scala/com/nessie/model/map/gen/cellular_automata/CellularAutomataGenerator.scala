@@ -1,7 +1,7 @@
 package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.common.rng.Rngable
-import com.nessie.model.map.{BattleMap, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, MapPoint, VectorGrid}
 import com.nessie.model.map.gen.MapGenerator
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
@@ -12,7 +12,7 @@ private object CellularAutomataGenerator extends MapGenerator {
   val initialMap = {
     val Width = 80
     val Height = 70
-    VectorBattleMap(Width, Height)
+    BattleMap.create(VectorGrid, Width, Height)
   }
   override def iterativeGenerator: Rngable[LazyIterable[BattleMap]] = {
     val initialProbability: Percentage = 0.52

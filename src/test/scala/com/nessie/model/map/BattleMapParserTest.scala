@@ -3,8 +3,8 @@ package com.nessie.model.map
 import common.AuxSpecs
 import org.scalatest.FreeSpec
 
-abstract class BattleMapParserTest extends FreeSpec with AuxSpecs {
-  protected def createParser: BattleMapParser
+class BattleMapParserTest extends FreeSpec with AuxSpecs {
+  def createParser: BattleMapParser = BattleMapParser.fromFactory(VectorGrid)
 
   "empty throws" in {
     an[IllegalArgumentException] shouldBe thrownBy {createParser.parse("")}

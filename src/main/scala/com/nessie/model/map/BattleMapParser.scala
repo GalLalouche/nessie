@@ -19,11 +19,11 @@ object BattleMapParser {
   }
   class InvalidBattleMapStringException(map: String) extends Exception(s"Invalid BattleMap string:\n$map")
 
-  def fromPoints(create: (Width, Height) => BattleMap): BattleMapParser = map => lines(map) match {
+  def fromFactory(gf: GridFactory): BattleMapParser = map => lines(map) match {
     case -\/(a) => throw a
     case \/-(lines) =>
       val width = lines.head.length
-      val $ = create(width, lines.length)
+      val $ = BattleMap.create(gf, width, lines.length)
       val points = (for {
         y <- lines.indices
         x <- lines(y).indices

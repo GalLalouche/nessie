@@ -1,12 +1,12 @@
 package com.nessie.model.map.gen.cellular_automata
 
-import com.nessie.model.map.{MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMapParser, MapPoint, VectorGrid}
 import common.AuxSpecs
 import org.scalatest.FreeSpec
 
 class CavesTest extends FreeSpec with AuxSpecs {
   "from" in {
-    val map = VectorBattleMap.parser.parse(
+    val map = BattleMapParser.fromFactory(VectorGrid).parse(
       """_*_*_
         |___*_
         |*****

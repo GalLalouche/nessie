@@ -1,7 +1,7 @@
 package com.nessie.gm
 
 import com.nessie.gm.TurnAction.EndTurn
-import com.nessie.model.map.{CombatUnitObject, FullWall, MapPoint, VectorBattleMap}
+import com.nessie.model.map.{BattleMap, CombatUnitObject, FullWall, MapPoint, VectorGrid}
 import com.nessie.model.units.{Archer, CombatUnit, Skeleton, Warrior, Zombie}
 import com.nessie.model.units.Owner.Player
 import common.rich.collections.RichIterator._
@@ -24,7 +24,7 @@ class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with
       gs.map.objects.iterator.map(_._2).select[CombatUnitObject].exists(_.unit.owner == Player)
     val gm = GameMaster.initiate(
       state = GameState.fromMap(
-        VectorBattleMap(5, 5)
+        BattleMap.create(VectorGrid, 5, 5)
             .place(MapPoint(0, 0), CombatUnitObject(Warrior.create))
             .place(MapPoint(0, 1), CombatUnitObject(Archer.create))
             .place(MapPoint(1, 0), FullWall)
@@ -44,7 +44,7 @@ class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with
       gs.map.objects.iterator.map(_._2).select[CombatUnitObject].map(_.unit.owner).toSet.size == 2
     val gm = GameMaster.initiate(
       state = GameState.fromMap(
-        VectorBattleMap(5, 5)
+        BattleMap.create(VectorGrid, 5, 5)
             .place(MapPoint(0, 0), CombatUnitObject(Warrior.create))
             .place(MapPoint(0, 1), CombatUnitObject(Archer.create))
             .place(MapPoint(1, 0), FullWall)
