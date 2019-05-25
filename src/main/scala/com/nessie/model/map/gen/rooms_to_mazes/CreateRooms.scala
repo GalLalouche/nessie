@@ -61,7 +61,8 @@ private object CreateRooms
     def roomIndex(p: MapPoint): Option[RoomMapObject] =
       rooms.findIndex(_.pointInRectangle(p)).map(RoomMapObject.apply)
 
-    initialMap.clearAllPoints.fillItAll
-        .foldPoints((map, p) => roomIndex(p).mapHeadOrElse(map.replace(p, _), map))
+    initialMap
+        .foldPoints(_.place(_, FullWall))
+        .foldPoints((map, p) => roomIndex(p).mapHeadOrElse(map.place(p, _), map))
   }
 }

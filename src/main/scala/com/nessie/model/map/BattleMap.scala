@@ -18,60 +18,36 @@ abstract class BattleMap(val width: Int, val height: Int)
   require(width > 0)
   require(height > 0)
 
-  protected def internalPlace(p: MapPoint, o: BattleMapObject): BattleMap
+  @inline def isInBounds(p: MapPoint): Boolean = p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
+  @inline private def checkBounds(p: MapPoint): Unit =
+    if (isInBounds(p).isFalse)
+      throw new IndexOutOfBoundsException(
+        s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
+  @inline def isBorder(p: MapPoint): Boolean = p.x == 0 || p.y == 0 || p.x == width - 1 || p.y == height - 1
 
-  def size: Int = width * height
-  def replace(p: MapPoint, o: BattleMapObject): BattleMap = remove(p).place(p, o)
-  def replaceSafely(p: MapPoint, o: BattleMapObject): BattleMap =
-    removeSafely(p).mapIf(o neq EmptyMapObject).to(_.place(p, o))
+  protected def internalPlace(p: MapPoint, o: BattleMapObject): BattleMap
+  def place(p: MapPoint, o: BattleMapObject): BattleMap = {
+    checkBounds(p)
+    internalPlace(p, o)
+  }
+
+  protected def internalApply(p: MapPoint): BattleMapObject
+  def apply(p: MapPoint): BattleMapObject = {
+    checkBounds(p)
+    internalApply(p)
+  }
 
   def points: Iterable[MapPoint] = for (y <- 0 until height; x <- 0 until width) yield MapPoint(x, y)
   def objects: Iterable[(MapPoint, BattleMapObject)] = points fproduct apply
 
-  def isInBounds(p: MapPoint): Boolean = p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
-  def isBorder(p: MapPoint): Boolean = p.x == 0 || p.y == 0 || p.x == width - 1 || p.y == height - 1
-
-  def apply(p: MapPoint): BattleMapObject
-
-  private def checkBounds(p: MapPoint): Unit =
-    if (p.x >= width || p.y >= height)
-      throw new IndexOutOfBoundsException(
-        s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
-  def place(p: MapPoint, o: BattleMapObject): BattleMap = {
-    require(o != EmptyMapObject, "Don't place empty objects. Use remove instead.")
-    checkBounds(p)
-    if (isOccupiedAt(p)) throw new MapOccupiedException(p) else internalPlace(p, o)
-  }
-
   // Using eq for singletons is potentially faster.
   def isEmptyAt(p: MapPoint): Boolean = EmptyMapObject eq apply(p)
   def isOccupiedAt(p: MapPoint): Boolean = isEmptyAt(p).isFalse
+  def remove(p: MapPoint): BattleMap = place(p, EmptyMapObject)
 
-  def remove(p: MapPoint): BattleMap =
-    if (isOccupiedAt(p)) this.internalPlace(p, EmptyMapObject)
-    else throw new MapEmptyException(p)
-  def removeSafely(p: MapPoint): BattleMap =
-    this.mapIf(isOccupiedAt(p)).to(_.internalPlace(p, EmptyMapObject))
-
-  /**
-   * Moves an object from one location to another
-   *
-   * @param src The location of the object
-   * @throws MapEmptyException If the map empty at src
-   */
-  def move(src: MapPoint) = {
-    val o = this (src)
-    new {
-      /**
-       * Moves an object to the location
-       *
-       * @param dst The location to move to
-       * @return The modified controller
-       * @throws MapOccupiedException If there's already an object at dst
-       */
-      def to(dst: MapPoint): BattleMap = remove(src).place(dst, o)
-    }
-  }
+  def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
+  private def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] =
+    if (this (mp).canMoveThrough) neighbors(mp).filter((apply _).andThen(_.canMoveThrough)) else Nil
 
   lazy val toObjectGraph: Graph[(MapPoint, BattleMapObject), UnDiEdge] = {
     val nodes: Iterable[(MapPoint, BattleMapObject)] = objects
@@ -97,12 +73,4 @@ abstract class BattleMap(val width: Int, val height: Int)
   )
 
   def foldPoints: ((BattleMap, MapPoint) => BattleMap) => BattleMap = points.foldLeft(this)
-  def clearAllPoints: BattleMap = foldPoints(_ removeSafely _)
-  /** Marks the points as a FullWall and places walls around it. */
-  def fillItAll: BattleMap = foldPoints(_.replaceSafely(_, FullWall))
-
-  def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
-  def neighborsAndDiagonals(mp: MapPoint): Iterable[MapPoint] = mp.neighborsAndDiagonals.filter(isInBounds)
-  def reachableNeighbors(mp: MapPoint): Iterable[MapPoint] =
-    if (this (mp).canMoveThrough) neighbors(mp).filter((apply _).andThen(_.canMoveThrough)) else Nil
 }

@@ -3,9 +3,8 @@ package com.nessie.model.map
 class DictBattleMap private(
     objects: Map[MapPoint, BattleMapObject], width: Int, height: Int
 ) extends BattleMap(width, height) {
-  override def apply(p: MapPoint) = objects.getOrElse(p, EmptyMapObject)
-
-  override def internalPlace(p: MapPoint, o: BattleMapObject) = new DictBattleMap(
+  override protected def internalApply(p: MapPoint) = objects.getOrElse(p, EmptyMapObject)
+  override protected def internalPlace(p: MapPoint, o: BattleMapObject) = new DictBattleMap(
     if (o == EmptyMapObject) objects - p else objects + (p -> o), width, height)
 }
 

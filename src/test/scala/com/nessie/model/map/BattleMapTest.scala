@@ -4,6 +4,7 @@ import common.AuxSpecs
 import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge
+
 import scalaz.syntax.ToFunctorOps
 
 abstract class BattleMapTest extends FreeSpec with AuxSpecs
@@ -23,45 +24,18 @@ abstract class BattleMapTest extends FreeSpec with AuxSpecs
     val $ = createBattleMap(width = 5, height = 10)
     $.width shouldReturn 5
     $.height shouldReturn 10
-    $.size shouldReturn 50
   }
   "Exceptions" - {
     val objectPoint = MapPoint(0, 0)
-    val emptyPoint = MapPoint(3, 4)
     val $ = createBattleMap(5, 2).place(objectPoint, NonEmptyBattleMapObject)
     "Out of bounds" - { // Negatives indices handled by the appropriate case class constructor
       "Object" in {
         an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(5, 1), NonEmptyBattleMapObject)
         an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(1, 2), NonEmptyBattleMapObject)
+        an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(-1, 1), NonEmptyBattleMapObject)
+        an[IndexOutOfBoundsException] should be thrownBy $.place(MapPoint(1, -1), NonEmptyBattleMapObject)
       }
     }
-    "Place on non-empty" in {an[MapOccupiedException] should be thrownBy $.place(objectPoint, NonEmptyBattleMapObject)}
-    "Place empty" in {an[IllegalArgumentException] should be thrownBy $.place(emptyPoint, EmptyMapObject)}
-    "Remove empty" in {a[MapEmptyException] should be thrownBy $.remove(MapPoint(1, 1))}
-  }
-
-  "clearAllPoints" in {
-    val g = createBattleMap(width = 2, height = 3)
-        .place(MapPoint(0, 1), FullWall)
-        .place(MapPoint(1, 2), NonEmptyBattleMapObject)
-    all(g.clearAllPoints.objects.map(_._2)) shouldEqual EmptyMapObject
-  }
-
-  "fillItAll" in {
-    val g = createBattleMap(width = 2, height = 3)
-        .place(MapPoint(0, 1), FullWall)
-        .place(MapPoint(1, 2), NonEmptyBattleMapObject)
-    all(g.fillItAll.objects.map(_._2)) shouldEqual FullWall
-  }
-
-  "neighborsAndDiagonals" in {
-    createBattleMap(2, 3).neighborsAndDiagonals(MapPoint(1, 1)) shouldMultiSetEqual Vector(
-      0 -> 0,
-      0 -> 1,
-      0 -> 2,
-      1 -> 0,
-      1 -> 2,
-    ).map(MapPoint.apply)
   }
 
   "toGraph" in {

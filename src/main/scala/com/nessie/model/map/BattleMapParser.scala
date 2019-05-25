@@ -28,7 +28,7 @@ object BattleMapParser {
         y <- lines.indices
         x <- lines(y).indices
       } yield MapPoint(x, y) -> lines(y)(x)).toMap
-      $.foldPoints((map, mp) => map.replaceSafely(mp, points(mp) match {
+      $.foldPoints((map, mp) => map.place(mp, points(mp) match {
         case '*' => FullWall
         case '_' => EmptyMapObject
       }))

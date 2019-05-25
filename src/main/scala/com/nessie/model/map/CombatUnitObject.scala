@@ -17,7 +17,7 @@ object CombatUnitObject {
         .map {currentLocation =>
           replace match {
             case None => map.remove(currentLocation)
-            case Some(r) => map.replace(currentLocation, r)
+            case Some(r) => map.place(currentLocation, r)
           }
         } getOrElse map
     Lens[BattleMap, Option[CombatUnitObject]](get)(set)

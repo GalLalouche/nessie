@@ -17,7 +17,7 @@ private case class Caves(caves: Seq[Cave], uf: ImmutableUnionFind[Cave]) {
   def isConnected = uf.hasSingleSet
   def areConnected(c1: Cave, c2: Cave): Boolean = uf.sameSet(c1, c2)
   def mark(map: BattleMap) =
-    map.foldPoints((map, p) => cave(p).map(CaveMapObject apply _.id).fold(map)(map.replaceSafely(p, _)))
+    map.foldPoints((map, p) => cave(p).map(CaveMapObject apply _.id).fold(map)(map.place(p, _)))
 }
 private object Caves {
   private val IDs = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

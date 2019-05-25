@@ -42,7 +42,7 @@ private object CellularAutomataGenerator extends MapGenerator {
         val r2 = wallsInDistance(mp, 2)
         val isWall = r1 >= 5
         val changed = isWall != wasWall
-        if (changed.isFalse) map else map.replace(mp, if (isWall) Wall(n) else Empty(n))
+        if (changed.isFalse) map else map.place(mp, if (isWall) Wall(n) else Empty(n))
       })
 
       nextMap.opt

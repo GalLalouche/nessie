@@ -37,7 +37,7 @@ private object ConnectRooms
         // TODO lenses?
         val dug = map(head) eq FullWall
         copy(
-          map = map.replace(head, if (dug) TunnelMapObject(index) else map(head)),
+          map = map.place(head, if (dug) TunnelMapObject(index) else map(head)),
           remainingPoints = {
             val roomNumbers = map.neighbors(head).map(map.apply).select[RoomMapObject].map(_.index).toSet
             val $ = remainingPoints.filterNot(map(_).asInstanceOf[RoomMapObject].index |> roomNumbers)

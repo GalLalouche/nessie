@@ -10,9 +10,9 @@ case class VectorBattleMap private(
     override val width: Int,
     override val height: Int,
 ) extends BattleMap(width, height) {
-  override def apply(p: MapPoint) = grid(p.x)(p.y)
+  @inline override protected final def internalApply(p: MapPoint) = grid(p.x)(p.y)
   // TODO lenses?
-  @inline override final def internalPlace(p: MapPoint, o: BattleMapObject) =
+  @inline override protected final def internalPlace(p: MapPoint, o: BattleMapObject) =
     copy(grid = grid.updated(p.x, grid(p.x).updated(p.y, o)))
 }
 

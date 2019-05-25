@@ -66,8 +66,8 @@ private object ConnectRoomsViaPairs
               .select[RoomMapObject]
               .map(_.index)
               .toVector
+          val nextMap = fullWalls.foldLeft(map)(_.place(_, TunnelMapObject(index)))
           val nextUnionFind = connectedRooms.foldLeft(roomConnections)(_.union(r1, _))
-          val nextMap = fullWalls.foldLeft(map)(_.replaceSafely(_, TunnelMapObject(index)))
           nextMap -> nextUnionFind
         }
       }

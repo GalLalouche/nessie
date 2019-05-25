@@ -7,7 +7,7 @@ object AutomataGeneration {
   def canonize(map: BattleMap): BattleMap =
     map.foldPoints((map, next) => map(next) match {
       case Empty(_) | CaveMapObject(_) | Tunnel => map.remove(next)
-      case Wall(_) => map.replace(next, FullWall)
+      case Wall(_) => map.place(next, FullWall)
     })
 }
 case class Empty(index: Int) extends AutomataGeneration
