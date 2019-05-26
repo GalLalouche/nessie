@@ -3,8 +3,8 @@ package com.nessie.gm
 import com.nessie.common.rng.StdGen
 import com.nessie.model.map.BattleMap
 import com.nessie.model.map.gen.MapGenerator
-import common.rich.RichT._
 import common.rich.collections.LazyIterable
+import common.rich.collections.RichStream._
 
 trait DebugMapStepper {
   def currentMap: BattleMap
@@ -20,9 +20,7 @@ object DebugMapStepper {
   private class StreamStepper(
       s: Stream[BattleMap], canonizer: BattleMap => BattleMap) extends DebugMapStepper {
     override def currentMap: BattleMap = s.head
-    override def nextSmallStep(): Option[DebugMapStepper] =
-    // TODO tailOpt
-      s.tail.opt.filter(_.nonEmpty).map(new StreamStepper(_, canonizer))
+    override def nextSmallStep(): Option[DebugMapStepper] = s.tailOption.map(new StreamStepper(_, canonizer))
     override def nextBigStep(): Option[DebugMapStepper] = None
     override def canonize: BattleMap = canonizer(currentMap)
   }
