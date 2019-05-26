@@ -5,16 +5,14 @@ import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
 import com.nessie.model.map.BattleMap
 import com.nessie.model.map.gen.MapGenerator
-import common.rich.RichTuple._
-import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
+import common.rich.primitives.RichBoolean._
 
 private class CellularDigger(private val map: BattleMap, caves: Caves) extends ToRngableOps {
   def next: Rngable[Option[CellularDigger]] = if (caves.isConnected) Rngable.pure(None) else {
-    // TODO RTO.filterNot
     val pairs =
-      caves.uf.values.unorderedPairs.filter(_.reduce(caves.areConnected(_, _).isFalse)).toVector.sorted
+      caves.uf.values.unorderedPairs.filterNot(Function tupled caves.areConnected).toVector.sorted
     for {
       (src, dst) <- pairs.sample
       start <- src.mapPoints.sample
