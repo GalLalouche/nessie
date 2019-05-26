@@ -10,7 +10,7 @@ import scala.language.postfixOps
 import scalaz.concurrent.Task
 
 class PromiseZTest extends FreeSpec with AuxSpecs with TimeLimitedTests with OneInstancePerTest {
-  override val timeLimit = 500 millis
+  override val timeLimit = 1000 millis
   override val defaultTestSignaler: Signaler = Signaler(_.interrupt())
 
   private def checkReturn[A](task: Task[A], e: A): Unit =
