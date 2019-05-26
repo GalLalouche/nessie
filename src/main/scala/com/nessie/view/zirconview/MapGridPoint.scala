@@ -14,7 +14,7 @@ private case class MapGridPoint(
   private def inBounds(mapPoint: MapPoint): Boolean =
     mapPoint.x >= 0 && mapPoint.y >= 0 && mapPoint.x < mapSize.getWidth && mapPoint.y < mapSize.getHeight
   def go(d: Direction): Option[MapGridPoint] =
-    mapPoint.go(d).opt.filter(inBounds).map(mp => copy(mapPoint = mp))
+    mapPoint.go(d).optFilter(inBounds).map(mp => copy(mapPoint = mp))
   val relativePosition: Position = Positions.create(mapPoint.x, mapPoint.y)
   val absolutePosition: Position = relativePosition.withRelative(mapGridPosition)
 }
@@ -26,5 +26,5 @@ private object MapGridPoint {
       mapGridPosition,
       mapSize,
       absolutePosition.withInverseRelative(mapGridPosition).mapTo(p => MapPoint(x = p.getX, y = p.getY)),
-    ).opt.filter(p => p.inBounds(p.mapPoint))
+    ).optFilter(p => p.inBounds(p.mapPoint))
 }

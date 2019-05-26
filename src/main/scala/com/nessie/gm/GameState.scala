@@ -5,9 +5,8 @@ import com.nessie.model.eq.EventQueue
 import com.nessie.model.map.{BattleMap, CombatUnitObject}
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
-import monocle.{Lens, Setter}
 import monocle.macros.Lenses
-
+import monocle.{Lens, Setter}
 import scalaz.std.OptionInstances
 
 @Lenses
@@ -18,7 +17,7 @@ case class GameState(
 ) extends OptionInstances {
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
-    val noneIfDead = replacer(original).opt.filterNot(_.hitPoints.isDead)
+    val noneIfDead = replacer(original).optFilter(_.hitPoints.isNotDead)
     val mapLens: Lens[BattleMap, Option[CombatUnit]] =
       CombatUnitObject.lens(original).^|->(MonocleUtils.lift(CombatUnitObject.unit)(optionInstance))
     val queueLens = Setter[EventQueue[Event], Option[CombatUnit]](GameState.updateEq(original))

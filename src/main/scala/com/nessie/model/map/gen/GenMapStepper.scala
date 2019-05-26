@@ -16,7 +16,7 @@ private class GenMapStepper @Inject()(
   class FirstStepper(s: Stream[BattleMap]) extends DebugMapStepper {
     override def currentMap: BattleMap = s.head
     override def nextSmallStep(): Option[DebugMapStepper] =
-      s.tail.opt.filter(_.nonEmpty).map(new FirstStepper(_))
+      s.tail.optFilter(_.nonEmpty).map(new FirstStepper(_))
     override def nextBigStep(): Option[DebugMapStepper] =
       Some(new SecondStepper(mapGenerator.canonize(currentMap)))
     override def canonize: BattleMap = mapGenerator.canonize(currentMap)
