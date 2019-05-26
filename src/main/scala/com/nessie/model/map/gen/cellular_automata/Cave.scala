@@ -15,8 +15,7 @@ private object Cave {
 private case class Caves(caves: Seq[Cave], uf: ImmutableUnionFind[Cave]) {
   // TODO implement more efficiently
   def cave(mp: MapPoint): Option[Cave] = caves.find(_.contains(mp))
-  // TODO UnionFind.singleSet
-  def isConnected = uf.numberOfSets == 1
+  def isConnected = uf.hasSingleSet
   def areConnected(c1: Cave, c2: Cave): Boolean = uf.sameSet(c1, c2)
   def mark(map: BattleMap) =
     map.foldPoints((map, p) => cave(p).map(CaveMapObject apply _.id).fold(map)(map.replaceSafely(p, _)))
