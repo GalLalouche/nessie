@@ -12,18 +12,17 @@ import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.Positions
 import org.hexworks.zircon.api.behavior.Disablable
 import org.hexworks.zircon.api.color.TileColor
-import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
 import org.hexworks.zircon.api.component.modal.Modal
+import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
 import org.hexworks.zircon.api.data.{Position, Tile}
 import org.hexworks.zircon.api.graphics.DrawSurface
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent._
 import rx.lang.scala.Observable
-
-import scala.collection.JavaConverters._
-
 import scalaz.concurrent.Task
 import scalaz.std.OptionInstances
+
+import scala.collection.JavaConverters._
 
 private object ZirconUtils
     extends ToMoreFoldableOps with OptionInstances
@@ -71,12 +70,7 @@ private object ZirconUtils
   implicit class RichComponent(private val $: Component) extends AnyVal {
     def onActivation(f: () => Any): Unit =
       $.onComponentEvent(ComponentEventType.ACTIVATED, (_: ComponentEvent) => {
-        // TODO safeCast to interface?
-        val isEnabled = $ match {
-          case d: Disablable => d.isEnabled
-          case _ => true
-        }
-        if (isEnabled) {
+        if ($.safeAs[Disablable].mapHeadOrElse(_.isEnabled, true)) {
           f()
           Processed.INSTANCE
         } else
