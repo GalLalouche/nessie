@@ -9,4 +9,9 @@ object RngableDeterministicTest extends GeneratorDrivenPropertyChecks with Match
   def forAll(rngable: => Rngable[_]): Unit = {
     forAll((rng: StdGen) => rngable.mkRandom(rng) should ===(rngable.mkRandom(rng)) )
   }
+  def apply(rngable: => Rngable[_]): Unit = {
+    val seed = 4 // chosen by fair dice roll.
+                 // guaranteed to be random.
+    rngable.mkRandom(StdGen(seed)) should ===(rngable.mkRandom(StdGen(seed)))
+  }
 }
