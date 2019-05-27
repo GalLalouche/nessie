@@ -2,16 +2,18 @@ package com.nessie.common.rng
 
 import com.nessie.common.rng.Rngable.ToRngableOps
 import common.AuxSpecs
+import common.rich.func.ToMoreFunctorOps
 import org.scalatest.PropSpec
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.time.SpanSugar._
-
 import scalaz.std.VectorInstances
 import scalaz.syntax.ToTraverseOps
 
+import scala.language.postfixOps
+
 class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with ToRngableOps
-    with ToTraverseOps with VectorInstances with TimeLimitedTests {
+    with ToTraverseOps with VectorInstances with TimeLimitedTests with ToMoreFunctorOps {
   override val timeLimit = 1000 millis
   override val defaultTestSignaler = Signaler(_.stop())
   private case class Person(age: Int, name: String)
@@ -80,10 +82,10 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   }
 
   private def verifyIncreasing(xs: Seq[Int]) = xs.sliding(2).foreach(v => v(0) should be <= v(1))
+  private def addBinaryRngable(e: Int): Rngable[Int] = Rngable.BooleanEv.when(1, 0).map(e + _)
   property("Rngable.iterate") {
-    // TODO ToMoreFunctorOps.when?
     forAll((rng: StdGen) => {
-      val $ = Rngable.iterate(1)(e => Rngable.BooleanEv.map(b => e + (if (b) 1 else 0)))
+      val $ = Rngable.iterate(1)(addBinaryRngable)
           .map(_ take 10)
           .mkRandom(rng)
       val vector = $.toVector
@@ -94,10 +96,11 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     })
   }
 
+  private def someAddBinaryRngable(e: Int): Rngable[Option[Int]] = addBinaryRngable(e).map(Some.apply)
   property("Rngable.iterateOptionally") {
     forAll((rng: StdGen) => {
       val $ = Rngable.iterateOptionally(1)(
-        e => if (e >= 10) Rngable.pure(None) else Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0)))
+        e => if (e >= 10) Rngable.pure(None) else someAddBinaryRngable(e)
       ).mkRandom(rng)
       val vector = $.toVector
       verifyIncreasing(vector)
@@ -108,7 +111,7 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   }
   property("Rngable.iterateOptionally on infinite") {
     forAll((rng: StdGen) => {
-      val $ = Rngable.iterateOptionally(1)(e => Rngable.BooleanEv.map(b => Some(e + (if (b) 1 else 0))))
+      val $ = Rngable.iterateOptionally(1)(someAddBinaryRngable)
           .map(_.take(20))
           .mkRandom(rng)
       val vector = $.toVector
