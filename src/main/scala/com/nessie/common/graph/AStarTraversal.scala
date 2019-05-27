@@ -17,16 +17,18 @@ object AStarTraversal {
     def next: Rngable[Option[Aux[A]]] = {
       val head :: tail = path
       if (head == destination) Rngable.pure(None) else if (visited(head)) copy(path = tail).next else {
-        // Sorting is required for reproducibility.
         val nextNeighbors = graph.get(head)
             .~|
             .view
             .filterNot(visited)
+        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.pure(None) else nextNeighbors
             .map(_.toOuter)
             .groupBy(_.distanceTo(destination))
-            .toVector.minBy(_._1)
+            .minBy(_._1)
             ._2
-        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.pure(None) else nextNeighbors.shuffle
+            .toVector
+            .sorted // Sorting is required to ensure deterministic results.
+            .shuffle
             .map(_.toList ++ tail)
             .map(Aux(graph, _, visited + head, destination).opt)
       }
