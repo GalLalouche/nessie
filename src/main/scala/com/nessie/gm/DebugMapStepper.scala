@@ -1,6 +1,7 @@
 package com.nessie.gm
 
 import com.nessie.common.rng.StdGen
+import common.rich.collections.RichList._
 import com.nessie.model.map.BattleMap
 import com.nessie.model.map.gen.MapGenerator
 import common.rich.collections.LazyIterable
@@ -42,11 +43,8 @@ object DebugMapStepper {
     private def currentOption(f: DebugMapStepper => Option[DebugMapStepper]): Option[DebugMapStepper] =
       f(currentStepper).map(new Composite(_, steppers))
     override def nextSmallStep(): Option[DebugMapStepper] = currentOption(_.nextSmallStep())
-    override def nextBigStep(): Option[DebugMapStepper] = currentOption(_.nextBigStep()).orElse(
-      steppers match { // TODO extract head :: tail opt
-        case Nil => None
-        case head :: tail => Some(new Composite(head(currentMap), tail))
-      })
+    override def nextBigStep(): Option[DebugMapStepper] = currentOption(_.nextBigStep())
+        .orElse(steppers.headTailOption.map {case (head, tail) => new Composite(head(currentMap), tail)})
     override def canonize = currentStepper.canonize
   }
 
