@@ -48,6 +48,8 @@ object RichUndirected {
     }
 
     def removeNodes(xs: Traversable[A]): Graph[A, UnDiEdge] = $ -- Graph.from(xs, Nil)
+    def filterNodes(p: A => Boolean): Graph[A, UnDiEdge] =
+      $ -- Graph.from(outerNodes.filterNot(p), Nil)
 
     def stronglyConnectedComponents: Iterable[Iterable[A]] =
       $.strongComponentTraverser().map(_.nodes.map(_.toOuter)).toIterable

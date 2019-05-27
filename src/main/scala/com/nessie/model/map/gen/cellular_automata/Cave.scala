@@ -1,7 +1,6 @@
 package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.model.map.{BattleMap, MapPoint}
-import common.rich.primitives.RichBoolean._
 import common.uf.ImmutableUnionFind
 
 private case class Cave(mapPoints: Seq[MapPoint], id: Char) {
@@ -24,8 +23,7 @@ private object Caves {
   private val IDs = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   def from(map: BattleMap): Caves = {
     import com.nessie.common.graph.RichUndirected._
-    val cavePoints = map.toPointGraph
-        .removeNodes(map.objects.filter(_._2.canMoveThrough.isFalse).map(_._1))
+    val cavePoints = map.passablePointGraph
         .stronglyConnectedComponents
         .view.map(_.toVector.sorted)
         .toVector

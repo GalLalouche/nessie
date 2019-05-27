@@ -82,6 +82,8 @@ abstract class BattleMap(val width: Int, val height: Int)
   }
 
   lazy val toPointGraph: Graph[MapPoint, UnDiEdge] = toObjectGraph.mapNodes(_._1)
+  lazy val passablePointGraph: Graph[MapPoint, UnDiEdge] =
+    toObjectGraph.filterNodes(_._2.canMoveThrough).mapNodes(_._1)
 
   lazy val toFullGraph: Graph[MapPoint, UnDiEdge] = Graph.from(
     nodes = points,
