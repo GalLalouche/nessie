@@ -4,7 +4,7 @@ import com.nessie.common.graph.AStarTraversal
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
 import com.nessie.model.map.BattleMap
-import com.nessie.model.map.gen.MapGenerator
+import com.nessie.model.map.gen.MapIterator
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.primitives.RichBoolean._
@@ -31,12 +31,11 @@ private class CellularDigger(private val map: BattleMap, caves: Caves) extends T
 }
 
 private object CellularDigger {
-  def generator(map: BattleMap): MapGenerator = {
+  def iterator(map: BattleMap): MapIterator = {
     val caves = Caves.from(map)
     val markedMap = caves.mark(map)
-    new MapGenerator {
-      override def initialMap = markedMap
-      override def iterativeGenerator =
+    new MapIterator {
+      override def steps =
         Rngable.iterateOptionally(new CellularDigger(markedMap, caves))(_.next).map(_.map(_.map))
       override def canonize(map: BattleMap) = AutomataGeneration.canonize(map)
     }

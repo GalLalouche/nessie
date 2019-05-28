@@ -4,12 +4,13 @@ import common.AuxSpecs
 import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge
-
 import scalaz.syntax.ToFunctorOps
 
 abstract class BattleMapTest extends FreeSpec with AuxSpecs
     with ToFunctorOps with MoreIterableInstances {
-  protected def createBattleMap(width: Int, height: Int): BattleMap
+  protected def createBattleMap(gs: GridSize): BattleMap
+  private def createBattleMap(width: Int, height: Int): BattleMap =
+    createBattleMap(GridSize(width = width, height = height))
 
   "Constructor" - {
     "Negative width" in {an[IllegalArgumentException] should be thrownBy createBattleMap(-3, 10)}

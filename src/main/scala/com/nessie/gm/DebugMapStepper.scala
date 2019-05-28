@@ -1,10 +1,10 @@
 package com.nessie.gm
 
-import com.nessie.common.rng.StdGen
-import common.rich.collections.RichList._
-import com.nessie.model.map.BattleMap
-import com.nessie.model.map.gen.MapGenerator
+import com.nessie.common.rng.Rngable
+import com.nessie.model.map.{BattleMap, GridSize}
+import com.nessie.model.map.gen.{MapIterator, MapIteratorFactory}
 import common.rich.collections.LazyIterable
+import common.rich.collections.RichList._
 import common.rich.collections.RichStream._
 
 trait DebugMapStepper {
@@ -25,10 +25,10 @@ object DebugMapStepper {
     override def nextBigStep(): Option[DebugMapStepper] = None
     override def canonize: BattleMap = canonizer(currentMap)
   }
-  def from(mg: MapGenerator, stdGen: StdGen): DebugMapStepper = new StreamStepper(
-    mg.iterativeGenerator.map(_.toStream).mkRandom(stdGen),
-    mg.canonize
-  )
+  def from(iterator: MapIterator): Rngable[DebugMapStepper] =
+    iterator.steps.map(_.toStream).map(new StreamStepper(_, iterator.canonize))
+  def from(factory: MapIteratorFactory): Rngable[DebugMapStepperFactory] =
+    Rngable.fromStdGen(stdGen => gs => from(factory.generate(gs)).mkRandom(stdGen))
 
   def Null: DebugMapStepper = new DebugMapStepper {
     override def currentMap = ???
@@ -48,6 +48,11 @@ object DebugMapStepper {
     override def canonize = currentStepper.canonize
   }
 
-  def composite(stepper1: DebugMapStepper, steppers: (BattleMap => DebugMapStepper)*): DebugMapStepper =
-    new Composite(stepper1, steppers.toList)
+  private class CompositeFactory(currentStepper: DebugMapStepperFactory, steppers: List[BattleMap => DebugMapStepper])
+      extends DebugMapStepperFactory {
+    override def apply(gridSize: GridSize) = new Composite(currentStepper(gridSize), steppers)
+  }
+
+  def composite(stepper1: DebugMapStepperFactory, steppers: (BattleMap => DebugMapStepper)*): DebugMapStepperFactory =
+    new CompositeFactory(stepper1, steppers.toList)
 }

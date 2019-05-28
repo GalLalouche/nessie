@@ -12,7 +12,7 @@ import scalax.collection.GraphEdge.UnDiEdge
 
 import scalaz.syntax.ToFunctorOps
 
-/** An map of a given level without between-objects, so walls and its ilks taken up a full tile. */
+/** A map of a given level without between-objects, so walls and its ilks taken up a full tile. */
 @Lenses
 case class BattleMap private(grid: Grid[BattleMapObject])
     extends GridLike[BattleMap, BattleMapObject]
@@ -41,6 +41,7 @@ case class BattleMap private(grid: Grid[BattleMapObject])
 }
 
 object BattleMap {
+  def create(gf: GridFactory, gridSize: GridSize): BattleMap = new BattleMap(gf(gridSize, EmptyMapObject))
   def create(gf: GridFactory, width: Int, height: Int): BattleMap =
-    new BattleMap(gf(width, height, EmptyMapObject))
+    new BattleMap(gf(GridSize(width = width, height = height), EmptyMapObject))
 }

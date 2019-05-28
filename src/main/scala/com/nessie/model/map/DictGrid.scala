@@ -12,6 +12,6 @@ case class DictGrid[A] private(
 }
 
 object DictGrid extends GridFactory {
-  override def apply[A](width: Int, height: Int, default: A) =
-    new DictGrid(Map(), width = width, height = height, default = default)
+  override def apply[A](gs: GridSize, default: A) =
+    new DictGrid(Map(), width = gs.width, height = gs.height, default = default)
 }

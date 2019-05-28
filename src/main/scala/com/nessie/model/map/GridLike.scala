@@ -6,9 +6,10 @@ import monocle.Lens
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
 import scalax.collection.immutable.Graph
-import scalaz.syntax.ToFunctorOps
 
 import scala.language.higherKinds
+
+import scalaz.syntax.ToFunctorOps
 
 trait GridLike[G, A]
     extends ToFunctorOps with MoreIterableInstances {self: G =>
@@ -16,6 +17,7 @@ trait GridLike[G, A]
   def width: Int = gridLens.get(this).width
   def height: Int = gridLens.get(this).height
 
+  def size: GridSize = GridSize(width, height)
   // TODO rename MapPoint to LatticePoint or do *something* about the naming dissonance
   @inline def isInBounds(p: MapPoint): Boolean = p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
   @inline private def checkBounds(p: MapPoint): Unit =

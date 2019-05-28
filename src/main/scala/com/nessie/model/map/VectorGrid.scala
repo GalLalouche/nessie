@@ -17,9 +17,9 @@ case class VectorGrid[A] private(
 }
 
 object VectorGrid extends GridFactory {
-  override def apply[A](width: Int, height: Int, initialObject: A): VectorGrid[A] = new VectorGrid(
-    grid = Vector.fill(width, height)(initialObject),
-    width = width,
-    height = height,
+  override def apply[A](gs: GridSize, initialObject: A): VectorGrid[A] = new VectorGrid(
+    grid = Vector.fill(gs.width, gs.height)(initialObject),
+    width = gs.width,
+    height = gs.height,
   )
 }
