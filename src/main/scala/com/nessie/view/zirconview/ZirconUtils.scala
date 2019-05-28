@@ -1,6 +1,7 @@
 package com.nessie.view.zirconview
 
 import com.nessie.common.PromiseZ
+import com.nessie.model.map.{GridSize, MapPoint}
 import common.rich.RichObservable
 import common.rich.RichObservable.Unsubscribable
 import common.rich.RichT._
@@ -9,13 +10,13 @@ import common.rich.func.{MoreObservableInstances, ToMoreFoldableOps, ToMoreMonad
 import monocle.Lens
 import org.hexworks.cobalt.datatypes.Maybe
 import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
-import org.hexworks.zircon.api.Positions
+import org.hexworks.zircon.api.{Positions, Sizes}
 import org.hexworks.zircon.api.behavior.Disablable
 import org.hexworks.zircon.api.color.TileColor
 import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
 import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.data.{Position, Size, Tile}
-import org.hexworks.zircon.api.graphics.{DrawSurface, Layer}
+import org.hexworks.zircon.api.graphics.{DrawSurface, Layer, TileComposite}
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent._
 import rx.lang.scala.Observable
@@ -28,9 +29,17 @@ import scalaz.std.OptionInstances
 private object ZirconUtils
     extends ToMoreFoldableOps with OptionInstances
         with ToMoreMonadPlusOps with MoreObservableInstances {
+  implicit class RichGridSize(private val $: GridSize) extends AnyVal {
+    def toZirconSize: Size = Sizes.create($.width, $.height)
+  }
   implicit class RichSize(private val $: Size) extends AnyVal {
     @inline def width: Int = $.getWidth
     @inline def height: Int = $.getWidth
+  }
+  implicit class RichTileComposite(private val $: TileComposite) extends AnyVal {
+    @inline def width: Int = $.getWidth
+    @inline def height: Int = $.getWidth
+    @inline def size: Size = $.getSize
   }
   implicit class RichPosition(private val $: Position) extends AnyVal {
     def withInverseRelative(other: Position): Position =

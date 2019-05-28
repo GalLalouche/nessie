@@ -3,10 +3,11 @@ package com.nessie.view.zirconview.input
 import com.nessie.gm.GameState
 import com.nessie.model.map.MapPoint
 import com.nessie.model.units.abilities.AbilityToTurnAction
-import com.nessie.view.zirconview.{MapPointConverter, OnBuildWrapper, ZirconConstants}
+import com.nessie.view.zirconview.{OnBuildWrapper, ZirconConstants}
 import com.nessie.view.zirconview.input.PopupMenu._
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.ActionMenuHelper
+import com.nessie.view.zirconview.map.MapPointConverter
 import org.hexworks.zircon.api.{Components, Positions, Sizes}
 import org.hexworks.zircon.api.builder.component.ModalBuilder
 import org.hexworks.zircon.api.color.ANSITileColor

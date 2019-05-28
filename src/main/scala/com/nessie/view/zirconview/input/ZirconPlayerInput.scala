@@ -5,9 +5,10 @@ import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.model.map.{CombatUnitObject, MapPoint}
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{AbilityToTurnAction, CanBeUsed}
-import com.nessie.view.zirconview.{Instructions, InstructionsPanel, MapPointHighlighter, ZirconMap}
+import com.nessie.view.zirconview.{Instructions, InstructionsPanel, MapPointHighlighter}
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.input.MovementLayer.MovementLayerAction
+import com.nessie.view.zirconview.map.ZirconMap
 import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, ToMoreMonadPlusOps}
 import org.hexworks.zircon.api.screen.Screen

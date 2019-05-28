@@ -6,6 +6,7 @@ import com.nessie.model.map.Direction
 import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.input.ZirconPlayerInput
 import com.nessie.view.zirconview.ZirconUtils._
+import com.nessie.view.zirconview.map.ZirconMap
 import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
 import org.hexworks.zircon.api.uievent.KeyCode
@@ -52,7 +53,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     def createNewMap(state: GameState): ZirconMap = {
       val $ = ZirconMap.create(state.fogOfWar, customizer.mapCustomizer, mapGridPosition, Sizes.create(50, 50))
       $.mouseEvents(screen).foreach(gc => {
-        propertiesPanel.update($.getCurrentBattleMap.map)(gc)
+        propertiesPanel.update($.getCurrentMap.map)(gc)
         if (debugPanel.isHoverFovChecked) {
           $.updateViewAndFog(gc)
           drawMap()

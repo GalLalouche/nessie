@@ -1,8 +1,9 @@
 package com.nessie.view.zirconview.input
 
 import com.nessie.model.map.{Direction, MapPoint}
-import com.nessie.view.zirconview.{MapGridPoint, SimpleKeyboardEvents}
+import com.nessie.view.zirconview.SimpleKeyboardEvents
 import com.nessie.view.zirconview.ZirconUtils._
+import com.nessie.view.zirconview.map.MapGridPoint
 import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.Layer
