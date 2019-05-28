@@ -3,6 +3,7 @@ package com.nessie.view
 import com.nessie.gm.{Attack, GameState, Movement, PostAction, PreAction}
 import com.nessie.model.eq.EventQueue
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint, VectorGrid}
+import com.nessie.model.map.fov.FogOfWar
 import com.nessie.model.units.{Skeleton, Warrior}
 import com.nessie.model.units.abilities.{DamageAbility, MoveAbility}
 import common.rich.collections.RichTraversableOnce._
@@ -20,7 +21,7 @@ class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
           .place(MapPoint(3, 2), CombatUnitObject(unit))
           .place(MapPoint(3, 3), CombatUnitObject(Skeleton.create))
       val turn = PreAction.empty(unit)
-      val gs = GameState(map, EventQueue.empty, Some(turn))
+      val gs = GameState(FogOfWar.allVisible(map), EventQueue.empty, Some(turn))
       ActionMenuHelper
           .usableAbilities(gs)(MapPoint(3, 2), MapPoint(3, 3))
           .filter(_._1.isInstanceOf[DamageAbility])
@@ -30,7 +31,7 @@ class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
       val unit = Warrior.create
       val map = BattleMap.create(VectorGrid, 5, 5).place(MapPoint(3, 2), CombatUnitObject(unit))
       val turn = PostAction.apply(unit, Nil, mock[Attack], Nil)
-      val gs = GameState(map, EventQueue.empty, Some(turn))
+      val gs = GameState(FogOfWar.allVisible(map), EventQueue.empty, Some(turn))
       ActionMenuHelper
           .usableAbilities(gs)(MapPoint(3, 2), MapPoint(2, 3))
           .iterator
@@ -48,7 +49,7 @@ class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
           .append(Movement(MapPoint(1, 2), MapPoint(2, 2)))
           .append(mock[Attack])
           .append(Movement(MapPoint(2, 2), MapPoint(3, 2)))
-      val gs = GameState(map, EventQueue.empty, Some(turn))
+      val gs = GameState(FogOfWar.allVisible(map), EventQueue.empty, Some(turn))
       forAll(ActionMenuHelper
           .usableAbilities(gs)(MapPoint(3, 2), MapPoint(2, 3))) {_._2 shouldReturn true}
     }

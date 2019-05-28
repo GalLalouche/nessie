@@ -3,18 +3,21 @@ package com.nessie.gm
 import com.nessie.common.MonocleUtils
 import com.nessie.model.eq.EventQueue
 import com.nessie.model.map.{BattleMap, CombatUnitObject}
+import com.nessie.model.map.fov.FogOfWar
 import com.nessie.model.units.CombatUnit
 import common.rich.RichT._
-import monocle.macros.Lenses
 import monocle.{Lens, Setter}
+import monocle.macros.Lenses
+
 import scalaz.std.OptionInstances
 
 @Lenses
 case class GameState(
-    map: BattleMap,
+    fogOfWar: FogOfWar,
     eq: EventQueue[Event],
     currentTurn: Option[ComposedTurn], // Is defined when it's time for a unit to take its turn.
 ) extends OptionInstances {
+  def map: BattleMap = fogOfWar.map
   //TODO handle the case where the unit dies
   private def mapUnit(original: CombatUnit, replacer: CombatUnit => CombatUnit): GameState = {
     val noneIfDead = replacer(original).optFilter(_.hitPoints.isNotDead)
@@ -41,12 +44,14 @@ object GameState {
     }
   }
   def fromMap(map: BattleMap): GameState = {
+    val fow = FogOfWar.allVisible(map)
     val units = map.objects.map(_._2).flatMap(_.safeCast[CombatUnitObject]).map(_.unit)
     val eq = units.foldLeft(new EventQueue[Event]) {
       (agg, next) => agg.add(UnitTurn(next), 1.0 / next.moveAbility.range)
     }
-    GameState(map, eq, currentTurn = None)
+    GameState(fow, eq, currentTurn = None)
   }
   def unitSetter(original: CombatUnit): Setter[GameState, CombatUnit] =
     Setter[GameState, CombatUnit](replacer => _.mapUnit(original, replacer))
+  def map: Lens[GameState, BattleMap] = fogOfWar ^|-> FogOfWar.map
 }
