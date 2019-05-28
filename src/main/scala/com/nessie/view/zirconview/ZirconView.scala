@@ -38,15 +38,23 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
   screen.display()
 
   private var map: Option[ZirconMap] = None
+  debugPanel.hoverFov.onActivation(() => {
+    if (debugPanel.isHoverFovChecked) map.get.showAll() else map.get.hideAll()
+  })
   private val mapGridPosition = Positions.create(0, 1).relativeToRightOf(propertiesPanel.component)
   override def updateState(change: GameStateChange, state: GameState): Unit = synchronized {
-    def drawMap(): Unit = screen.draw(map.get.graphics, mapGridPosition)
+    def drawMap(): Unit = {
+      screen.draw(map.get.graphics, mapGridPosition)
+      val layer = map.get.fogOfWarLayer
+      screen.removeLayer(layer)
+      screen.pushLayer(layer)
+    }
     def createNewMap(state: GameState): ZirconMap = {
-      val $ = ZirconMap.create(state.map, customizer.mapCustomizer, mapGridPosition, Sizes.create(50, 50))
+      val $ = ZirconMap.create(state.fogOfWar, customizer.mapCustomizer, mapGridPosition, Sizes.create(50, 50))
       $.mouseEvents(screen).foreach(gc => {
-        propertiesPanel.update($.getCurrentBattleMap)(gc)
+        propertiesPanel.update($.getCurrentBattleMap.map)(gc)
         if (debugPanel.isHoverFovChecked) {
-          $.drawFov(gc)
+          $.updateViewAndFog(gc)
           drawMap()
         }
       })
@@ -54,7 +62,7 @@ private class ZirconView(customizer: ZirconViewCustomizer, private var stepper: 
     }
     map match {
       case None => map = Some(createNewMap(state))
-      case Some(value) => value.update(state.map)
+      case Some(value) => value.update(state.fogOfWar)
     }
     drawMap()
   }

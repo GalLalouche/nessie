@@ -32,11 +32,11 @@ private class DebugButtonPanel private(
     bigStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextBigStep.isFalse)
     smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep.isFalse)
   }
-  def isHoverFovChecked: Boolean = panel.getChildren.iterator.asScala
+  val hoverFov: CheckBox = panel.getChildren.iterator.asScala
       .flatMap(_.safeCast[CheckBox])
       .find(_.getText == "Hover FOV")
       .get
-      .isChecked
+  def isHoverFovChecked: Boolean = hoverFov.isChecked
 }
 
 private object DebugButtonPanel

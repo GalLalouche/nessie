@@ -64,8 +64,9 @@ private object ZirconUtils
 
   implicit class RichCheckBox(private val $: CheckBox) extends AnyVal {
     // Nice API there buddy!
-    def isChecked: Boolean = $.getState ==
-        org.hexworks.zircon.internal.component.impl.DefaultCheckBox.CheckBoxState.CHECKED
+    def isChecked: Boolean =
+      $.getState == org.hexworks.zircon.internal.component.impl.DefaultCheckBox.CheckBoxState.CHECKED ||
+          $.getState == org.hexworks.zircon.internal.component.impl.DefaultCheckBox.CheckBoxState.UNCHECKING
   }
 
   implicit class RichMaybe[A](private val $: Maybe[A]) extends AnyVal {
