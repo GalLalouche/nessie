@@ -21,8 +21,8 @@ private class ZirconMap(
     c: ZirconMapCustomizer,
     val graphics: TileGraphics,
     val fogOfWarLayer: Layer,
-    mapGridPosition: Position,
 ) extends MapPointConverter {
+  private val mapGridPosition: Position = fogOfWarLayer.getPosition
   private var currentOffset = MapPoint(0, 0)
   def offset = synchronized {currentOffset}
   private def toPosition(mp: MapPoint): Position = Positions.create(mp.x, mp.y)
@@ -76,7 +76,7 @@ private class ZirconMap(
       .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
   def toMapGridPoint: MapPoint => MapGridPoint =
     MapGridPoint.withMapGridPosition(mapGridPosition, graphicsSize)
-  def buildLayer: Layer = ZirconMap.buildLayer(mapGridPosition, graphics)
+  def buildLayer: Layer = fogOfWarLayer.clearCopy
   def tileAt(mapPoint: MapPoint): Tile = graphics.getTileAt(toPosition(mapPoint)).get.asInstanceOf[Tile]
   override def toAbsolutePosition(mp: MapPoint) = toMapGridPoint(mp).absolutePosition
 
@@ -102,14 +102,14 @@ private class ZirconMap(
 
 private object ZirconMap {
   private val theme = ZirconConstants.Theme
-  private def buildLayer(position: Position, graphics: TileGraphics) = Layers.newBuilder
-      .withOffset(position)
-      .withSize(graphics.getSize)
-      .build
   def create(map: FogOfWar, c: ZirconMapCustomizer, mapGridPosition: Position, maxSize: Size): ZirconMap = {
     val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder
         .withSize(Sizes.create(math.min(maxSize.width, map.width), math.min(map.height, maxSize.height)))
         .build
-    new ZirconMap(map, c, graphics, buildLayer(mapGridPosition, graphics), mapGridPosition).<|(_.updateTiles())
+    val fogOfWarLayer = Layers.newBuilder
+      .withOffset(mapGridPosition)
+      .withSize(graphics.getSize)
+      .build
+    new ZirconMap(map, c, graphics, fogOfWarLayer).<|(_.updateTiles())
   }
 }

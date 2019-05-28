@@ -15,7 +15,7 @@ import org.hexworks.zircon.api.color.TileColor
 import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
 import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.data.{Position, Size, Tile}
-import org.hexworks.zircon.api.graphics.DrawSurface
+import org.hexworks.zircon.api.graphics.{DrawSurface, Layer}
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent._
 import rx.lang.scala.Observable
@@ -125,6 +125,10 @@ private object ZirconUtils
 
   implicit class RichModal[A](private val $: Modal[ModalResultWrapper[A]]) extends AnyVal {
     def close(result: A): Unit = $.close(ModalResultWrapper(result))
+  }
+
+  implicit class RichLayer(private val $: Layer) extends AnyVal {
+    def clearCopy: Layer = $.createCopy <| (_.clear())
   }
 
   implicit class RichColorTheme(private val $: ColorTheme) extends AnyVal {
