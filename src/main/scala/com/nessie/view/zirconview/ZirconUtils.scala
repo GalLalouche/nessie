@@ -34,7 +34,7 @@ private object ZirconUtils
   }
   implicit class RichSize(private val $: Size) extends AnyVal {
     @inline def width: Int = $.getWidth
-    @inline def height: Int = $.getWidth
+    @inline def height: Int = $.getHeight
   }
   implicit class RichTileComposite(private val $: TileComposite) extends AnyVal {
     @inline def width: Int = $.getWidth

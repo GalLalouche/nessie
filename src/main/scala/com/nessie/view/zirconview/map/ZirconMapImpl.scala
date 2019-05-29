@@ -1,7 +1,7 @@
 package com.nessie.view.zirconview.map
 
-import com.nessie.model.map.fov.FogOfWar
 import com.nessie.model.map.{Direction, MapPoint}
+import com.nessie.model.map.fov.FogOfWar
 import com.nessie.view.zirconview.ZirconUtils._
 import org.hexworks.zircon.api.data.Position
 import org.hexworks.zircon.api.graphics.{Layer, TileGraphics}

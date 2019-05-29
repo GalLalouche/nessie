@@ -26,7 +26,7 @@ private class PopupMenu(mpc: MapPointConverter, gs: GameState, source: MapPoint)
     val $: WrappedModal[MenuAction] = ModalBuilder
         .newBuilder()
         .withParentSize(panel.getSize.plus(Sizes.create(1, 1)))
-        .withPosition(mpc.toAbsolutePosition(destination))
+        .withPosition(mpc.toAbsolutePosition(destination).get)
         .withComponent(panel)
         .build()
     panel.addComponents(

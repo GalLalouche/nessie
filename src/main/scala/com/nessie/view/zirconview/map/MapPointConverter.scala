@@ -13,12 +13,16 @@ import org.hexworks.zircon.api.data.Position
  * Absolute and relative positions:
  * Absolute position is the position of a tile within the entire visible screen. Since there are other views
  * than the map, and since the map isn't necessarily pinned to top left corner, not every absolute position is
- * part of the map view (or indeed, part of the screen at all).
+ * part of the map view (or indeed, part of the screen at all). Absolute positions can be used to create
+ * Modals at the position.
  *
  * Relative position is the position relative to the top level corner of the map view. If the map is not
  * scrolled, this would be MapPoint(0, 0), but that's not necessarily so. Also, since the map view isn't
  * infinite, it's possible for a relative position to be outside of the bounds of the map. However, since
- * This Should Never Happen, an exception is thrown in such cases instead of returning an Option.
+ * This Should Never Happen, an exception is thrown in such cases instead of returning an Option. Relative
+ * positions are used by updating layer graphics.
+ *
+ * It's always true that relativePosition(mp).withRelative(mapViewPosition) == absolutePosition(mp).
  *
  * Note that a MapPoint is always absolute, and refers to a concrete location in the map Grid. Whether said
  * MapPoint is currently visible depends on the size of the current [[com.nessie.model.map.BattleMap]] and the
@@ -26,10 +30,13 @@ import org.hexworks.zircon.api.data.Position
  * [[com.nessie.model.map.BattleMap]] grid.
  */
 private[zirconview] trait MapPointConverter {
-  def toAbsolutePosition(mp: MapPoint): Position
-  def toRelativePosition(mp: MapPoint): Position
+  def toAbsolutePosition(mp: MapPoint): Option[Position]
+  def toRelativePosition(mp: MapPoint): Option[Position]
 
   def fromAbsolutePosition(p: Position): Option[MapPoint]
+  def fromRelativePosition(p: Position): MapPoint
 
   def isInBounds(mp: MapPoint): Boolean
+  def isAbsolutePositionInBounds(p: Position): Boolean
+  def isRelativePositionInBounds(p: Position): Boolean
 }

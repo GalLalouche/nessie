@@ -33,7 +33,7 @@ private object MovementLayer
     val movingUnitTile = Tiles.newBuilder
         .withBackgroundColor(ANSITileColor.BRIGHT_CYAN.toData.multiplyAlphaBy(0.5))
         .build
-    layer.setTileAt(converter.toRelativePosition(currentLocation), movingUnitTile)
+    layer.setTileAt(converter.toRelativePosition(currentLocation).get, movingUnitTile)
     val movementSubscriptions = keyboardEvents
         .filter(MovementKeys.contains(_))
         .map {
@@ -48,7 +48,7 @@ private object MovementLayer
           currentLocation = newLocation
           highlighter(currentLocation)
           layer.clear()
-          layer.setTileAt(converter.toRelativePosition(currentLocation), movingUnitTile)
+          layer.setTileAt(converter.toRelativePosition(currentLocation).get, movingUnitTile)
         }
     val openMenuSubscription =
       keyboardEvents.collect({
