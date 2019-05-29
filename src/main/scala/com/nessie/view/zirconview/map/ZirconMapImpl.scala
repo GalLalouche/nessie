@@ -3,6 +3,7 @@ package com.nessie.view.zirconview.map
 import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.model.map.fov.FogOfWar
 import com.nessie.view.zirconview.ZirconUtils._
+import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.{Layer, TileGraphics}
 
 private class ZirconMapImpl(
@@ -10,6 +11,7 @@ private class ZirconMapImpl(
     view: MapView,
     private var currentOffset: MapPoint,
 ) extends ZirconMap {
+  private var movables: Iterable[MapPoint] = Nil
   override def getCurrentMap: FogOfWar = synchronized {currentMap}
   override val graphics: TileGraphics = view.graphics
   override val fogOfWarLayer: Layer = view.fogOfWarLayer
@@ -29,6 +31,12 @@ private class ZirconMapImpl(
   override def scroll(n: Int, direction: Direction): Unit = synchronized {
     Scroller(n, direction, currentOffset, graphics.size, currentMap.size)
         .foreach(internalUpdate(currentMap, _))
+    highlightMovable(movables)
+  }
+  def highlightMovable(mps: Iterable[MapPoint]): Unit = synchronized {
+    movables = mps
+    mps.iterator.flatMap(mapPointConverter.toRelativePosition)
+        .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
   }
 }
 

@@ -7,7 +7,7 @@ import common.rich.RichObservable.Unsubscribable
 import common.rich.RichT._
 import common.rich.collections.RichIterator._
 import common.rich.func.{MoreObservableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
-import monocle.Lens
+import monocle.{Lens, Optional}
 import org.hexworks.cobalt.datatypes.Maybe
 import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.{Positions, Sizes}
@@ -50,8 +50,8 @@ private object ZirconUtils
       $.x >= p.x & $.y >= p.y && $.x < p.x + size.width && $.y < p.y + size.height
   }
 
-  def tileLens(p: Position): Lens[DrawSurface, Tile] =
-    Lens[DrawSurface, Tile](_.getTileAt(p).get)(t => _.applyAndReturn(_.setTileAt(p, t)))
+  def tileLens(p: Position): Optional[DrawSurface, Tile] =
+    Optional[DrawSurface, Tile](_.getTileAt(p).toOption)(t => _.applyAndReturn(_.setTileAt(p, t)))
 
   private implicit val UnsubscribableZircon: Unsubscribable[Subscription] = _.cancel(CancelledByHand.INSTANCE)
   private def handleEvent[A](f: A => Any)(a: A, p: UIEventPhase): UIEventResponse = {

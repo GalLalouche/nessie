@@ -6,8 +6,7 @@ import com.nessie.model.map.fov.FogStatus.{Hidden, Visible}
 import com.nessie.view.zirconview.{ZirconConstants, ZirconMapCustomizer}
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
-import org.hexworks.zircon.api.{DrawSurfaces, Layers, Positions, Sizes}
-import org.hexworks.zircon.api.color.ANSITileColor
+import org.hexworks.zircon.api.{DrawSurfaces, Layers, Sizes}
 import org.hexworks.zircon.api.data.{Position, Size}
 import org.hexworks.zircon.api.graphics.{Layer, TileGraphics}
 import org.hexworks.zircon.api.screen.Screen
@@ -28,8 +27,7 @@ private[zirconview] trait ZirconMap {
   def showAll(): Unit = synchronized {update(getCurrentMap.foldPoints(_.place(_, Visible)))}
 
   def mapPointConverter: MapPointConverter
-  def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(_.toPosition)
-      .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
+  def highlightMovable(mps: Iterable[MapPoint]): Unit
 
   def mouseEvents(screen: Screen): Observable[Option[MapPoint]] =
     screen.mouseActions().map(_.getPosition |> mapPointConverter.fromAbsolutePosition)
