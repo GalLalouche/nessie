@@ -14,8 +14,7 @@ import org.hexworks.zircon.api.screen.Screen
 import rx.lang.scala.Observable
 
 // This map has to be mutable, since redrawing the same graphics causes nasty refresh bugs in Zircon :\
-private[zirconview] trait ZirconMap extends MapPointConverter {
-  protected final def toPosition(mp: MapPoint): Position = Positions.create(mp.x, mp.y)
+private[zirconview] trait ZirconMap {
   def getCurrentMap: FogOfWar
   def graphics: TileGraphics
   def fogOfWarLayer: Layer
@@ -28,13 +27,12 @@ private[zirconview] trait ZirconMap extends MapPointConverter {
   def hideAll(): Unit = synchronized {update(getCurrentMap.foldPoints(_.place(_, Hidden)))}
   def showAll(): Unit = synchronized {update(getCurrentMap.foldPoints(_.place(_, Visible)))}
 
-  def toMapGridPoint: MapPoint => MapGridPoint =
-    MapGridPoint.withMapGridPosition(fogOfWarLayer.getPosition, graphics.getSize)
-  def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(toPosition)
+  def mapPointConverter: MapPointConverter
+  def highlightMovable(mps: Iterable[MapPoint]): Unit = mps.iterator.map(_.toPosition)
       .foreach(tileLens(_).modify(_.withBackgroundColor(ANSITileColor.GREEN))(graphics))
 
   def mouseEvents(screen: Screen): Observable[Option[MapPoint]] =
-    screen.mouseActions().map(_.getPosition |> fromAbsolutePosition)
+    screen.mouseActions().map(_.getPosition |> mapPointConverter.fromAbsolutePosition)
   def update(map: FogOfWar): Unit
   def scroll(n: Int, direction: Direction): Unit
 }

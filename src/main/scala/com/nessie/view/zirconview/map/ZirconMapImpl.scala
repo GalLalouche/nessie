@@ -1,9 +1,8 @@
 package com.nessie.view.zirconview.map
 
-import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.model.map.fov.FogOfWar
+import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.view.zirconview.ZirconUtils._
-import common.rich.RichT._
 import org.hexworks.zircon.api.data.Position
 import org.hexworks.zircon.api.graphics.{Layer, TileGraphics}
 
@@ -24,14 +23,10 @@ private class ZirconMapImpl(
   }
   def update(map: FogOfWar): Unit = synchronized {internalUpdate(map)}
 
-  override def toAbsolutePosition(mp: MapPoint) = synchronized {toMapGridPoint(mp).absolutePosition}
-
-  override def fromAbsolutePosition(p: Position) = synchronized {
-    p.opt.filter(_.inSizedContainer(mapGridPosition, view.size))
-        .map(_.withRelative(toPosition(currentOffset)))
-        .flatMap(MapGridPoint.fromPosition(mapGridPosition, currentMap.size.toZirconSize))
-        .map(_.mapPoint)
-  }
+  private def getCurrentOffset = synchronized {currentOffset}
+  override val mapPointConverter: MapPointConverter = new MapPointConverterImpl(
+    () => getCurrentOffset, () => getCurrentMap.size, mapGridPosition, graphics.size,
+  )
 
   def scroll(n: Int, direction: Direction): Unit = synchronized {
     Scroller(n, direction, currentOffset, graphics.size, currentMap.size)

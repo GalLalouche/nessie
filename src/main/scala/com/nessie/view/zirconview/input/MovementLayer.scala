@@ -3,11 +3,12 @@ package com.nessie.view.zirconview.input
 import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.view.zirconview.SimpleKeyboardEvents
 import com.nessie.view.zirconview.ZirconUtils._
-import com.nessie.view.zirconview.map.MapGridPoint
+import com.nessie.view.zirconview.map.MapPointConverter
+import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
+import org.hexworks.zircon.api.Tiles
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.Layer
-import org.hexworks.zircon.api.Tiles
 import rx.lang.scala.Subscription
 
 private class MovementLayer(val layer: Layer, subscriptions: Subscription*) {
@@ -24,14 +25,15 @@ private object MovementLayer
       keyboardEvents: SimpleKeyboardEvents,
       layer: Layer,
       listener: MovementLayerListener,
-      initialLocation: MapGridPoint,
+      initialLocation: MapPoint,
+      converter: MapPointConverter,
       highlighter: MapPoint => Any,
   ): MovementLayer = {
     var currentLocation = initialLocation
     val movingUnitTile = Tiles.newBuilder
         .withBackgroundColor(ANSITileColor.BRIGHT_CYAN.toData.multiplyAlphaBy(0.5))
         .build
-    layer.setTileAt(currentLocation.relativePosition, movingUnitTile)
+    layer.setTileAt(converter.toRelativePosition(currentLocation), movingUnitTile)
     val movementSubscriptions = keyboardEvents
         .filter(MovementKeys.contains(_))
         .map {
@@ -41,19 +43,19 @@ private object MovementLayer
           case 'D' | 'L' => Direction.Right
         }
         // (_) is necessary in order to get the current variable value.
-        .oMap(currentLocation.go(_))
+        .oMap(currentLocation.go(_).optFilter(converter.isInBounds))
         .subscribe {newLocation =>
           currentLocation = newLocation
-          highlighter(currentLocation.mapPoint)
+          highlighter(currentLocation)
           layer.clear()
-          layer.setTileAt(currentLocation.relativePosition, movingUnitTile)
+          layer.setTileAt(converter.toRelativePosition(currentLocation), movingUnitTile)
         }
     val openMenuSubscription =
       keyboardEvents.collect({
         case ' ' => OpenActionMenu
         case 'M' => Move
         // (_) is necessary in order to get the current variable value.
-      }).subscribe(listener(currentLocation.mapPoint)(_))
+      }).subscribe(listener(currentLocation)(_))
     new MovementLayer(layer, movementSubscriptions, openMenuSubscription)
   }
 
