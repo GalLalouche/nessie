@@ -39,4 +39,6 @@ private[zirconview] trait MapPointConverter {
   def isInBounds(mp: MapPoint): Boolean
   def isAbsolutePositionInBounds(p: Position): Boolean
   def isRelativePositionInBounds(p: Position): Boolean
+
+  def center: MapPoint
 }

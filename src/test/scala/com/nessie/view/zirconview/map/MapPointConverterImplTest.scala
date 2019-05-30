@@ -8,10 +8,12 @@ import org.scalatest.FreeSpec
 //noinspection NameBooleanParameters
 class MapPointConverterImplTest extends FreeSpec with AuxSpecs {
   private val $ = new MapPointConverterImpl(
-    () => MapPoint(3, 5),
-    () => GridSize(100, 200),
+    new ScrollableMapViewProperties {
+      override def getCurrentMapSize = GridSize(100, 200)
+      override def getCurrentOffset = MapPoint(3, 5)
+      override val graphicsSize = Sizes.create(20, 30)
+    },
     Positions.create(2, 8),
-    Sizes.create(20, 30),
   )
   "toAbsolutePosition" in {
     def checkNone(x: Int, y: Int): Unit = $.toAbsolutePosition(MapPoint(x, y)) shouldReturn None
@@ -128,5 +130,16 @@ class MapPointConverterImplTest extends FreeSpec with AuxSpecs {
     check(19, 29, true)
     check(20, 29, false)
     check(19, 30, false)
+  }
+  "center" in {
+    $.center shouldReturn MapPoint(13, 20)
+    new MapPointConverterImpl(
+      new ScrollableMapViewProperties {
+        override def getCurrentMapSize = GridSize(100, 200)
+        override def getCurrentOffset = MapPoint(0, 0)
+        override val graphicsSize = Sizes.create(9, 5)
+      },
+      Positions.create(2, 8),
+    ).center shouldReturn MapPoint(4, 2)
   }
 }

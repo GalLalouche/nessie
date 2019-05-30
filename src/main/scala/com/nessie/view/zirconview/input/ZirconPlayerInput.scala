@@ -27,6 +27,7 @@ private[zirconview] class ZirconPlayerInput(
   def nextState(currentlyPlayingUnit: CombatUnit, gs: GameState): Task[TurnAction] = {
     val promise = PromiseZ[TurnAction]()
     val location = CombatUnitObject.findIn(currentlyPlayingUnit, gs.map).get
+    mapGrid.center(location)
     val converter = mapGrid.mapPointConverter
     val popupMenu = new PopupMenu(converter, gs, location)
     val endTurnSub = screen.keyCodes().filter(_ == KeyCode.ENTER).head.subscribe {_ =>

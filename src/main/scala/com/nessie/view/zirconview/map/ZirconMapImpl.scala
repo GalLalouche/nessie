@@ -1,7 +1,7 @@
 package com.nessie.view.zirconview.map
 
-import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.model.map.fov.FogOfWar
+import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.view.zirconview.ZirconUtils._
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.{Layer, TileGraphics}
@@ -10,9 +10,9 @@ private class ZirconMapImpl(
     private var currentMap: FogOfWar,
     view: MapView,
     private var currentOffset: MapPoint,
-) extends ZirconMap {
+) extends ZirconMap with ScrollableMapViewProperties {
   private var movables: Iterable[MapPoint] = Nil
-  override def getCurrentMap: FogOfWar = synchronized {currentMap}
+  override def getCurrentMap: FogOfWar = synchronized(currentMap)
   override val graphics: TileGraphics = view.graphics
   override val fogOfWarLayer: Layer = view.fogOfWarLayer
 
@@ -21,18 +21,21 @@ private class ZirconMapImpl(
     currentOffset = offset
     view.updateTiles(map, offset)
   }
-  override def update(map: FogOfWar): Unit = synchronized {internalUpdate(map)}
+  override def update(map: FogOfWar): Unit = synchronized(internalUpdate(map))
 
-  private def getCurrentOffset = synchronized {currentOffset}
-  override val mapPointConverter: MapPointConverter = new MapPointConverterImpl(
-    () => getCurrentOffset, () => getCurrentMap.size, view.position, graphics.size,
-  )
+  override def getCurrentOffset = synchronized(currentOffset)
+  override def getCurrentMapSize = synchronized(currentMap.size)
+  override val graphicsSize = graphics.size
+  override val mapPointConverter: MapPointConverter = new MapPointConverterImpl(this, view.position)
 
+  private val scroller = new Scroller(this)
   override def scroll(n: Int, direction: Direction): Unit = synchronized {
-    Scroller(n, direction, currentOffset, graphics.size, currentMap.size)
-        .foreach(internalUpdate(currentMap, _))
+    scroller(n, direction).foreach(internalUpdate(currentMap, _))
     highlightMovable(movables)
   }
+  override def center(mp: MapPoint): Unit =
+    synchronized(internalUpdate(currentMap, scroller.center(mp, mapPointConverter.center)))
+
   def highlightMovable(mps: Iterable[MapPoint]): Unit = synchronized {
     movables = mps
     mps.iterator.flatMap(mapPointConverter.toRelativePosition)

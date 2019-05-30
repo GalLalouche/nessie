@@ -33,6 +33,7 @@ private[zirconview] trait ZirconMap {
     screen.mouseActions().map(_.getPosition |> mapPointConverter.fromAbsolutePosition)
   def update(map: FogOfWar): Unit
   def scroll(n: Int, direction: Direction): Unit
+  def center(mp: MapPoint): Unit
 }
 
 private[zirconview] object ZirconMap {
