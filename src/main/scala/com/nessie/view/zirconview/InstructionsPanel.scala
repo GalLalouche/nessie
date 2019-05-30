@@ -2,7 +2,7 @@ package com.nessie.view.zirconview
 
 import org.hexworks.zircon.api.component.Component
 
-private class InstructionsPanel private(panel: TextBoxPanel) {
+private class InstructionsPanel private(panel: TextBoxPanel) extends ComponentWrapper {
   private var stack: List[Instructions] = Nil
   def update(i: Instructions): Unit = synchronized {
     i match {
@@ -25,7 +25,7 @@ private class InstructionsPanel private(panel: TextBoxPanel) {
     if (stack.nonEmpty) update(stack.head) else clear()
   }
   def clear(): Unit = synchronized {panel.clear()}
-  def component: Component = panel.component
+  override def component: Component = panel.component
 }
 
 private object InstructionsPanel {

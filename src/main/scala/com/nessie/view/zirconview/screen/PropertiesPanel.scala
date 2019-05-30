@@ -1,15 +1,16 @@
-package com.nessie.view.zirconview
+package com.nessie.view.zirconview.screen
 
 import com.nessie.gm.GameState
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.units.{CombatUnit, PlayerUnit}
 import com.nessie.model.units.inventory.Equipment
 import com.nessie.model.units.stats.Stats
+import com.nessie.view.zirconview.{ComponentWrapper, MapPointHighlighter, PanelPlacer, TextBoxPanel}
 import common.rich.RichT._
 import org.hexworks.zircon.api.builder.component.TextBoxBuilder
 import org.hexworks.zircon.api.component.Component
 
-private class PropertiesPanel private(panel: TextBoxPanel) {
+private class PropertiesPanel private(panel: TextBoxPanel) extends ComponentWrapper {
   def update(map: BattleMap)(mp: Option[MapPoint]): Unit = synchronized {
     clear()
     mp.foreach {mp =>
@@ -26,7 +27,7 @@ private class PropertiesPanel private(panel: TextBoxPanel) {
     override def apply(gs: GameState, mp: MapPoint): Unit = update(gs.map)(Some(mp))
     override def clear(): Unit = PropertiesPanel.this.clear()
   }
-  def component: Component = panel.component
+  override def component: Component = panel.component
 }
 
 private object PropertiesPanel {

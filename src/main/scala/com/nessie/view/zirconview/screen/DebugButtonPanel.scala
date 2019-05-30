@@ -1,14 +1,17 @@
-package com.nessie.view.zirconview
+package com.nessie.view.zirconview.screen
 
-import com.nessie.gm.{DebugMapStepper, GameState, View}
-import com.nessie.gm.GameStateChange.NoOp
-import com.nessie.view.zirconview.DebugButtonPanel.StepperWrapper
+import com.nessie.gm.DebugMapStepper
+import com.nessie.model.map.BattleMap
+import com.nessie.model.map.fov.FogOfWar
+import com.nessie.view.zirconview.{ComponentWrapper, OnBuildWrapper, PanelPlacer, ZirconConstants}
 import com.nessie.view.zirconview.ZirconUtils._
+import com.nessie.view.zirconview.screen.DebugButtonPanel.StepperWrapper
 import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.func.ToMoreFoldableOps
 import org.hexworks.zircon.api.{Components, Positions}
 import org.hexworks.zircon.api.component.{Button, CheckBox, Component, Panel}
+import rx.lang.scala.{Observable, Subject}
 
 import scala.collection.JavaConverters._
 
@@ -19,8 +22,8 @@ private class DebugButtonPanel private(
     panel: Panel,
     smallStepButton: Button,
     bigStepButton: Button,
-) {
-  def component: Component = panel
+) extends ComponentWrapper {
+  override def component: Component = panel
   smallStepButton.onActivation(() => nextSmallStep())
   def nextSmallStep(): Unit = {
     stepperWrapper.nextSmallStep()
@@ -37,6 +40,7 @@ private class DebugButtonPanel private(
       .find(_.getText == "Hover FOV")
       .get
   def isHoverFovChecked: Boolean = hoverFov.isChecked
+  def mapObservable: Observable[FogOfWar] = stepperWrapper.observable
 }
 
 private object DebugButtonPanel
@@ -48,29 +52,33 @@ private object DebugButtonPanel
         .|>(pp)
         .<|(_.addComponents(bps, Positions.zero, Positions.create(-1, 0)))
 
-  private class StepperWrapper(private var stepper: DebugMapStepper, view: View) {
+  private class StepperWrapper(private var stepper: DebugMapStepper) {
     def hasNextSmallStep: Boolean = stepper.nextSmallStep().isDefined
+    private val $ = Subject[FogOfWar]()
+    private def update(bm: BattleMap): Unit = $.onNext(FogOfWar.allVisible(bm))
     def nextSmallStep(): Unit = {
       stepper = stepper.nextSmallStep().get
-      view.updateState(NoOp, GameState.fromMap(stepper.currentMap))
+      update(stepper.currentMap)
     }
     def finishCurrentStep(): Unit = {
       stepper = stepper.finishCurrentStep()
-      view.updateState(NoOp, GameState.fromMap(stepper.currentMap))
+      update(stepper.currentMap)
     }
 
     def hasNextBigStep: Boolean = stepper.nextBigStep().isDefined
     def nextBigStep(): Unit = {
       stepper = stepper.nextBigStep().get
-      view.updateState(NoOp, GameState.fromMap(stepper.currentMap))
+      update(stepper.currentMap)
     }
     def canonize(): Unit = {
-      view.updateState(NoOp, GameState.fromMap(stepper.canonize))
+      update(stepper.canonize)
     }
+
+    def observable: Observable[FogOfWar] = $
   }
 
-  def create(stepper: DebugMapStepper, view: View, panelPlacer: PanelPlacer): DebugButtonPanel = {
-    val wrapper = new StepperWrapper(stepper, view)
+  def create(stepper: DebugMapStepper, panelPlacer: PanelPlacer): DebugButtonPanel = {
+    val wrapper = new StepperWrapper(stepper)
     val panel = buildPanel(
       panelPlacer,
       OnBuildWrapper.noOp(Components.button.withText("Small Step")),

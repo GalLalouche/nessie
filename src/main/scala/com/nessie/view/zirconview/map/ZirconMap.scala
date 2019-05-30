@@ -1,12 +1,12 @@
 package com.nessie.view.zirconview.map
 
-import com.nessie.model.map.{Direction, MapPoint}
+import com.nessie.model.map.{BattleMap, Direction, MapPoint, VectorGrid}
 import com.nessie.model.map.fov.{FogOfWar, FovCalculator}
 import com.nessie.model.map.fov.FogStatus.{Hidden, Visible}
 import com.nessie.view.zirconview.{ZirconConstants, ZirconMapCustomizer}
 import com.nessie.view.zirconview.ZirconUtils._
 import common.rich.RichT._
-import org.hexworks.zircon.api.{DrawSurfaces, Layers, Sizes}
+import org.hexworks.zircon.api.{DrawSurfaces, Layers}
 import org.hexworks.zircon.api.data.{Position, Size}
 import org.hexworks.zircon.api.graphics.{Layer, TileGraphics}
 import org.hexworks.zircon.api.screen.Screen
@@ -37,17 +37,17 @@ private[zirconview] trait ZirconMap {
 }
 
 private[zirconview] object ZirconMap {
-  def create(map: FogOfWar, c: ZirconMapCustomizer, mapGridPosition: Position, maxSize: Size): ZirconMap = {
+  def create(c: ZirconMapCustomizer, mapGridPosition: Position, graphicsSize: Size): ZirconMap = {
     val graphics: TileGraphics = DrawSurfaces.tileGraphicsBuilder
-        .withSize(Sizes.create(math.min(maxSize.width, map.width), math.min(map.height, maxSize.height)))
+        .withSize(graphicsSize)
         .build
     val fogOfWarLayer = Layers.newBuilder
         .withOffset(mapGridPosition)
         .withSize(graphics.getSize)
         .build
     val view = new MapView(graphics, fogOfWarLayer, c, ZirconConstants.Theme)
-    val initialOffset = MapPoint(0, 0)
-    new ZirconMapImpl(map, view <| (_.updateTiles(map, initialOffset)), currentOffset = initialOffset)
+    val emptyMap = FogOfWar.allVisible(BattleMap.create(VectorGrid, 10, 10))
+    new ZirconMapImpl(emptyMap, view, currentOffset = MapPoint(0, 0))
   }
 }
 
