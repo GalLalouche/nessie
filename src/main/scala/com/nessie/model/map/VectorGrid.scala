@@ -14,6 +14,7 @@ case class VectorGrid[A] private(
   // TODO lenses?
   @inline override final def place(p: MapPoint, o: A): VectorGrid[A] =
     copy(grid = grid.updated(p.x, grid(p.x).updated(p.y, o)))
+  override def map(f: A => A): Grid[A] = copy(grid = grid.map(_.map(f)))
 }
 
 object VectorGrid extends GridFactory {

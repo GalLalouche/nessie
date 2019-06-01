@@ -71,4 +71,21 @@ abstract class GridLikeTest(factory: GridFactory) extends FreeSpec with AuxSpecs
       UnDiEdge(node12, node02),
     )
   }
+
+  "map" in {
+    createGrid(width = 2, height = 3)
+        .place(MapPoint(0, 0), 1)
+        .place(MapPoint(0, 1), 2)
+        .place(MapPoint(0, 2), 3)
+        .place(MapPoint(1, 0), 4)
+        .place(MapPoint(1, 1), 5)
+        .place(MapPoint(1, 2), 6)
+        .map(i => i * i) shouldReturn createGrid(width = 2, height = 3)
+        .place(MapPoint(0, 0), 1)
+        .place(MapPoint(0, 1), 4)
+        .place(MapPoint(0, 2), 9)
+        .place(MapPoint(1, 0), 16)
+        .place(MapPoint(1, 1), 25)
+        .place(MapPoint(1, 2), 36)
+  }
 }

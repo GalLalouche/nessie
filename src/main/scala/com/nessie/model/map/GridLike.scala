@@ -26,13 +26,13 @@ trait GridLike[G, A]
         s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
   @inline def isBorder(p: MapPoint): Boolean = p.x == 0 || p.y == 0 || p.x == width - 1 || p.y == height - 1
 
-  private def internalPlace(p: MapPoint, o: A): G = gridLens.modify(_.place(p, o))(this)
+  @inline private def internalPlace(p: MapPoint, o: A): G = gridLens.modify(_.place(p, o))(this)
   def place(p: MapPoint, o: A): G = {
     checkBounds(p)
     internalPlace(p, o)
   }
 
-  private def internalApply(p: MapPoint): A = gridLens.get(this)(p)
+  @inline private def internalApply(p: MapPoint): A = gridLens.get(this)(p)
   def apply(p: MapPoint): A = {
     checkBounds(p)
     internalApply(p)
@@ -43,6 +43,8 @@ trait GridLike[G, A]
 
   def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
   def foldPoints: ((G, MapPoint) => G) => G = points.foldLeft(this)
+
+  def map(f: A => A): G = gridLens.modify(_.map(f))(this)
 
   lazy val toFullGraph: Graph[MapPoint, UnDiEdge] = Graph.from(
     nodes = points,

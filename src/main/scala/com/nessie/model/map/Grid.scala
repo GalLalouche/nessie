@@ -12,4 +12,6 @@ trait Grid[A] extends ToFunctorOps with MoreIterableInstances {
 
   require(width > 0)
   require(height > 0)
+
+  def map(f: A => A): Grid[A]
 }
