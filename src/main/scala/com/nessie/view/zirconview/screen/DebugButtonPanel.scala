@@ -27,13 +27,13 @@ private class DebugButtonPanel private(
   smallStepButton.onActivation(() => nextSmallStep())
   def nextSmallStep(): Unit = {
     stepperWrapper.nextSmallStep()
-    smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep.isFalse)
+    smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep().isFalse)
   }
   bigStepButton.onActivation(() => nextBigStep())
   def nextBigStep(): Unit = {
     stepperWrapper.nextBigStep()
-    bigStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextBigStep.isFalse)
-    smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep.isFalse)
+    bigStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextBigStep().isFalse)
+    smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep().isFalse)
   }
   val hoverFov: CheckBox = panel.getChildren.iterator.asScala
       .flatMap(_.safeCast[CheckBox])
@@ -53,7 +53,7 @@ private object DebugButtonPanel
         .<|(_.addComponents(bps, Positions.zero, Positions.create(-1, 0)))
 
   private class StepperWrapper(private var stepper: DebugMapStepper) {
-    def hasNextSmallStep: Boolean = stepper.nextSmallStep().isDefined
+    def hasNextSmallStep(): Boolean = stepper.hasNextSmallStep()
     private val $ = Subject[FogOfWar]()
     private def update(bm: BattleMap): Unit = $.onNext(FogOfWar.allVisible(bm))
     def nextSmallStep(): Unit = {
@@ -65,7 +65,7 @@ private object DebugButtonPanel
       update(stepper.currentMap)
     }
 
-    def hasNextBigStep: Boolean = stepper.nextBigStep().isDefined
+    def hasNextBigStep(): Boolean = stepper.hasNextBigStep()
     def nextBigStep(): Unit = {
       stepper = stepper.nextBigStep().get
       update(stepper.currentMap)

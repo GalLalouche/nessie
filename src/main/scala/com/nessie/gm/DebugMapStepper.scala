@@ -9,10 +9,11 @@ import common.rich.collections.RichStream._
 
 trait DebugMapStepper {
   def currentMap: BattleMap
-  // TODO has hasNextSmallStep, since calling next and checking if it's defined can be pretty expensive.
   def nextSmallStep(): Option[DebugMapStepper]
+  def hasNextSmallStep(): Boolean = nextSmallStep().isDefined
   def finishCurrentStep(): DebugMapStepper = LazyIterable.iterateOptionally(this)(_.nextSmallStep()).last
   def nextBigStep(): Option[DebugMapStepper]
+  def hasNextBigStep(): Boolean = nextBigStep().isDefined
   /** Remove any internal map objects and replace them with the canonical ones, e.g., FullWall and EmptyMapObject. */
   def canonize: BattleMap
 }
@@ -43,8 +44,10 @@ object DebugMapStepper {
     private def currentOption(f: DebugMapStepper => Option[DebugMapStepper]): Option[DebugMapStepper] =
       f(currentStepper).map(new Composite(_, steppers))
     override def nextSmallStep(): Option[DebugMapStepper] = currentOption(_.nextSmallStep())
+    override def hasNextSmallStep(): Boolean = currentStepper.hasNextSmallStep()
     override def nextBigStep(): Option[DebugMapStepper] = currentOption(_.nextBigStep())
         .orElse(steppers.headTailOption.map {case (head, tail) => new Composite(head(currentMap), tail)})
+    override def hasNextBigStep() = currentStepper.hasNextBigStep() || steppers.nonEmpty
     override def canonize = currentStepper.canonize
   }
 
