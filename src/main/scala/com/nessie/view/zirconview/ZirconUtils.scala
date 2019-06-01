@@ -121,6 +121,7 @@ private object ZirconUtils
     def find(p: Component => Boolean): Option[Component] = $.getChildren.iterator.asScala.find(p)
     def collect[A](pf: PartialFunction[Component, A]): Iterator[A] =
       $.getChildren.iterator.asScala.collect(pf)
+    def children: Seq[Component] = $.getChildren.toArray.toVector.map(_.asInstanceOf[Component])
   }
 
   implicit class RichScreen(private val $: Screen) extends AnyVal {

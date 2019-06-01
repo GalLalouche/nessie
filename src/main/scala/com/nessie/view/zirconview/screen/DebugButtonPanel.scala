@@ -22,7 +22,11 @@ private class DebugButtonPanel private(
     panel: Panel,
     smallStepButton: Button,
     bigStepButton: Button,
+    finishAllButton: Button,
 ) extends ComponentWrapper {
+  import common.rich.func.ToMoreMonadPlusOps._
+  import common.rich.func.MoreSeqInstances._
+
   override def component: Component = panel
   smallStepButton.onActivation(() => nextSmallStep())
   def nextSmallStep(): Unit = {
@@ -35,6 +39,10 @@ private class DebugButtonPanel private(
     bigStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextBigStep().isFalse)
     smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep().isFalse)
   }
+  finishAllButton.onActivation(() => {
+    panel.children.select[Button].map(_.disable())
+    stepperWrapper.finishAll()
+  })
   val hoverFov: CheckBox = panel.getChildren.iterator.asScala
       .flatMap(_.safeCast[CheckBox])
       .find(_.getText == "Hover FOV")
@@ -56,47 +64,48 @@ private object DebugButtonPanel
     def hasNextSmallStep(): Boolean = stepper.hasNextSmallStep()
     private val $ = Subject[FogOfWar]()
     private def update(bm: BattleMap): Unit = $.onNext(FogOfWar.allVisible(bm))
-    def nextSmallStep(): Unit = {
-      stepper = stepper.nextSmallStep().get
+    private def update(f: DebugMapStepper => DebugMapStepper): Unit = {
+      stepper = f(stepper)
       update(stepper.currentMap)
     }
-    def finishCurrentStep(): Unit = {
-      stepper = stepper.finishCurrentStep()
-      update(stepper.currentMap)
-    }
+    def nextSmallStep(): Unit = update(_.nextSmallStep().get)
+    def finishCurrentStep(): Unit = update(_.finishCurrentStep())
 
     def hasNextBigStep(): Boolean = stepper.hasNextBigStep()
-    def nextBigStep(): Unit = {
-      stepper = stepper.nextBigStep().get
-      update(stepper.currentMap)
-    }
-    def canonize(): Unit = {
+    def nextBigStep(): Unit = update(_.nextBigStep().get)
+    def finishAll(): Unit = {
+      stepper = stepper.finishAll()
       update(stepper.canonize)
     }
+    def canonize(): Unit = update(stepper.canonize)
 
     def observable: Observable[FogOfWar] = $
   }
 
   def create(stepper: DebugMapStepper, panelPlacer: PanelPlacer): DebugButtonPanel = {
     val wrapper = new StepperWrapper(stepper)
+    val BigStep = "Big Step"
+    val SmallStep = "Small Step"
+    val FinishAll = "Finish All"
     val panel = buildPanel(
       panelPlacer,
-      OnBuildWrapper.noOp(Components.button.withText("Small Step")),
+      OnBuildWrapper.noOp(Components.button.withText(SmallStep)),
       OnBuildWrapper(Components.button.withText("Finish Step"))(
         _.onActivation(() => wrapper.finishCurrentStep())),
-      OnBuildWrapper.noOp(Components.button.withText("Big Step")),
+      OnBuildWrapper.noOp(Components.button.withText(BigStep)),
+      OnBuildWrapper.noOp(Components.button.withText(FinishAll)),
       OnBuildWrapper(Components.button.withText("Canonize"))(
         _.onActivation(() => wrapper.canonize())),
       OnBuildWrapper.noOp(Components.checkBox.withText("Hover FOV")),
     )
     panel.applyColorTheme(ZirconConstants.Theme)
+    def findButton(text: String): Button = panel.collect {
+      case b: Button if b.getText == text => b
+    }.next
     new DebugButtonPanel(wrapper, panel,
-      panel.collect {
-        case b: Button if b.getText == "Small Step" => b
-      }.next,
-      panel.collect {
-        case b: Button if b.getText == "Big Step" => b
-      }.next,
+      smallStepButton = findButton(SmallStep),
+      bigStepButton = findButton(BigStep),
+      finishAllButton = findButton(FinishAll),
     )
   }
 }
