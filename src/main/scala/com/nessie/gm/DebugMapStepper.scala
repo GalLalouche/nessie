@@ -46,7 +46,8 @@ object DebugMapStepper {
     override def nextSmallStep(): Option[DebugMapStepper] = currentOption(_.nextSmallStep())
     override def hasNextSmallStep(): Boolean = currentStepper.hasNextSmallStep()
     override def nextBigStep(): Option[DebugMapStepper] = currentOption(_.nextBigStep())
-        .orElse(steppers.headTailOption.map {case (head, tail) => new Composite(head(currentMap), tail)})
+        .orElse(steppers.headTailOption
+            .map {case (head, tail) => new Composite(head(currentStepper.canonize), tail)})
     override def hasNextBigStep() = currentStepper.hasNextBigStep() || steppers.nonEmpty
     override def canonize = currentStepper.canonize
   }
