@@ -14,6 +14,7 @@ case class StdGen(seed: Long) {
   def nextSeed: Long = next._1
   def nextGen: StdGen = next._2
   def split: (StdGen, StdGen) = StdGen(seed - 1).next._2 -> StdGen(seed + 1).next._2
+  def iterator: Iterator[StdGen] = Iterator.iterate(split)(_._2.split).map(_._1)
 }
 
 object StdGen {

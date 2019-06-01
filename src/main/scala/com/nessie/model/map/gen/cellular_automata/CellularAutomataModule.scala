@@ -4,6 +4,7 @@ import com.google.inject.Provides
 import com.nessie.common.rng.StdGen
 import com.nessie.gm.{DebugMapStepper, DebugMapStepperFactory}
 import com.nessie.model.map.gen.MapIteratorFactory
+import com.nessie.model.map.gen.mob.MobPlacer
 import com.nessie.view.sfx.ScalaFxViewCustomizer
 import com.nessie.view.zirconview.ZirconViewCustomizer
 import common.rich.RichT._
@@ -16,11 +17,12 @@ object CellularAutomataModule extends ScalaModule {
     bind[MapIteratorFactory] toInstance CellularAutomataGenerator
   }
 
-  @Provides private def provideStepper(stdGen: StdGen): DebugMapStepperFactory = {
-    val (s1, s2) = stdGen.split
+  @Provides private def provideStepper(stdGen: StdGen, mobPlacer: MobPlacer): DebugMapStepperFactory = {
+    val s1 :: s2 :: s3 :: Nil = stdGen.iterator.take(3).toList
     DebugMapStepper.composite(
       DebugMapStepper.from(CellularAutomataGenerator).mkRandom(s1),
       CellularDigger.iterator(_).mapTo(DebugMapStepper.from).mkRandom(s2),
+      mobPlacer.iterator(_).|>(DebugMapStepper.from).mkRandom(s3),
     )
   }
 }
