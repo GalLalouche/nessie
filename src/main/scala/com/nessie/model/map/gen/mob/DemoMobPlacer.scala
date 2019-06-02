@@ -2,8 +2,8 @@ package com.nessie.model.map.gen.mob
 
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.ToRngableOps
-import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.map.gen.MapIterator
+import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.units.{Warrior, Zombie}
 import common.rich.collections.LazyIterable
 
@@ -26,8 +26,7 @@ object DemoMobPlacer extends MobPlacer with ToRngableOps {
         .place(enemySpot, CombatUnitObject(Zombie.create))
   }
   override def iterator(map: BattleMap): MapIterator = new MapIterator {
-    // TODO LazyIterable.apply
-    override def steps = place(map).map(Iterator(_)).map(LazyIterable.from(_))
+    override def steps = place(map).map(LazyIterable(_))
     override def canonize(map: BattleMap) = map
   }
 }
