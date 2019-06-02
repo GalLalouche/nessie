@@ -8,7 +8,7 @@ case class DictGrid[A] private(
 ) extends Grid[A] {
   override def apply(p: MapPoint) = objects.getOrElse(p, default)
   override def place(p: MapPoint, o: A): DictGrid[A] =
-    copy(objects = if (o == EmptyMapObject) objects - p else objects + (p -> o))
+    copy(objects = if (default == o) objects - p else objects + (p -> o))
   override def map[B](f: A => B): Grid[B] = copy(objects = objects.mapValues(f), default = f(default))
 }
 
