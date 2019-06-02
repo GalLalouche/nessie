@@ -1,7 +1,7 @@
 package com.nessie.model.map.fov
 
-import com.nessie.model.map.{BattleMap, Grid, GridLike, MapPoint, VectorGrid}
 import com.nessie.model.map.fov.FogStatus.{Fogged, Hidden, Visible}
+import com.nessie.model.map.{BattleMap, Grid, GridLike, MapPoint}
 import monocle.Lens
 import monocle.macros.Lenses
 
@@ -20,8 +20,10 @@ case class FogOfWar private(map: BattleMap, grid: Grid[FogStatus]) extends GridL
       case FogStatus.Hidden => Hidden
     }))
 }
+
 object FogOfWar {
-  // TODO use the same grid as BattleMap
-  def allVisible(map: BattleMap): FogOfWar = FogOfWar(map, VectorGrid(map.size, Visible))
-  def allHidden(map: BattleMap): FogOfWar = FogOfWar(map, VectorGrid(map.size, Hidden))
+  import scalaz.syntax.functor._
+
+  def allVisible(map: BattleMap): FogOfWar = FogOfWar(map, map.grid >| Visible)
+  def allHidden(map: BattleMap): FogOfWar = FogOfWar(map, map.grid >| Hidden)
 }

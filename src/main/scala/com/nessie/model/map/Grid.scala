@@ -1,7 +1,7 @@
 package com.nessie.model.map
 
 import common.rich.func.MoreIterableInstances
-
+import scalaz.Functor
 import scalaz.syntax.ToFunctorOps
 
 trait Grid[A] extends ToFunctorOps with MoreIterableInstances {
@@ -13,5 +13,11 @@ trait Grid[A] extends ToFunctorOps with MoreIterableInstances {
   require(width > 0)
   require(height > 0)
 
-  def map(f: A => A): Grid[A]
+  def map[B](f: A => B): Grid[B]
+}
+
+object Grid {
+  implicit object FunctorEv extends Functor[Grid] {
+    override def map[A, B](fa: Grid[A])(f: A => B): Grid[B] = fa.map(f)
+  }
 }
