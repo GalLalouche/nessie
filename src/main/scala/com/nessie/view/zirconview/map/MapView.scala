@@ -23,9 +23,14 @@ private class MapView(
   private val width = graphics.width
   private val height = graphics.height
   def updateTiles(fog: FogOfWar, viewOffset: MapPoint): Unit = synchronized {
-    for (x <- viewOffset.x until viewOffset.x + width; y <- viewOffset.y until viewOffset.y + height) {
-      val mp = MapPoint(x = x, y = y)
-      val obj = fog.map(mp)
+    val map = fog.map
+    for (
+      x <- viewOffset.x until viewOffset.x + width;
+      y <- viewOffset.y until viewOffset.y + height;
+      mp = MapPoint(x = x, y = y)
+      if map.isInBounds(mp)
+    ) {
+      val obj = map(mp)
       val pos = toPosition(mp).withInverseRelative(toPosition(viewOffset))
       val tile =
         c.getTile.lift(obj).getOrElse((obj match {
