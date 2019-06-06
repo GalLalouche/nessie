@@ -24,8 +24,8 @@ private class DebugButtonPanel private(
     bigStepButton: Button,
     finishAllButton: Button,
 ) extends ComponentWrapper {
-  import common.rich.func.ToMoreMonadPlusOps._
   import common.rich.func.MoreSeqInstances._
+  import common.rich.func.ToMoreMonadPlusOps._
 
   override def component: Component = panel
   smallStepButton.onActivation(() => nextSmallStep())
@@ -40,8 +40,9 @@ private class DebugButtonPanel private(
     smallStepButton.getDisabledProperty.setValue(stepperWrapper.hasNextSmallStep().isFalse)
   }
   finishAllButton.onActivation(() => {
-    panel.children.select[Button].map(_.disable())
+    panel.children.select[Button].foreach(_.disable())
     stepperWrapper.finishAll()
+    debugButtonsSubject.onNext(DebugButton.FinishAll(stepperWrapper.currentMap))
   })
   val hoverFov: CheckBox = panel.getChildren.iterator.asScala
       .flatMap(_.safeCast[CheckBox])
@@ -49,6 +50,8 @@ private class DebugButtonPanel private(
       .get
   def isHoverFovChecked: Boolean = hoverFov.isChecked
   def mapObservable: Observable[FogOfWar] = stepperWrapper.observable
+  private val debugButtonsSubject = Subject[DebugButton]()
+  def debugButtons: Observable[DebugButton] = debugButtonsSubject
 }
 
 private object DebugButtonPanel
@@ -61,6 +64,8 @@ private object DebugButtonPanel
         .<|(_.addComponents(bps, Positions.zero, Positions.create(-1, 0)))
 
   private class StepperWrapper(private var stepper: DebugMapStepper) {
+    def currentMap = stepper.currentMap
+
     def hasNextSmallStep(): Boolean = stepper.hasNextSmallStep()
     private val $ = Subject[FogOfWar]()
     private def update(bm: BattleMap): Unit = $.onNext(FogOfWar.allVisible(bm))

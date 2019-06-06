@@ -47,6 +47,7 @@ private class ZirconScreenImpl(
           drawMap()
         }
       })
+  override def debugButtons = debugPanel.debugButtons
 
   override def onKeyboardEvent(ket: KeyboardEventType, keh: KeyboardEventHandler) =
     screen.onKeyboardEvent(ket, keh)

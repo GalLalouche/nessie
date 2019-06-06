@@ -1,12 +1,13 @@
 package com.nessie.view.zirconview
 
+import common.rich.RichT._
 import ch.qos.logback.classic.Level
-import com.nessie.gm.{GameState, GameStateChange, PlayerInput, View}
+import com.nessie.gm.{GameLoop, GameState, GameStateChange, PlayerInput, View}
 import com.nessie.model.map.Direction
 import com.nessie.model.units.CombatUnit
 import com.nessie.view.zirconview.input.ZirconPlayerInput
 import com.nessie.view.zirconview.ZirconUtils._
-import com.nessie.view.zirconview.screen.ZirconScreen
+import com.nessie.view.zirconview.screen.{DebugButton, ZirconScreen}
 import com.nessie.view.zirconview.ZirconView._
 import org.hexworks.zircon.api.uievent.KeyCode
 import org.slf4j.LoggerFactory
@@ -22,6 +23,11 @@ private class ZirconView(screen: ZirconScreen) extends View {
     screen.map.scroll(n = if (ke.getCtrlDown) 10 else if (ke.getShiftDown) 5 else 1, direction = d)
     screen.drawMap()
   }
+  screen.debugButtons
+      // TODO RichObservable.single
+      .select[DebugButton.FinishAll].head
+      .map(_.map |> GameState.fromMap)
+      .foreach(GameLoop.initialize(this, _))
   override def playerInput = new PlayerInput {
     override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) =
       new ZirconPlayerInput(

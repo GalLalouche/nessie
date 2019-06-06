@@ -19,6 +19,7 @@ private[zirconview] trait ZirconScreen extends UIEventSource {
   def updateMap(fow: FogOfWar): Unit
   def drawMap(): Unit
   def nextSmallStep(): Unit
+  def debugButtons: Observable[DebugButton]
 
   def modalTask[A](m: Modal[ModalResultWrapper[A]]): Task[A]
 }
