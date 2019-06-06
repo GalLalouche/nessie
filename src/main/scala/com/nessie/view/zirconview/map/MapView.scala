@@ -42,14 +42,13 @@ private class MapView(
             .withForegroundColor(theme.getSecondaryForegroundColor)
         ).build
       graphics.setTileAt(pos, tile)
-      fogOfWarLayer.setAbsoluteTileAt(pos.withRelative(fogOfWarLayer.getPosition),
-        Tiles.newBuilder()
-            .withBackgroundColor(ANSITileColor.BLACK.toData.multiplyAlphaBy(fog(mp) match {
-              case FogStatus.Visible => 0.0
-              case FogStatus.Hidden => 1.0
-              case FogStatus.Fogged => 0.5
-            }))
-            .build)
+      fogOfWarLayer.setTileAt(pos, Tiles.newBuilder()
+          .withBackgroundColor(ANSITileColor.BLACK.toData.multiplyAlphaBy(fog(mp) match {
+            case FogStatus.Visible => 0.0
+            case FogStatus.Hidden => 1.0
+            case FogStatus.Fogged => 0.5
+          }))
+          .build)
     }
   }
 }

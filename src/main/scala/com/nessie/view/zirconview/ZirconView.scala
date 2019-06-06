@@ -25,7 +25,7 @@ private class ZirconView(screen: ZirconScreen) extends View {
   override def playerInput = new PlayerInput {
     override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) =
       new ZirconPlayerInput(
-        screen.screen,
+        screen,
         screen.map,
         screen.instructions,
         screenDrawer = screen.drawMap,

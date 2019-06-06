@@ -9,15 +9,17 @@ import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.input.MovementLayer.MovementLayerAction
 import com.nessie.view.zirconview.map.ZirconMap
 import com.nessie.view.zirconview.{Instructions, InstructionsPanel, MapPointHighlighter}
+import com.nessie.view.zirconview.screen.ZirconScreen
 import common.rich.RichT._
 import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, ToMoreMonadPlusOps}
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent.KeyCode
+
 import scalaz.concurrent.Task
 import scalaz.{-\/, \/-}
 
 private[zirconview] class ZirconPlayerInput(
-    screen: Screen,
+    screen: ZirconScreen,
     mapGrid: ZirconMap,
     instructionsPanel: InstructionsPanel,
     screenDrawer: () => Unit,
@@ -56,12 +58,12 @@ private[zirconview] class ZirconPlayerInput(
       highlighter = highlighter(gs, _)
     )
     instructionsPanel.push(Instructions.BasicInput)
-    screen.pushLayer(movementLayer.layer)
+    screen.screen.pushLayer(movementLayer.layer)
     mapGrid.highlightMovable(
       CanBeUsed.getUsablePoints(remainingMoveAbility)(gs.map, location))
     screenDrawer()
     promise.toTask.listen {_ =>
-      screen.popLayer()
+      screen.screen.popLayer()
       endTurnSub.unsubscribe()
       movementLayer.clear()
     }

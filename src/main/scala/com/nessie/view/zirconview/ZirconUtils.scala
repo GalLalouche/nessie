@@ -1,21 +1,20 @@
 package com.nessie.view.zirconview
 
-import com.nessie.common.PromiseZ
-import com.nessie.model.map.{GridSize, MapPoint}
+import com.nessie.model.map.GridSize
 import common.rich.RichObservable
 import common.rich.RichObservable.Unsubscribable
 import common.rich.RichT._
 import common.rich.collections.RichIterator._
 import common.rich.func.{MoreObservableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
-import monocle.{Lens, Optional}
+import monocle.Optional
 import org.hexworks.cobalt.datatypes.Maybe
 import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.{Positions, Sizes}
-import org.hexworks.zircon.api.behavior.Disablable
+import org.hexworks.zircon.api.behavior.{Boundable, Disablable}
 import org.hexworks.zircon.api.color.TileColor
 import org.hexworks.zircon.api.component.{CheckBox, ColorTheme, Component, Container}
 import org.hexworks.zircon.api.component.modal.Modal
-import org.hexworks.zircon.api.data.{Position, Size, Tile}
+import org.hexworks.zircon.api.data.{Position, Rect, Size, Tile}
 import org.hexworks.zircon.api.graphics.{DrawSurface, Layer, TileComposite}
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent._
@@ -23,7 +22,6 @@ import rx.lang.scala.Observable
 
 import scala.collection.JavaConverters._
 
-import scalaz.concurrent.Task
 import scalaz.std.OptionInstances
 
 private object ZirconUtils
@@ -107,15 +105,13 @@ private object ZirconUtils
         bps: Seq[OnBuildWrapper[_ <: Component, _]],
         initialPosition: Position = Positions.create(0, 1),
         relativePosition: Position = Positions.create(-1, -1),
-    ): Unit = {
-      bps.foreach {obBuildWrapper =>
-        val position = $.getChildren
-            .iterator.asScala
-            .lastOption
-            .mapHeadOrElse(relativePosition.relativeToBottomOf, initialPosition)
-        obBuildWrapper.cb.withPosition(position)
-        $.addComponent(obBuildWrapper.build())
-      }
+    ): Unit = bps.foreach {obBuildWrapper =>
+      val position = $.getChildren
+          .iterator.asScala
+          .lastOption
+          .mapHeadOrElse(relativePosition.relativeToBottomOf, initialPosition)
+      obBuildWrapper.cb.withPosition(position)
+      $.addComponent(obBuildWrapper.build())
     }
 
     def find(p: Component => Boolean): Option[Component] = $.getChildren.iterator.asScala.find(p)
@@ -125,12 +121,7 @@ private object ZirconUtils
   }
 
   implicit class RichScreen(private val $: Screen) extends AnyVal {
-    def modalTask[A](m: Modal[ModalResultWrapper[A]]): Task[A] = {
-      val promise = PromiseZ[A]()
-      m.onClosed(promise fulfill _.value)
-      $.openModal(m)
-      promise.toTask
-    }
+    def containsLayer(l: Layer): Boolean = $.getLayers.contains(l)
   }
 
   implicit class RichModal[A](private val $: Modal[ModalResultWrapper[A]]) extends AnyVal {
@@ -139,6 +130,19 @@ private object ZirconUtils
 
   implicit class RichLayer(private val $: Layer) extends AnyVal {
     def clearCopy: Layer = $.createCopy <| (_.clear())
+  }
+
+  implicit class RichBoundable(private val $: Boundable) extends AnyVal {
+    def position: Position = $.getPosition
+    def width: Int = $.getWidth
+    def height: Int = $.getHeight
+    def rect: Rect = $.getRect
+    // TODO handle shadows
+    def points: Set[Position] = ($ match {
+      case _: Modal[_] => rect.withHeight(height - 2).withWidth(width - 2)
+      case _ => rect
+    }).fetchPositions.iterator.asScala.toSet
+    def intersectingPoints(other: Boundable): Set[Position] = $.points.intersect(other.points)
   }
 
   implicit class RichColorTheme(private val $: ColorTheme) extends AnyVal {
