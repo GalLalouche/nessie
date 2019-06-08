@@ -1,6 +1,7 @@
 package com.nessie.model.map
 
 import common.rich.func.MoreIterableInstances
+
 import scalaz.Functor
 import scalaz.syntax.ToFunctorOps
 
@@ -14,6 +15,8 @@ trait Grid[A] extends ToFunctorOps with MoreIterableInstances {
   require(height > 0)
 
   def map[B](f: A => B): Grid[B]
+  val size = GridSize(width, height)
+  def isInBounds(mp: MapPoint): Boolean = size.isInBounds(mp)
 }
 
 object Grid {
