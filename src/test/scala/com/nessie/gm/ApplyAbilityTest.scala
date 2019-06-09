@@ -29,7 +29,8 @@ class ApplyAbilityTest extends FreeSpec with AuxSpecs {
         val $ = ApplyAbility(ActionTaken(MovementAction(Movement(MapPoint(0, 1), MapPoint(2, 1)))))(gs)
         $.map(MapPoint(0, 1)) shouldReturn EmptyMapObject
         $.map(MapPoint(2, 1)) shouldReturn unitObject
-        $.currentTurn.get shouldReturn action.append(Movement(MapPoint(0, 1), MapPoint(2, 1)))
+        $.currentTurn.get shouldReturn
+            action.append(MovementWithDistance(Movement(MapPoint(0, 1), MapPoint(2, 1)), 2))
       }
 
       "ActualAction" in {

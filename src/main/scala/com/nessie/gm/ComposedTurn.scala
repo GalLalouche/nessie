@@ -7,11 +7,11 @@ import monocle.macros.Lenses
 
 sealed trait ComposedTurn {
   def unit: CombatUnit
-  def append(m: Movement): ComposedTurn
-  def +(m: Movement): ComposedTurn = append(m)
+  def append(m: MovementWithDistance): ComposedTurn
+  def +(m: MovementWithDistance): ComposedTurn = append(m)
   // TODO specify order
-  def movements: Seq[Movement]
-  def totalMovement: Int = movements.view.map(_.manhattanDistance).sum
+  def movements: Seq[MovementWithDistance]
+  def totalMovement: Int = movements.view.map(_.distance).sum
   def remainingMovement: Int = unit.moveAbility.range - totalMovement
   require(remainingMovement >= 0)
   def remainingMovementAbility: MoveAbility = MoveAbility(remainingMovement)
@@ -24,12 +24,16 @@ sealed trait UnitAction {
 case class Attack(
     src: MapPoint, dst: MapPoint, damageAmount: Int, override val turnDelay: Double) extends UnitAction
 case class Movement(src: MapPoint, dst: MapPoint) {
-  def manhattanDistance: Int = src manhattanDistanceTo dst
+  def manhattanDistance: Int = src.manhattanDistanceTo(dst)
+}
+// TODO better name
+case class MovementWithDistance(m: Movement, distance: Int) {
+  require(distance <= m.manhattanDistance)
 }
 @Lenses
-case class PreAction(unit: CombatUnit, movements: List[Movement]) extends ComposedTurn {
+case class PreAction(unit: CombatUnit, movements: List[MovementWithDistance]) extends ComposedTurn {
   require(remainingMovement >= 0)
-  override def append(movement: Movement): PreAction = PreAction.movements.modify(movement :: _)(this)
+  override def append(movement: MovementWithDistance): PreAction = PreAction.movements.modify(movement :: _)(this)
   def append(attack: Attack): PostAction = PostAction(unit, movements, attack, Nil)
   def +(attack: Attack): PostAction = append(attack)
   override def canAppendAction: Boolean = true
@@ -39,12 +43,12 @@ object PreAction {
 }
 case class PostAction(
     unit: CombatUnit,
-    preActionMovements: List[Movement],
+    preActionMovements: List[MovementWithDistance],
     action: Attack,
-    postActionMovements: List[Movement],
+    postActionMovements: List[MovementWithDistance],
 ) extends ComposedTurn {
-  override def append(movement: Movement): PostAction =
+  override def append(movement: MovementWithDistance): PostAction =
     copy(postActionMovements = movement :: postActionMovements)
-  override def movements: Seq[Movement] = postActionMovements ++ preActionMovements
+  override def movements: Seq[MovementWithDistance] = postActionMovements ++ preActionMovements
   override def canAppendAction: Boolean = false
 }

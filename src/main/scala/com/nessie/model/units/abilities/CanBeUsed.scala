@@ -1,7 +1,9 @@
 package com.nessie.model.units.abilities
 
+import com.nessie.common.graph.GridDijkstra
+import com.nessie.common.graph.GridDijkstra.Blockable
 import com.nessie.common.graph.RichUndirected._
-import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
+import com.nessie.model.map.{BattleMap, BattleMapObject, CombatUnitObject, MapPoint}
 import common.rich.RichT._
 import common.rich.primitives.RichBoolean._
 
@@ -13,9 +15,12 @@ object CanBeUsed {
   }
   private def inRange(range: Int): Constraint = (map, src, dst) =>
     if (range == 1) src.manhattanDistanceTo(dst) <= 1 && map(dst).canMoveThrough && map(src).canMoveThrough
-    else map.toPointGraph.distance(src, dst).exists(d => d > 0 && d <= range)
+    // TODO use the algorithm variant for a specific target.
+    // TODO RichIterable.contains
+    else allInRange(map, src)(range).exists(_ == dst)
+  private implicit val blockableEv: Blockable[BattleMapObject] = Blockable(_.canMoveThrough.isFalse)
   private def allInRange(map: BattleMap, src: MapPoint)(range: Int): Iterable[MapPoint] =
-    map.toPointGraph.distances(src, range).keysIterator.filter(_ != src).toVector
+    GridDijkstra(map.grid, src, range).keys.toVector
   private def emptyDst: Constraint = (map, _, dst) => map.isEmptyAt(dst)
   private def differentOwner: Constraint = (map, src, dst) => {
     def getOwner(point: MapPoint) = map(point).safeCast[CombatUnitObject].map(_.unit.owner)
