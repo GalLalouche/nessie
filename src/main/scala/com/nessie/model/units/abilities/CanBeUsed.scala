@@ -3,7 +3,6 @@ package com.nessie.model.units.abilities
 import com.nessie.common.graph.GridDijkstra
 import com.nessie.common.graph.GridDijkstra.Blockable
 import com.nessie.model.map.{BattleMap, BattleMapObject, CombatUnitObject, MapPoint}
-import common.rich.collections.RichTraversableOnce._
 import common.rich.RichT._
 import common.rich.primitives.RichBoolean._
 
@@ -15,8 +14,7 @@ object CanBeUsed {
   }
   private def inRange(range: Int): Constraint = (map, src, dst) =>
     if (range == 1) src.manhattanDistanceTo(dst) <= 1 && map(dst).canMoveThrough && map(src).canMoveThrough
-    // TODO use the algorithm variant for a specific target.
-    else allInRange(map, src)(range).contains(dst)
+    else GridDijkstra(map.grid, src, dst).exists(_ <= range)
   private implicit val blockableEv: Blockable[BattleMapObject] = Blockable(_.canMoveThrough.isFalse)
   private def allInRange(map: BattleMap, src: MapPoint)(range: Int): Iterable[MapPoint] =
     GridDijkstra(map.grid, src, range).keys.toVector

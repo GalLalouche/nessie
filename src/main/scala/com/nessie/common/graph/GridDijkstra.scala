@@ -2,15 +2,15 @@ package com.nessie.common.graph
 
 import com.nessie.model.map.{Grid, MapPoint}
 import com.nessie.model.map.fov.BresenhamsLine
+import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.RichTuple._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.CacheMap
-
-import scala.collection.mutable
-
 import scalaz.std.vector.vectorInstance
 import scalaz.syntax.functor._
+
+import scala.collection.mutable
 
 /**
  * A modified Dijkstra algorithms for grids with blocking cells, e.g., walls, assuming Euclidean distance
@@ -47,15 +47,20 @@ object GridDijkstra {
     def apply[A](f: A => Boolean): Blockable[A] = f(_)
   }
 
-  def apply[A: Blockable](grid: Grid[A], source: MapPoint, maxDistance: Int): Map[MapPoint, Double] = {
+  private def apply[A: Blockable](
+      grid: Grid[A], source: MapPoint, maxDistance: Option[Int], target: Option[MapPoint]
+  ): Map[MapPoint, Double] = {
     val ev = implicitly[Blockable[A]]
     val unimpeded = CacheMap[(MapPoint, MapPoint), Boolean](Function.tupled(ev.unimpededStraightLine(grid)))
-    val vertices = for {
-      x <- source.x - maxDistance to source.x + maxDistance
-      y <- source.y - maxDistance to source.y + maxDistance
-      mp = MapPoint(x, y)
-      if mp != source && grid.isInBounds(mp)
-    } yield mp
+    val vertices = maxDistance match {
+      case None => for {x <- 0 until grid.width; y <- 0 until grid.height} yield MapPoint(x = x, y = y)
+      case Some(md) => for {
+        x <- source.x - md to source.x + md
+        y <- source.y - md to source.y + md
+        mp = MapPoint(x, y)
+        if grid.isInBounds(mp)
+      } yield mp
+    }
 
     // The initial distance between two unimpeded cells is the Euclidean distance between them.
     val initialDistances =
@@ -69,7 +74,7 @@ object GridDijkstra {
       priorityQueue += mp -> distance
     }
 
-    while (priorityQueue.nonEmpty) {
+    while (priorityQueue.nonEmpty && target.contains(priorityQueue.head._1).isFalse) {
       val (next, nextDistance) = priorityQueue.dequeue()
       for ((neighbor, neighborDistance) <- initialDistances.neighbors(next)) {
         val alternative = nextDistance + neighborDistance
@@ -80,6 +85,11 @@ object GridDijkstra {
       }
     }
 
-    $.filter(_._2 <= maxDistance).toMap
+    ($ - source).filterNot(e => e._2.isPosInfinity || maxDistance.exists(e._2.>)).toMap
   }
+
+  def apply[A: Blockable](grid: Grid[A], source: MapPoint, target: MapPoint): Option[Double] =
+    apply(grid, source, None, Some(target)).get(target)
+  def apply[A: Blockable](grid: Grid[A], source: MapPoint, maxDistance: Int): Map[MapPoint, Double] =
+    apply(grid, source, Some(maxDistance), None)
 }
