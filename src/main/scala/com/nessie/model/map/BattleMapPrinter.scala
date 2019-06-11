@@ -1,13 +1,12 @@
 package com.nessie.model.map
 
+import com.nessie.model.map.GridPrinter.CharPrintable
+
 object BattleMapPrinter {
-  private def print(o: BattleMapObject): Char = o match {
+  implicit val battleMapObjectEv: CharPrintable[BattleMapObject] = CharPrintable.apply {
     case EmptyMapObject => '_'
     case FullWall => '*'
     case CombatUnitObject(u) => u.metadata.name.head
   }
-  def apply(m: BattleMap): String = {
-    val rows = 0.until(m.height).map(y => 0.until(m.width).map(x => m(MapPoint(x, y))))
-    rows.map(_.map(print).mkString(",")).mkString("\n")
-  }
+  def apply(m: BattleMap): String = GridPrinter(m.grid)
 }

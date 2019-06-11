@@ -2,7 +2,6 @@ package com.nessie.model.map
 
 import common.rich.collections.RichTraversableOnce._
 
-// TODO handle code duplication with BattleMapPrinter
 object GridPrinter {
   trait CharPrintable[A] {
     def apply(a: A): Char
