@@ -32,14 +32,7 @@ object GridParser {
       }
       lines match {
         case -\/(a) => throw a
-        case \/-(lines) =>
-          val width = lines.head.length
-          val $ = gf(GridSize(width = width, height = lines.length), lines.head.head)
-          // TODO better ways to create a grid in factory than folding
-          (for {
-            y <- lines.indices
-            x <- lines(y).indices
-          } yield MapPoint(x, y) -> lines(y)(x)).foldLeft($)((grid, next) => grid.place(next._1, next._2))
+        case \/-(lines) => gf.apply(lines)
       }
     }
   }

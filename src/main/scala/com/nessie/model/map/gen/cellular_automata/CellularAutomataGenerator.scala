@@ -1,7 +1,7 @@
 package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.common.rng.Rngable
-import com.nessie.model.map.{BattleMap, GridSize, MapPoint, VectorGrid}
+import com.nessie.model.map.{BattleMap, BattleMapObject, GridSize, MapPoint, VectorGrid}
 import com.nessie.model.map.gen.{MapIterator, MapIteratorFactory}
 import common.Percentage
 import common.rich.RichT._
@@ -11,14 +11,11 @@ import common.rich.primitives.RichBoolean._
 private class CellularAutomataGenerator private(gs: GridSize) extends MapIterator {
   override def steps: Rngable[LazyIterable[BattleMap]] = {
     val initialProbability: Percentage = 0.52
-    val initialMap = BattleMap.create(VectorGrid, gs)
+    //val initialMap = BattleMap.create(VectorGrid, gs)
     for {
       initialMap <- Rngable.fromRandom(random => {
-        initialMap.foldPoints {(map, mp) =>
-          val next = if (initialProbability.roll(random)) Empty(0) else Wall(0)
-          map.place(mp, next)
-        }
-      })
+        Vector.fill(gs.height, gs.width)(if (initialProbability.roll(random)) Empty(0) else Wall(0))
+      }).map(VectorGrid.apply[BattleMapObject]).map(BattleMap.apply)
     } yield LazyIterable.iterateOptionally(new Aux(initialMap, 1))(_.next).map(_.map)
   }
 
