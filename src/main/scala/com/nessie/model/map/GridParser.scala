@@ -7,10 +7,9 @@ import common.rich.primitives.RichBoolean._
 import scalaz.{-\/, \/, \/-}
 
 trait GridParser {
-  def parse[A: CharParsable](s: String): Grid[A]
+  def parse[A: CharParsable](grid: String): Grid[A]
 }
 
-// TODO handle code duplication with GridParser
 object GridParser {
   trait CharParsable[A] {
     def apply(c: Char): A
@@ -19,9 +18,7 @@ object GridParser {
     def apply[A](f: Char => A): CharParsable[A] = f(_)
     implicit val IntEv: CharParsable[Int] = _.toString.toInt
   }
-  type Width = Int
-  type Height = Int
-  class InvalidGridStringException(map: String) extends Exception(s"Invalid Grid string:\n$map")
+  class InvalidGridStringException(grid: String) extends Exception(s"Invalid Grid string:\n$grid")
 
   def fromFactory(gf: GridFactory): GridParser = new GridParser {
     override def parse[A](s: String)(implicit ev: CharParsable[A]) = {
