@@ -24,7 +24,6 @@ private class ZirconView(screen: ZirconScreen) extends View {
     screen.drawMap()
   }
   screen.debugButtons
-      // TODO RichObservable.single
       .select[DebugButton.FinishAll].head
       .map(_.map |> GameState.fromMap)
       .foreach(GameLoop.initialize(this, _))
