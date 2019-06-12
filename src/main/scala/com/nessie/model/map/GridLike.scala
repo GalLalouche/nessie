@@ -14,8 +14,9 @@ import scala.language.higherKinds
 trait GridLike[G, A]
     extends ToFunctorOps with MoreIterableInstances {self: G =>
   protected def gridLens: Lens[G, Grid[A]]
-  def width: Int = gridLens.get(this).width
-  def height: Int = gridLens.get(this).height
+  private def grid: Grid[A] = gridLens.get(this)
+  def width: Int = grid.width
+  def height: Int = grid.height
 
   def size: GridSize = GridSize(width, height)
   // TODO rename MapPoint to LatticePoint or do *something* about the naming dissonance
@@ -32,13 +33,13 @@ trait GridLike[G, A]
     internalPlace(p, o)
   }
 
-  @inline private def internalApply(p: MapPoint): A = gridLens.get(this)(p)
+  @inline private def internalApply(p: MapPoint): A = grid(p)
   def apply(p: MapPoint): A = {
     checkBounds(p)
     internalApply(p)
   }
 
-  def points: Iterable[MapPoint] = for (y <- 0 until height; x <- 0 until width) yield MapPoint(x, y)
+  def points: Iterable[MapPoint] = grid.points
   def objects: Iterable[(MapPoint, A)] = points fproduct apply
 
   def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)

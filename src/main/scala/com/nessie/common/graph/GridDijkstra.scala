@@ -53,7 +53,7 @@ object GridDijkstra {
     val ev = implicitly[Blockable[A]]
     val unimpeded = CacheMap[(MapPoint, MapPoint), Boolean](Function.tupled(ev.unimpededStraightLine(grid)))
     val vertices = maxDistance match {
-      case None => for {x <- 0 until grid.width; y <- 0 until grid.height} yield MapPoint(x = x, y = y)
+      case None => grid.points
       case Some(md) => for {
         x <- source.x - md to source.x + md
         y <- source.y - md to source.y + md

@@ -17,7 +17,7 @@ import scalaz.syntax.ToFunctorOps
 case class BattleMap private(grid: Grid[BattleMapObject])
     extends GridLike[BattleMap, BattleMapObject]
         with ToFunctorOps with MoreSetInstances with MoreIterableInstances {
-  override protected def gridLens: Lens[BattleMap, Grid[BattleMapObject]] = BattleMap.grid
+  override protected val gridLens: Lens[BattleMap, Grid[BattleMapObject]] = BattleMap.grid
 
   // Using eq for singletons is potentially faster.
   def isEmptyAt(p: MapPoint): Boolean = EmptyMapObject eq apply(p)

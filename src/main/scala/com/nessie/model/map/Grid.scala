@@ -1,13 +1,13 @@
 package com.nessie.model.map
 
 import common.rich.func.MoreIterableInstances
-
 import scalaz.Functor
 import scalaz.syntax.ToFunctorOps
 
 trait Grid[A] extends ToFunctorOps with MoreIterableInstances {
   def width: Int
   def height: Int
+  def points: Iterable[MapPoint] = for {y <- 0 until height; x <- 0 until width} yield MapPoint(x = x, y = y)
   def place(p: MapPoint, o: A): Grid[A]
   def apply(p: MapPoint): A
 
