@@ -15,6 +15,7 @@ trait Grid[A] extends ToFunctorOps with MoreIterableInstances {
   require(height > 0)
 
   def map[B](f: A => B): Grid[B]
+  def mapPoints[B](f: (MapPoint, A) => B): Grid[B]
   val size = GridSize(width, height)
   def isInBounds(mp: MapPoint): Boolean = size.isInBounds(mp)
 }

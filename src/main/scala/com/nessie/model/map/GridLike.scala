@@ -2,14 +2,14 @@ package com.nessie.model.map
 
 import common.rich.func.MoreIterableInstances
 import common.rich.primitives.RichBoolean._
+import common.rich.RichT._
 import monocle.Lens
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
 import scalax.collection.immutable.Graph
+import scalaz.syntax.ToFunctorOps
 
 import scala.language.higherKinds
-
-import scalaz.syntax.ToFunctorOps
 
 trait GridLike[G, A]
     extends ToFunctorOps with MoreIterableInstances {self: G =>
@@ -42,9 +42,10 @@ trait GridLike[G, A]
   def objects: Iterable[(MapPoint, A)] = points fproduct apply
 
   def neighbors(mp: MapPoint): Iterable[MapPoint] = mp.neighbors.filter(isInBounds)
-  def foldPoints: ((G, MapPoint) => G) => G = points.foldLeft(this)
 
-  def map(f: A => A): G = gridLens.modify(_.map(f))(this)
+  def fill(c: A): G = map(c.const)
+  def map(f: A => A): G = mapPoints((_, a) => f(a))
+  def mapPoints(f: (MapPoint, A) => A): G = gridLens.modify(_.mapPoints(f))(this)
 
   lazy val toFullGraph: Graph[MapPoint, UnDiEdge] = Graph.from(
     nodes = points,

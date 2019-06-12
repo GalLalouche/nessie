@@ -28,12 +28,15 @@ private class CellularAutomataGenerator private(gs: GridSize) extends MapIterato
         ).count(mp => map.isInBounds(mp).isFalse || map(mp).isInstanceOf[Wall])
 
     def next: Option[Aux] = {
-      val nextMap: BattleMap = map.foldPoints((map, mp) => {
-        val wasWall = map(mp).isInstanceOf[Wall]
-        val r1 = wallsInDistance(mp, 1)
+      val nextMap: BattleMap = map.mapPoints((p, o) => {
+        val wasWall = o.isInstanceOf[Wall]
+        val r1 = wallsInDistance(p, 1)
         val isWall = r1 >= 5
         val changed = isWall != wasWall
-        if (changed.isFalse) map else map.place(mp, if (isWall) Wall(n) else Empty(n))
+        if (changed)
+          if (isWall) Wall(n) else Empty(n)
+        else
+          o
       })
 
       nextMap.opt

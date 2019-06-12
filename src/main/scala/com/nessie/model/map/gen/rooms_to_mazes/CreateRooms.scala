@@ -7,7 +7,6 @@ import common.rich.collections.RichSeq._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.RichT._
 import common.rich.func.ToMoreFoldableOps
-
 import scalaz.std.OptionInstances
 import scalaz.syntax.ToMonadOps
 
@@ -61,8 +60,6 @@ private object CreateRooms
     def roomIndex(p: MapPoint): Option[RoomMapObject] =
       rooms.findIndex(_.pointInRectangle(p)).map(RoomMapObject.apply)
 
-    initialMap
-        .foldPoints(_.place(_, FullWall))
-        .foldPoints((map, p) => roomIndex(p).mapHeadOrElse(map.place(p, _), map))
+    initialMap.fill(FullWall).mapPoints(roomIndex(_).getOrElse(_))
   }
 }

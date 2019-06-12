@@ -14,11 +14,10 @@ case class FogOfWar private(map: BattleMap, grid: Grid[FogStatus]) extends GridL
    * All points will be set to visible, all previously visible points which are no longer visible will be set
    * to Fogged.
    */
-  def updateVisible(mps: Set[MapPoint]): FogOfWar =
-    foldPoints((fow, p) => fow.place(p, if (mps(p)) Visible else grid(p) match {
-      case FogStatus.Visible | FogStatus.Fogged => Fogged
-      case FogStatus.Hidden => Hidden
-    }))
+  def updateVisible(mps: Set[MapPoint]): FogOfWar = mapPoints((p, o) => if (mps(p)) Visible else o match {
+    case FogStatus.Visible | FogStatus.Fogged => Fogged
+    case FogStatus.Hidden => Hidden
+  })
 }
 
 object FogOfWar {

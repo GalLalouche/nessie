@@ -22,9 +22,7 @@ private class CellularDigger(private val map: BattleMap, caves: Caves) extends T
     } yield {
       val path = t.takeWhile(caves.cave(_).forall(caves.areConnected(src, _))).toVector
       val widenedPath = PathWidener(path, tunnelWidth).toSet
-      val clearedMap = map.foldPoints((map, p) => map
-          .mapIf(widenedPath(p) && map(p).canMoveThrough.isFalse)
-          .to(_.place(p, Tunnel)))
+      val clearedMap = map.mapPoints((p, o) => o.mapIf(widenedPath(p) && o.canMoveThrough.isFalse).to(Tunnel))
       Some(new CellularDigger(clearedMap, Caves.from(clearedMap)))
     }
   }

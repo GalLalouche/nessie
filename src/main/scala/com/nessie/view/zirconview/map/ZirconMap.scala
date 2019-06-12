@@ -23,8 +23,8 @@ private[zirconview] trait ZirconMap {
     update(mp.fold(getCurrentMap)(mp =>
       getCurrentMap.updateVisible(FovCalculator(getCurrentMap.map).getVisiblePointsFrom(mp, 10).toSet)))
   }
-  def hideAll(): Unit = synchronized {update(getCurrentMap.foldPoints(_.place(_, Hidden)))}
-  def showAll(): Unit = synchronized {update(getCurrentMap.foldPoints(_.place(_, Visible)))}
+  def hideAll(): Unit = synchronized {update(getCurrentMap.fill(Hidden))}
+  def showAll(): Unit = synchronized {update(getCurrentMap.fill(Visible))}
 
   def mapPointConverter: MapPointConverter
   def highlightMovable(mps: Iterable[MapPoint]): Unit
