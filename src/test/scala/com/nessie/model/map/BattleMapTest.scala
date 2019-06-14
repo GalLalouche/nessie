@@ -1,9 +1,11 @@
 package com.nessie.model.map
 
+import com.nessie.model.units.{Owner, Warrior}
 import common.AuxSpecs
 import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge
+
 import scalaz.syntax.ToFunctorOps
 
 class BattleMapTest extends FreeSpec with AuxSpecs
@@ -32,5 +34,11 @@ class BattleMapTest extends FreeSpec with AuxSpecs
       UnDiEdge(node11, node12),
       UnDiEdge(node12, node02),
     )
+  }
+
+  "owners" in {
+    BattleMap.create(VectorGrid, width = 2, height = 3)
+        .place(MapPoint(0, 1), CombatUnitObject(Warrior.create))
+        .owners shouldReturn Set(Owner.Player)
   }
 }

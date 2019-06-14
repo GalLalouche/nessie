@@ -1,22 +1,23 @@
 package com.nessie.model.map
 
 import com.nessie.common.graph.RichUndirected._
+import com.nessie.model.units.Owner
+import common.rich.func.MoreIteratorInstances._
+import common.rich.func.ToMoreMonadPlusOps._
 import common.rich.RichT._
 import common.rich.RichTuple._
-import common.rich.func.{MoreIterableInstances, MoreSetInstances}
 import common.rich.primitives.RichBoolean._
 import monocle.macros.Lenses
 import monocle.Lens
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
-import scalaz.syntax.ToFunctorOps
-
 /** A map of a given level without between-objects, so walls and its ilks taken up a full tile. */
 @Lenses
 case class BattleMap private(grid: Grid[BattleMapObject])
-    extends GridLike[BattleMap, BattleMapObject]
-        with ToFunctorOps with MoreSetInstances with MoreIterableInstances {
+    extends GridLike[BattleMap, BattleMapObject] {
+  def owners: Set[Owner] = objects.iterator.map(_._2).select[CombatUnitObject].map(_.unit.owner).toSet
+
   override protected val gridLens: Lens[BattleMap, Grid[BattleMapObject]] = BattleMap.grid
 
   // Using eq for singletons is potentially faster.
