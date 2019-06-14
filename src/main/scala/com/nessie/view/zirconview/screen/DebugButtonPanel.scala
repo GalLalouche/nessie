@@ -2,7 +2,6 @@ package com.nessie.view.zirconview.screen
 
 import com.nessie.gm.DebugMapStepper
 import com.nessie.model.map.BattleMap
-import com.nessie.model.map.fov.FogOfWar
 import com.nessie.view.zirconview.{ComponentWrapper, OnBuildWrapper, PanelPlacer, ZirconConstants}
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.screen.DebugButtonPanel.StepperWrapper
@@ -49,7 +48,7 @@ private class DebugButtonPanel private(
       .find(_.getText == "Hover FOV")
       .get
   def isHoverFovChecked: Boolean = hoverFov.isChecked
-  def mapObservable: Observable[FogOfWar] = stepperWrapper.observable
+  def mapObservable: Observable[BattleMap] = stepperWrapper.observable
   private val debugButtonsSubject = Subject[DebugButton]()
   def debugButtons: Observable[DebugButton] = debugButtonsSubject
 }
@@ -67,8 +66,8 @@ private object DebugButtonPanel
     def currentMap = stepper.currentMap
 
     def hasNextSmallStep(): Boolean = stepper.hasNextSmallStep()
-    private val $ = Subject[FogOfWar]()
-    private def update(bm: BattleMap): Unit = $.onNext(FogOfWar.allVisible(bm))
+    private val $ = Subject[BattleMap]()
+    private def update(bm: BattleMap): Unit = $.onNext(bm)
     private def update(f: DebugMapStepper => DebugMapStepper): Unit = {
       stepper = f(stepper)
       update(stepper.currentMap)
@@ -84,7 +83,7 @@ private object DebugButtonPanel
     }
     def canonize(): Unit = update(stepper.canonize)
 
-    def observable: Observable[FogOfWar] = $
+    def observable: Observable[BattleMap] = $
   }
 
   def create(stepper: DebugMapStepper, panelPlacer: PanelPlacer): DebugButtonPanel = {

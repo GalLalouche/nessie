@@ -16,4 +16,5 @@ trait CombatUnit extends ToMoreMonadPlusOps with MoreIterableInstances {
   def abilities: Iterable[UnitAbility] = Vector(moveAbility, attackAbility)
   def moveAbilities: Iterable[MoveAbility] = abilities.select[MoveAbility]
   def attacks: Iterable[DamageAbility] = abilities.select[DamageAbility]
+  def visionRange: Int = 10
 }

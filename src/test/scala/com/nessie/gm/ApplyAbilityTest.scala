@@ -4,10 +4,10 @@ import com.nessie.gm.GameStateChange.ActionTaken
 import com.nessie.gm.TurnAction.{ActualAction, MovementAction}
 import com.nessie.model.eq.EventQueue
 import com.nessie.model.map.{BattleMap, CombatUnitObject, EmptyMapObject, MapPoint, VectorGrid}
-import com.nessie.model.map.fov.FogOfWar
 import com.nessie.model.units.{Warrior, Zombie}
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.AuxSpecs
 
 class ApplyAbilityTest extends FreeSpec with AuxSpecs {
   "apply" - {
@@ -16,12 +16,11 @@ class ApplyAbilityTest extends FreeSpec with AuxSpecs {
       val enemy = Zombie.create
       val unitObject = CombatUnitObject(unit)
       val action = PreAction.empty(unit)
+      val map = BattleMap.create(VectorGrid, 5, 5)
+          .place(MapPoint(0, 1), unitObject)
+          .place(MapPoint(0, 2), CombatUnitObject(enemy))
       val gs = GameState(
-        fogOfWar = FogOfWar.allVisible(
-          BattleMap.create(VectorGrid, 5, 5)
-              .place(MapPoint(0, 1), unitObject)
-              .place(MapPoint(0, 2), CombatUnitObject(enemy)),
-        ),
+        MapAndFogs.allVisible(map),
         eq = new EventQueue[Event]().add(UnitTurn(unit), withDelay = 1.0),
         currentTurn = Some(action),
       )

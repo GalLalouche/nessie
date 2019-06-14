@@ -2,9 +2,11 @@ package com.nessie.view.zirconview.screen
 
 import ch.qos.logback.classic.Level
 import com.nessie.gm.DebugMapStepper
+import com.nessie.model.map.fov.FogOfWar
 import com.nessie.view.zirconview.{ComponentWrapper, InstructionsPanel, PanelPlacer, ZirconViewCustomizer}
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.map.ZirconMap
+import com.nessie.view.MapAndPlayerFog
 import common.rich.RichT._
 import org.hexworks.zircon.api.{AppConfigs, CP437TilesetResources, Positions, Screens, Sizes, SwingApplications}
 import org.hexworks.zircon.api.component.ComponentAlignment
@@ -41,14 +43,14 @@ private object ZirconScreenImplFactory {
         // This can fail if the event occurs before the map was updated
         .filter(_.exists(map.getCurrentMap.isInBounds))
         .foreach(mp => {
-          properties.update(map.getCurrentMap.map)(mp)
+          properties.update(map.getCurrentMap)(mp)
           if (debugPanel.isHoverFovChecked) {
             map.updateViewAndFog(mp)
             $.drawMap()
           }
         })
     debugPanel.hoverFov.onActivation(() => if (debugPanel.isHoverFovChecked) map.showAll() else map.hideAll())
-    debugPanel.mapObservable.foreach($.updateMap)
+    debugPanel.mapObservable.foreach(bm => $.updateMap(MapAndPlayerFog(bm, FogOfWar.allVisible(bm))))
     $
   }
 }

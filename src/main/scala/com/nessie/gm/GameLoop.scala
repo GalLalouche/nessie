@@ -4,6 +4,7 @@ import com.google.inject.Guice
 import com.nessie.model.map._
 import com.nessie.model.units._
 import com.nessie.view.ViewModule
+import common.rich.RichT._
 import net.codingwell.scalaguice.InjectorExtensions._
 
 /**
@@ -22,13 +23,12 @@ object GameLoop {
 
   def main(args: Array[String]): Unit = {
     val view = Guice.createInjector(ViewModule).instance[ViewFactory].create()
-    initialize(view, DemoState)
+    initialize(view, DemoState).join()
   }
 
-  // TODO make stoppable
-  def initialize(view: View, currentState: GameState): Unit = {
+  def initialize(view: View, currentState: GameState): Thread = new Thread(() => {
     val iterator = GameMaster.initiate(currentState, view.playerInput)
     while (true)
       (view.updateState _).tupled(iterator.next())
-  }
+  }, "GameLoop").<|(_.start())
 }

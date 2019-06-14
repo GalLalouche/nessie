@@ -2,9 +2,11 @@ package com.nessie.view.zirconview.screen
 
 import com.nessie.common.PromiseZ
 import com.nessie.model.map.fov.FogOfWar
+import com.nessie.model.map.BattleMap
 import com.nessie.view.zirconview.{InstructionsPanel, MapPointHighlighter, ModalResultWrapper}
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.map.ZirconMap
+import com.nessie.view.MapAndPlayerFog
 import common.rich.primitives.RichBoolean._
 import org.hexworks.zircon.api.{TileColors, Tiles}
 import org.hexworks.zircon.api.component.modal.Modal
@@ -25,8 +27,8 @@ private class ZirconScreenImpl(
     override val map: ZirconMap,
 ) extends ZirconScreen {
   override val highlighter: MapPointHighlighter = propertiesPanel.highlighter
-  override def updateMap(fow: FogOfWar): Unit = synchronized {
-    map.update(fow)
+  override def updateMap(mapf: MapAndPlayerFog): Unit = synchronized {
+    map.update(mapf)
     drawMap()
   }
   override def drawMap(): Unit = synchronized {
@@ -41,7 +43,7 @@ private class ZirconScreenImpl(
       // This can fail if the event occurs before the map was updated
       .filter(_.exists(map.getCurrentMap.isInBounds))
       .foreach(mp => {
-        propertiesPanel.update(map.getCurrentMap.map)(mp)
+        propertiesPanel.update(map.getCurrentMap)(mp)
         if (debugPanel.isHoverFovChecked) {
           map.updateViewAndFog(mp)
           drawMap()

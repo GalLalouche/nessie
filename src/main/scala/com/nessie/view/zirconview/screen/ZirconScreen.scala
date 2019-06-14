@@ -1,9 +1,9 @@
 package com.nessie.view.zirconview.screen
 
 import com.nessie.gm.DebugMapStepper
-import com.nessie.model.map.fov.FogOfWar
 import com.nessie.view.zirconview.{InstructionsPanel, MapPointHighlighter, ModalResultWrapper, ZirconViewCustomizer}
 import com.nessie.view.zirconview.map.ZirconMap
+import com.nessie.view.MapAndPlayerFog
 import org.hexworks.zircon.api.component.modal.Modal
 import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent.UIEventSource
@@ -16,7 +16,7 @@ private[zirconview] trait ZirconScreen extends UIEventSource {
   val highlighter: MapPointHighlighter
   def instructions: InstructionsPanel
   def map: ZirconMap
-  def updateMap(fow: FogOfWar): Unit
+  def updateMap(mapf: MapAndPlayerFog): Unit
   def drawMap(): Unit
   def nextSmallStep(): Unit
   def debugButtons: Observable[DebugButton]

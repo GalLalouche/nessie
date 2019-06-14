@@ -1,9 +1,10 @@
 package com.nessie.view.zirconview.map
 
 import com.nessie.model.map.{CombatUnitObject, EmptyMapObject, FullWall, MapPoint}
-import com.nessie.model.map.fov.{FogOfWar, FogStatus}
+import com.nessie.model.map.fov.FogStatus
 import com.nessie.view.zirconview.ZirconMapCustomizer
 import com.nessie.view.zirconview.ZirconUtils._
+import com.nessie.view.MapAndPlayerFog
 import org.hexworks.zircon.api.{Positions, Tiles}
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.component.ColorTheme
@@ -22,8 +23,9 @@ private class MapView(
   def buildLayer: Layer = fogOfWarLayer.clearCopy
   private val width = graphics.width
   private val height = graphics.height
-  def updateTiles(fog: FogOfWar, viewOffset: MapPoint): Unit = synchronized {
-    val map = fog.map
+  def updateTiles(mapf: MapAndPlayerFog, viewOffset: MapPoint): Unit = synchronized {
+    val map = mapf.map
+    val fog = mapf.fogOfWar
     for (
       x <- viewOffset.x until viewOffset.x + width;
       y <- viewOffset.y until viewOffset.y + height;
