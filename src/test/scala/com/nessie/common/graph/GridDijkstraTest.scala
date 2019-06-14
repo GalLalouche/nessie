@@ -106,9 +106,13 @@ class GridDijkstraTest extends FreeSpec with AuxSpecs {
     }
   }
   "pairs" - {
+    "distance too short" in {
+      val grid = parse("ffff")
+      GridDijkstra(grid, MapPoint(1, 0), MapPoint(3, 0), 1) shouldReturn None
+    }
     "horizontal" in {
       val grid = parse("ffff")
-      GridDijkstra(grid, MapPoint(1, 0), MapPoint(3, 0)) shouldReturn Some(2)
+      GridDijkstra(grid, MapPoint(1, 0), MapPoint(3, 0), 2) shouldReturn Some(2)
     }
     "vertical" in {
       val grid = parse(
@@ -116,41 +120,41 @@ class GridDijkstraTest extends FreeSpec with AuxSpecs {
            |f
            |f
            |f""".stripMargin)
-      GridDijkstra(grid, MapPoint(0, 1), MapPoint(0, 3)) shouldReturn Some(2)
+      GridDijkstra(grid, MapPoint(0, 1), MapPoint(0, 3), 2) shouldReturn Some(2)
     }
     "horizontal blocked" in {
       val grid = parse("ftf")
-      GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 0)) shouldReturn None
+      GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 0), 2) shouldReturn None
     }
     "vertical blocked" in {
       val grid = parse("f\nt\nf")
-      GridDijkstra(grid, MapPoint(0, 0), MapPoint(0, 2)) shouldReturn None
+      GridDijkstra(grid, MapPoint(0, 0), MapPoint(0, 2), 2) shouldReturn None
     }
     "diagonal" in {
       val grid = parse(
         """|ff
            |ff""".stripMargin)
-      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(1, 1))) shouldReturn 141
+      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(1, 1), 2)) shouldReturn 141
     }
     "Can't take diagonal around a blocker" in {
       val grid = parse(
         """|ft
            |ff""".stripMargin)
-      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(1, 1))) shouldReturn 200
+      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(1, 1), 2)) shouldReturn 200
     }
     "blocker in the middle 1" in {
       val grid = parse(
         """|fff
            |ftf
            |fff""".stripMargin)
-      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 2))) shouldReturn 400
+      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 2), 4)) shouldReturn 400
     }
     "blocker in the middle 2" in {
       val grid = parse(
         """|fffff
            |fftff
            |fffff""".stripMargin)
-      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(3, 2))) shouldReturn 424
+      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(3, 2), 5)) shouldReturn 424
     }
     "blockers in the middle 3" in {
       val grid = parse(
@@ -158,15 +162,20 @@ class GridDijkstraTest extends FreeSpec with AuxSpecs {
            |fftff
            |tftff
            |fffff""".stripMargin)
-      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(4, 2))) shouldReturn 541
+      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(4, 2), 6)) shouldReturn 541
     }
 
-    "round about distance" in {
+    "round about distance" - {
       val grid = parse(
         """|ftf
            |ftf
            |fff""".stripMargin)
-      round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 0))) shouldReturn 600
+      "distance too short" in {
+        GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 0), 5) shouldReturn None
+      }
+      "distance large enough" in {
+        round(GridDijkstra(grid, MapPoint(0, 0), MapPoint(2, 0), 6)) shouldReturn 600
+      }
     }
   }
 }

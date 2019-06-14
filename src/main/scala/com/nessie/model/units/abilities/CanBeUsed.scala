@@ -14,7 +14,7 @@ object CanBeUsed {
   }
   private def inRange(range: Int): Constraint = (map, src, dst) =>
     if (range == 1) src.manhattanDistanceTo(dst) <= 1 && map(dst).canMoveThrough && map(src).canMoveThrough
-    else GridDijkstra(map.grid, src, dst).exists(_ <= range)
+    else GridDijkstra(map.grid, src, dst, range).exists(_ <= range)
   private implicit val blockableEv: Blockable[BattleMapObject] = Blockable(_.canMoveThrough.isFalse)
   private def allInRange(map: BattleMap, src: MapPoint)(range: Int): Iterable[MapPoint] =
     GridDijkstra(map.grid, src, range).keys.toVector

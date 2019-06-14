@@ -7,10 +7,11 @@ import common.rich.RichT._
 import common.rich.RichTuple._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.CacheMap
-import scalaz.std.vector.vectorInstance
-import scalaz.syntax.functor._
 
 import scala.collection.mutable
+
+import scalaz.std.vector.vectorInstance
+import scalaz.syntax.functor._
 
 /**
  * A modified Dijkstra algorithms for grids with blocking cells, e.g., walls, assuming Euclidean distance
@@ -48,19 +49,16 @@ object GridDijkstra {
   }
 
   private def apply[A: Blockable](
-      grid: Grid[A], source: MapPoint, maxDistance: Option[Int], target: Option[MapPoint]
+      grid: Grid[A], source: MapPoint, maxDistance: Int, target: Option[MapPoint]
   ): Map[MapPoint, Double] = {
     val ev = implicitly[Blockable[A]]
     val unimpeded = CacheMap[(MapPoint, MapPoint), Boolean](Function.tupled(ev.unimpededStraightLine(grid)))
-    val vertices = maxDistance match {
-      case None => grid.points
-      case Some(md) => for {
-        x <- source.x - md to source.x + md
-        y <- source.y - md to source.y + md
-        mp = MapPoint(x, y)
-        if grid.isInBounds(mp)
-      } yield mp
-    }
+    val vertices = for {
+      x <- source.x - maxDistance to source.x + maxDistance
+      y <- source.y - maxDistance to source.y + maxDistance
+      mp = MapPoint(x, y)
+      if grid.isInBounds(mp)
+    } yield mp
 
     // The initial distance between two unimpeded cells is the Euclidean distance between them.
     val initialDistances =
@@ -85,11 +83,12 @@ object GridDijkstra {
       }
     }
 
-    ($ - source).filterNot(e => e._2.isPosInfinity || maxDistance.exists(e._2.>)).toMap
+    ($ - source).filter(_._2 <= maxDistance).toMap
   }
 
-  def apply[A: Blockable](grid: Grid[A], source: MapPoint, target: MapPoint): Option[Double] =
-    apply(grid, source, None, Some(target)).get(target)
+  def apply[A: Blockable](
+      grid: Grid[A], source: MapPoint, target: MapPoint, maxDistance: Int): Option[Double] =
+    apply(grid, source, maxDistance, Some(target)).get(target)
   def apply[A: Blockable](grid: Grid[A], source: MapPoint, maxDistance: Int): Map[MapPoint, Double] =
-    apply(grid, source, Some(maxDistance), None)
+    apply(grid, source, maxDistance, None)
 }
