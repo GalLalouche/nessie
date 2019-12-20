@@ -40,4 +40,3 @@ private class CatcherAI @VisibleForTesting() private[gm](c: AbilityToTurnActionC
 }
 
 private object CatcherAI extends CatcherAI(AbilityToTurnAction)
-

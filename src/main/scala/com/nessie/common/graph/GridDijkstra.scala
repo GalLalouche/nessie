@@ -2,16 +2,17 @@ package com.nessie.common.graph
 
 import com.nessie.model.map.{Grid, MapPoint}
 import com.nessie.model.map.fov.BresenhamsLine
-import common.rich.primitives.RichBoolean._
-import common.rich.RichT._
-import common.rich.RichTuple._
-import common.rich.collections.RichTraversableOnce._
-import common.rich.CacheMap
 
 import scala.collection.mutable
 
 import scalaz.std.vector.vectorInstance
 import scalaz.syntax.functor._
+
+import common.rich.primitives.RichBoolean._
+import common.rich.RichT._
+import common.rich.RichTuple._
+import common.rich.collections.RichTraversableOnce._
+import common.CacheMap
 
 /**
  * A modified Dijkstra algorithms for grids with blocking cells, e.g., walls, assuming Euclidean distance

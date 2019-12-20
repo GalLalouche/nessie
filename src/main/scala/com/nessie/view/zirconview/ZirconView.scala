@@ -9,9 +9,13 @@ import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.screen.{DebugButton, ZirconScreen}
 import com.nessie.view.zirconview.ZirconView._
 import com.nessie.view.MapAndPlayerFog
-import common.rich.RichT._
 import org.hexworks.zircon.api.uievent.KeyCode
 import org.slf4j.LoggerFactory
+
+import scalaz.std.option.optionInstance
+import scalaz.syntax.functor.ToFunctorOps
+
+import common.rich.RichT._
 
 private class ZirconView(screen: ZirconScreen) extends View {
   LoggerFactory.getLogger("org.hexworks").asInstanceOf[ch.qos.logback.classic.Logger].setLevel(Level.WARN)

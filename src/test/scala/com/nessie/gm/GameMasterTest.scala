@@ -4,17 +4,16 @@ import com.nessie.gm.TurnAction.EndTurn
 import com.nessie.model.map.{BattleMap, CombatUnitObject, FullWall, MapPoint, VectorGrid}
 import com.nessie.model.units.{Archer, CombatUnit, Skeleton, Warrior, Zombie}
 import com.nessie.model.units.Owner.Player
-import common.rich.collections.RichIterator._
-import common.AuxSpecs
-import common.rich.RichT._
-import common.rich.func.{MoreIteratorInstances, ToMoreMonadPlusOps}
 import org.scalatest.time.SpanSugar._
 import org.scalatest.FreeSpec
 import org.scalatest.tags.Slow
 
-import scala.language.{postfixOps, reflectiveCalls}
-
 import scalaz.concurrent.Task
+import common.rich.func.{MoreIteratorInstances, ToMoreMonadPlusOps}
+
+import common.rich.collections.RichIterator._
+import common.AuxSpecs
+import common.rich.RichT._
 
 @Slow
 class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with MoreIteratorInstances {
@@ -35,7 +34,7 @@ class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with
         override def nextState(currentlyPlayingUnit: CombatUnit)(gs: GameState) = Task.now(EndTurn)
       })
 
-    {gm.takeWhile(_._2 |> hasRemainingPlayers).last()} shouldFinish in lessThan 2000.millis
+    {gm.takeWhile(_._2 |> hasRemainingPlayers).last()} shouldFinishInLessThan 2000.millis
   }
 
   "AI versus AI eventually kills all players in one side" in {
@@ -54,6 +53,6 @@ class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with
       playerInput = PlayerInput.fromAI(CatcherAI)
     )
 
-    {gm.takeWhile(_._2 |> hasMultipleOwners).last()} shouldFinish in lessThan 2000.millis
+    {gm.takeWhile(_._2 |> hasMultipleOwners).last()} shouldFinishInLessThan 2000.millis
   }
 }
