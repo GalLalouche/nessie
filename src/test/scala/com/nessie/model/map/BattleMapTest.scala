@@ -1,12 +1,13 @@
 package com.nessie.model.map
 
 import com.nessie.model.units.{Owner, Warrior}
-import common.AuxSpecs
-import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge
 
 import scalaz.syntax.ToFunctorOps
+import common.rich.func.MoreIterableInstances
+
+import common.test.AuxSpecs
 
 class BattleMapTest extends FreeSpec with AuxSpecs
     with ToFunctorOps with MoreIterableInstances {

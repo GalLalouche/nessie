@@ -12,8 +12,8 @@ import scalaz.concurrent.Task
 import common.rich.func.{MoreIteratorInstances, ToMoreMonadPlusOps}
 
 import common.rich.collections.RichIterator._
-import common.AuxSpecs
 import common.rich.RichT._
+import common.test.AuxSpecs
 
 @Slow
 class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with MoreIteratorInstances {

@@ -1,8 +1,9 @@
 package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.model.map.{BattleMap, VectorGrid}
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class RoomMapObjectTest extends FreeSpec with AuxSpecs {
   private def addRoom(map: BattleMap, room: Room, index: Int): BattleMap =

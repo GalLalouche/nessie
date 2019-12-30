@@ -2,8 +2,9 @@ package com.nessie.model.units.abilities
 
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint, NonEmptyBattleMapObject, VectorGrid}
 import com.nessie.model.units.{Archer, Skeleton, Warrior, Zombie}
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class CanBeUsedTest extends FreeSpec with AuxSpecs {
   private val meleeAttack = MeleeAttack(5)

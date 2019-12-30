@@ -1,8 +1,9 @@
 package com.nessie.model.map.fov
 
 import com.nessie.model.map.{BattleMap, MapPoint, VectorGrid}
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class FogOfWarTest extends FreeSpec with AuxSpecs {
   "updateVisible" in {

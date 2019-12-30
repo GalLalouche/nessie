@@ -1,10 +1,11 @@
 package com.nessie.events.model
 
 import com.nessie.model.eq.EventQueue
-import common.AuxSpecs
 import org.mockito.Mockito._
 import org.scalatest.FreeSpec
 import org.scalatest.mockito.MockitoSugar
+
+import common.test.AuxSpecs
 
 class EventQueueTests extends FreeSpec with AuxSpecs with MockitoSugar {
   class Event {}

@@ -1,8 +1,9 @@
 package com.nessie.common.rng
 
-import common.AuxSpecs
 import org.scalatest.PropSpec
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
+
+import common.test.AuxSpecs
 
 class StdGenTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks {
   property("Same next every time") {

@@ -1,9 +1,10 @@
 package com.nessie.view.zirconview
 
-import common.AuxSpecs
 import org.hexworks.zircon.api.color.{ANSITileColor, TileColor}
 import org.hexworks.zircon.api.TileColors
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class TileColorDataTest extends FreeSpec with AuxSpecs {
   private def compareTileColors(tc1: TileColor, tc2: TileColor): Unit = {

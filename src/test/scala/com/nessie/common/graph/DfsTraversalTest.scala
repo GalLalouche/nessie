@@ -1,10 +1,11 @@
 package com.nessie.common.graph
 
 import com.nessie.common.rng.StdGen
-import common.AuxSpecs
 import org.scalatest.FreeSpec
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
+
+import common.test.AuxSpecs
 
 class DfsTraversalTest extends FreeSpec with AuxSpecs {
   "linear" in {

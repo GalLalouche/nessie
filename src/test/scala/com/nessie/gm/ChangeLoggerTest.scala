@@ -4,10 +4,11 @@ import com.nessie.gm.GameStateChange.{ActionTaken, NoOp}
 import com.nessie.gm.TurnAction.{ActualAction, EndTurn, MovementAction, StartTurn}
 import com.nessie.model.map.MapPoint
 import com.nessie.model.units.CombatUnit
-import common.AuxSpecs
 import org.mockito.Mockito
 import org.scalatest.FreeSpec
 import org.scalatest.mockito.MockitoSugar
+
+import common.test.AuxSpecs
 
 class ChangeLoggerTest extends FreeSpec with AuxSpecs with MockitoSugar {
   "toString" - {

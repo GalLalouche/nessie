@@ -1,16 +1,18 @@
 package com.nessie.common.rng
 
 import com.nessie.common.rng.Rngable.ToRngableOps
-import common.AuxSpecs
-import common.rich.func.ToMoreFunctorOps
 import org.scalatest.PropSpec
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.time.SpanSugar._
-import scalaz.std.VectorInstances
-import scalaz.syntax.ToTraverseOps
 
 import scala.language.postfixOps
+
+import scalaz.std.VectorInstances
+import scalaz.syntax.ToTraverseOps
+import common.rich.func.ToMoreFunctorOps
+
+import common.test.AuxSpecs
 
 class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with ToRngableOps
     with ToTraverseOps with VectorInstances with TimeLimitedTests with ToMoreFunctorOps {

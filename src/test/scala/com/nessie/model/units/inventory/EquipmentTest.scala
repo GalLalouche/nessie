@@ -1,7 +1,8 @@
 package com.nessie.model.units.inventory
 
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class EquipmentTest extends FreeSpec with AuxSpecs {
   private object Helmet extends EquippableItem(EquipType.Head, "helmet")

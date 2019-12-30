@@ -1,9 +1,10 @@
 package com.nessie.view.zirconview
 
-import common.AuxSpecs
 import org.hexworks.zircon.api.ColorThemes
 import org.hexworks.zircon.api.component.ColorTheme
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class ColorThemeDataTest extends FreeSpec with AuxSpecs {
   private def compareColorThemes(ct1: ColorTheme, ct2: ColorTheme): Unit = {

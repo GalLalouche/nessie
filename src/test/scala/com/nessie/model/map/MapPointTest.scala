@@ -1,7 +1,8 @@
 package com.nessie.model.map
 
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class MapPointTest extends FreeSpec with AuxSpecs {
   "go" - {

@@ -1,8 +1,9 @@
 package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.model.map.{BattleMapParser, MapPoint, VectorGrid}
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class CavesTest extends FreeSpec with AuxSpecs {
   "from" in {

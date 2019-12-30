@@ -1,8 +1,9 @@
 package com.nessie.model.units.inventory
 
-import common.AuxSpecs
-import common.rich.collections.RichTraversableOnce._
 import org.scalatest.FreeSpec
+
+import common.rich.collections.RichTraversableOnce._
+import common.test.AuxSpecs
 
 class EquipSlotTest extends FreeSpec with AuxSpecs {
   "default" in {

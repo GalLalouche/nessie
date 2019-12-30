@@ -1,7 +1,8 @@
 package com.nessie.model.units
 
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class PlayerUnitTest extends FreeSpec with AuxSpecs {
   "Keep abilities after hit point change" - {

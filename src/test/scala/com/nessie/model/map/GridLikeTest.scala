@@ -1,12 +1,14 @@
 package com.nessie.model.map
 
-import common.AuxSpecs
-import common.rich.func.MoreIterableInstances
-import monocle.Lens
 import org.scalatest.FreeSpec
 import org.scalatest.Inspectors._
 import scalax.collection.GraphEdge.UnDiEdge
+
 import scalaz.syntax.ToFunctorOps
+import common.rich.func.MoreIterableInstances
+import monocle.Lens
+
+import common.test.AuxSpecs
 
 abstract class GridLikeTest(factory: GridFactory) extends FreeSpec with AuxSpecs
     with ToFunctorOps with MoreIterableInstances {

@@ -8,7 +8,7 @@ import org.mockito.Mockito
 import org.scalatest.{FreeSpec, OneInstancePerTest}
 import org.scalatest.mockito.MockitoSugar
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 
 class CatcherAITest extends FreeSpec with AuxSpecs with MockitoSugar with OneInstancePerTest {
   private val unit = Skeleton.create

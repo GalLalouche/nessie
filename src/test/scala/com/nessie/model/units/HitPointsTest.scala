@@ -1,7 +1,8 @@
 package com.nessie.model.units
 
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class HitPointsTest extends FreeSpec with AuxSpecs {
   private val $ = HitPoints(currentHp = 50, maxHp = 100)

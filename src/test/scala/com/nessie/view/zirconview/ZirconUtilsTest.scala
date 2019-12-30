@@ -1,15 +1,17 @@
 package com.nessie.view.zirconview
 
 import com.nessie.view.zirconview.ZirconUtils._
-import common.AuxSpecs
 import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.uievent.{MouseEventType, UIEventSource}
-import org.mockito.Mockito.{verify, when}
 import org.mockito.{Matchers, Mockito}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.FreeSpec
 import org.scalatest.mockito.MockitoSugar
+
 import scalaz.std.VectorInstances
 import scalaz.syntax.ToFunctorOps
+
+import common.test.AuxSpecs
 
 class ZirconUtilsTest extends FreeSpec with AuxSpecs with MockitoSugar
     with ToFunctorOps with VectorInstances {

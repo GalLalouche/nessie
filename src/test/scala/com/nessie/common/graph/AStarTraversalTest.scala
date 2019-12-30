@@ -2,12 +2,13 @@ package com.nessie.common.graph
 
 import com.nessie.common.rng.{RngableDeterministicTest, StdGen}
 import com.nessie.model.map.MapPoint
-import common.rich.collections.RichSeq._
-import common.AuxSpecs
 import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
+
+import common.rich.collections.RichSeq._
+import common.test.AuxSpecs
 
 class AStarTraversalTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with Matchers {
   property("single line path") {

@@ -1,8 +1,9 @@
 package com.nessie.model.map.fov
 
 import com.nessie.model.map.MapPoint
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class BresenhamsLineTest extends FreeSpec with AuxSpecs {
   // Shorter, for alignment

@@ -3,9 +3,10 @@ package com.nessie.model.map.gen.cellular_automata
 import com.nessie.common.graph.RichUndirected._
 import com.nessie.common.rng.{Rngable, RngableDeterministicTest, StdGen}
 import com.nessie.model.map.{BattleMap, GridSize}
-import common.AuxSpecs
 import org.scalatest.FreeSpec
 import org.scalatest.tags.Slow
+
+import common.test.AuxSpecs
 
 @Slow
 class CellularDiggerTest extends FreeSpec with AuxSpecs {

@@ -1,9 +1,10 @@
 package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.model.map.MapPoint
-import common.AuxSpecs
 import org.scalatest.FreeSpec
 import org.scalatest.Inspectors._
+
+import common.test.AuxSpecs
 
 class RoomTest extends FreeSpec with AuxSpecs {
   //  01234

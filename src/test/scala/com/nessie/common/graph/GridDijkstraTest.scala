@@ -3,8 +3,9 @@ package com.nessie.common.graph
 import com.nessie.common.graph.GridDijkstra.Blockable
 import com.nessie.model.map.{Grid, GridParser, MapPoint, VectorGrid}
 import com.nessie.model.map.GridParser.CharParsable
-import common.AuxSpecs
 import org.scalatest.FreeSpec
+
+import common.test.AuxSpecs
 
 class GridDijkstraTest extends FreeSpec with AuxSpecs {
   private implicit val BooleanBlocks: Blockable[Boolean] = Blockable(identity)
