@@ -1,6 +1,6 @@
 package com.nessie.model.units.inventory
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import common.rich.collections.RichTraversableOnce._
 import org.scalatest.FreeSpec
 

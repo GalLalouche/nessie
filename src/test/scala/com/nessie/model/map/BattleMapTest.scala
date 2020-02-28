@@ -1,7 +1,7 @@
 package com.nessie.model.map
 
 import com.nessie.model.units.{Owner, Warrior}
-import common.AuxSpecs
+import common.test.AuxSpecs
 import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge

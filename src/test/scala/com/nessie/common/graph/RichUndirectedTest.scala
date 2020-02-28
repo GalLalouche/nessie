@@ -1,7 +1,7 @@
 package com.nessie.common.graph
 
 import com.nessie.common.graph.RichUndirected._
-import common.AuxSpecs
+import common.test.AuxSpecs
 import common.rich.RichTuple._
 import common.rich.collections.RichTraversableOnce._
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}

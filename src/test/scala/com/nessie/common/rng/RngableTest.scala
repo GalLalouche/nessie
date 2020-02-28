@@ -1,7 +1,7 @@
 package com.nessie.common.rng
 
 import com.nessie.common.rng.Rngable.ToRngableOps
-import common.AuxSpecs
+import common.test.AuxSpecs
 import common.rich.func.ToMoreFunctorOps
 import org.scalatest.PropSpec
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}

@@ -2,7 +2,7 @@ package com.nessie.model.units.abilities
 
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint, NonEmptyBattleMapObject, VectorGrid}
 import com.nessie.model.units.{Archer, Skeleton, Warrior, Zombie}
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class CanBeUsedTest extends FreeSpec with AuxSpecs {

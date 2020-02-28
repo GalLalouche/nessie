@@ -3,7 +3,7 @@ package com.nessie.common.graph
 import com.nessie.common.rng.{RngableDeterministicTest, StdGen}
 import com.nessie.model.map.MapPoint
 import common.rich.collections.RichSeq._
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scalax.collection.Graph

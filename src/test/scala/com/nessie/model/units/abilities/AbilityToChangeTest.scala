@@ -3,7 +3,7 @@ package com.nessie.model.units.abilities
 import com.nessie.gm.{Attack, Movement}
 import com.nessie.gm.TurnAction.{ActualAction, MovementAction}
 import com.nessie.model.map.MapPoint
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class AbilityToChangeTest extends FreeSpec with AuxSpecs {

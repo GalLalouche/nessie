@@ -1,6 +1,6 @@
 package com.nessie.view.zirconview
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.hexworks.zircon.api.ColorThemes
 import org.hexworks.zircon.api.component.ColorTheme
 import org.scalatest.FreeSpec

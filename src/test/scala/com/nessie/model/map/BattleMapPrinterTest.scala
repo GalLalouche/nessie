@@ -1,7 +1,7 @@
 package com.nessie.model.map
 
 import com.nessie.model.units.Warrior
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class BattleMapPrinterTest extends FreeSpec with AuxSpecs {

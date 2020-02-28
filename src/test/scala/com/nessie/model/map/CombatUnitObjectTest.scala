@@ -1,7 +1,7 @@
 package com.nessie.model.map
 
 import com.nessie.model.units.{Archer, Warrior}
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class CombatUnitObjectTest extends FreeSpec with AuxSpecs {

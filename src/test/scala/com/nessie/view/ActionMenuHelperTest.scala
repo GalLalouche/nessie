@@ -11,7 +11,7 @@ import org.scalatest.mockito.MockitoSugar
 
 import common.rich.collections.RichTraversableOnce._
 import common.rich.primitives.RichBoolean._
-import common.AuxSpecs
+import common.test.AuxSpecs
 
 class ActionMenuHelperTest extends FreeSpec with AuxSpecs with MockitoSugar {
   "getUsablePoints" - {

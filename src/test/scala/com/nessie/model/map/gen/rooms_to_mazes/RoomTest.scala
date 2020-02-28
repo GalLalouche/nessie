@@ -1,7 +1,7 @@
 package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.model.map.MapPoint
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 import org.scalatest.Inspectors._
 

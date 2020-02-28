@@ -1,6 +1,6 @@
 package com.nessie.model.units.inventory
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class EquipmentTest extends FreeSpec with AuxSpecs {

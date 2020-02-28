@@ -1,6 +1,6 @@
 package com.nessie.model.units
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class PlayerUnitTest extends FreeSpec with AuxSpecs {

@@ -1,6 +1,6 @@
 package com.nessie.common.rng
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.PropSpec
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 

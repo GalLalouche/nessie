@@ -3,7 +3,7 @@ package com.nessie.common.graph
 import com.nessie.common.graph.GridDijkstra.Blockable
 import com.nessie.model.map.{Grid, GridParser, MapPoint, VectorGrid}
 import com.nessie.model.map.GridParser.CharParsable
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class GridDijkstraTest extends FreeSpec with AuxSpecs {

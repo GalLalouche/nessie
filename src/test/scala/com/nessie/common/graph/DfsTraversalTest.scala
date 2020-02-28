@@ -1,7 +1,7 @@
 package com.nessie.common.graph
 
 import com.nessie.common.rng.StdGen
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._

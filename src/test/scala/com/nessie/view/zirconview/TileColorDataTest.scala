@@ -1,6 +1,6 @@
 package com.nessie.view.zirconview
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.hexworks.zircon.api.color.{ANSITileColor, TileColor}
 import org.hexworks.zircon.api.TileColors
 import org.scalatest.FreeSpec

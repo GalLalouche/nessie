@@ -1,6 +1,6 @@
 package com.nessie.model.map
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class GridParserTest extends FreeSpec with AuxSpecs {

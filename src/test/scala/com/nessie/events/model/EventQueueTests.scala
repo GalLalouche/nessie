@@ -1,7 +1,7 @@
 package com.nessie.events.model
 
 import com.nessie.model.eq.EventQueue
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.mockito.Mockito._
 import org.scalatest.FreeSpec
 import org.scalatest.mockito.MockitoSugar

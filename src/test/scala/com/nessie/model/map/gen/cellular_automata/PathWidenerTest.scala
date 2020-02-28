@@ -3,7 +3,7 @@ package com.nessie.model.map.gen.cellular_automata
 import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.model.map.Direction.{Down => D, Left => L, Right => R, Up => U}
 import com.nessie.model.map.gen.cellular_automata.PathWidener.Width
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class PathWidenerTest extends FreeSpec with AuxSpecs {

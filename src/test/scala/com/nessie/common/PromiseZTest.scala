@@ -1,6 +1,5 @@
 package com.nessie.common
 
-import common.AuxSpecs
 import org.scalatest.{FreeSpec, OneInstancePerTest}
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.time.SpanSugar._
@@ -8,6 +7,8 @@ import org.scalatest.time.SpanSugar._
 import scala.language.postfixOps
 
 import scalaz.concurrent.Task
+
+import common.test.AuxSpecs
 
 class PromiseZTest extends FreeSpec with AuxSpecs with TimeLimitedTests with OneInstancePerTest {
   override val timeLimit = 1000 millis

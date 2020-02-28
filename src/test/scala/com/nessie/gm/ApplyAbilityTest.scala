@@ -7,7 +7,7 @@ import com.nessie.model.map.{BattleMap, CombatUnitObject, EmptyMapObject, MapPoi
 import com.nessie.model.units.{Warrior, Zombie}
 import org.scalatest.FreeSpec
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 
 class ApplyAbilityTest extends FreeSpec with AuxSpecs {
   "apply" - {

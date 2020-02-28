@@ -1,6 +1,6 @@
 package com.nessie.model.map
 
-import common.AuxSpecs
+import common.test.AuxSpecs
 import common.rich.func.MoreIterableInstances
 import monocle.Lens
 import org.scalatest.FreeSpec

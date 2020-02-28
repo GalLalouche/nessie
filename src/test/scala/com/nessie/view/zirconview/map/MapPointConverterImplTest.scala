@@ -1,7 +1,7 @@
 package com.nessie.view.zirconview.map
 
 import com.nessie.model.map.{GridSize, MapPoint}
-import common.AuxSpecs
+import common.test.AuxSpecs
 import org.hexworks.zircon.api.{Positions, Sizes}
 import org.scalatest.FreeSpec
 
