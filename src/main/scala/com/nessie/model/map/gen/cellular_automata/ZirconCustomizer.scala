@@ -4,7 +4,7 @@ import com.nessie.view.zirconview.{ZirconMapCustomizer, ZirconViewCustomizer}
 import org.hexworks.zircon.api.Tiles
 import org.hexworks.zircon.api.color.ANSITileColor
 
-object ZirconCustomizer extends ZirconViewCustomizer {
+private object ZirconCustomizer extends ZirconViewCustomizer {
   override def mapCustomizer = new ZirconMapCustomizer {
     override def getTile = {
       case Empty(n) => Tiles.newBuilder().withCharacter(n.toString.last)
