@@ -1,5 +1,6 @@
 package com.nessie.view.sfx
 
+import com.nessie.common.sfx.Styles
 import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.gm.TurnAction.EndTurn
 import com.nessie.model.map.MapPoint

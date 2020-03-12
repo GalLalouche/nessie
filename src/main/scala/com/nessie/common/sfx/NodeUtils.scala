@@ -1,15 +1,17 @@
-package com.nessie.view.sfx
+package com.nessie.common.sfx
 
+import com.nessie.common.sfx.RichNode._
 import com.nessie.model.units.CombatUnit
-import com.nessie.view.sfx.RichNode._
-import common.rich.RichObservable
-import common.rich.RichTuple._
-import common.rich.func.{MoreObservableInstances, TuplePLenses}
 import rx.lang.scala.Observable
 import scalafx.scene.input.MouseEvent
-import scalaz.syntax.ToFunctorOps
 
-private object NodeUtils
+import scalaz.syntax.ToFunctorOps
+import common.rich.func.{MoreObservableInstances, TuplePLenses}
+
+import common.rich.RichObservable
+import common.rich.RichTuple._
+
+object NodeUtils
     extends ToFunctorOps with MoreObservableInstances {
   def mouseEvents[Key, N: NodeLike](ns: Traversable[(Key, N)]): Observable[(MouseEvent, Key)] = {
     val keyedObservables: Iterator[(Key, Observable[MouseEvent])] = ns.toIterator

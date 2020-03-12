@@ -3,15 +3,18 @@ package com.nessie.view.sfx
 import java.io.IOException
 
 import com.nessie.common.PromiseZ
+import com.nessie.common.sfx.NodeUtils
 import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
 import com.nessie.view.sfx.MapGrid._
-import com.nessie.view.sfx.RichNode._
+import com.nessie.common.sfx.RichNode._
+
 import common.rich.RichT._
 import common.rich.func.{MoreIterableInstances, MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
 import javafx.{scene => jfxs}
+
 import monocle.Optional
 import monocle.function.Index
 import rx.lang.scala.Observable

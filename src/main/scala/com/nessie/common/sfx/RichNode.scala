@@ -1,13 +1,14 @@
-package com.nessie.view.sfx
+package com.nessie.common.sfx
 
-import common.rich.RichObservable
 import javafx.event.{Event, EventType}
 import rx.lang.scala.Observable
 import scalafx.application.Platform.runLater
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.{Node => SNode}
 
-private object RichNode {
+import common.rich.RichObservable
+
+object RichNode {
   implicit class richNode[N](node: N)(implicit ev: NodeLike[N]) {
     private val n = ev.scalaNode(node)
     def setBackgroundColor(color: String): Unit = runLater(n.setStyle(Styles.backgroundColor(color)))

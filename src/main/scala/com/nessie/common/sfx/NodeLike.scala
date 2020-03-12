@@ -1,14 +1,14 @@
-package com.nessie.view.sfx
+package com.nessie.common.sfx
 
 import javafx.scene.{control => jfxsc, layout => jfxl, Node => JNode}
 import scalafx.scene.{control => sfxsc, layout => sfxl, Node => SNode}
 
-private trait NodeLike[N] {
+trait NodeLike[N] {
   def javaNode(n: N): JNode
   def scalaNode(n: N): SNode
 }
 
-private object NodeLike {
+object NodeLike {
   implicit def scalaNodeLike[N <: SNode]: NodeLike[N] = new NodeLike[N] {
     override def javaNode(n: N): JNode = n.delegate
     override def scalaNode(n: N): SNode = n

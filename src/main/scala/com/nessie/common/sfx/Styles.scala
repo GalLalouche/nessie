@@ -1,6 +1,6 @@
-package com.nessie.view.sfx
+package com.nessie.common.sfx
 
-private object Styles {
+object Styles {
   def style(property: String, value: String): String = s"$property: $value"
   val FontWeight = "-fx-font-weight"
   def fontWeight(value: String): String = style(FontWeight, value)

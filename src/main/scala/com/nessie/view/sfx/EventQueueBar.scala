@@ -1,8 +1,10 @@
 package com.nessie.view.sfx
 
+import com.nessie.common.sfx.NodeUtils
 import com.nessie.gm.{GameState, UnitTurn}
 import com.nessie.model.units.CombatUnit
-import com.nessie.view.sfx.RichNode._
+import com.nessie.common.sfx.RichNode._
+
 import common.rich.func.MoreIterableInstances
 import rx.lang.scala.Observable
 import scalafx.scene.control.Label
