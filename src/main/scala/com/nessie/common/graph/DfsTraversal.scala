@@ -1,17 +1,17 @@
 package com.nessie.common.graph
 
 import com.nessie.common.rng.Rngable
+import com.nessie.common.rng.Rngable.{RngableIterable, RngableOption}
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
 import common.rich.RichT._
-import common.rich.collections.LazyIterable
 
 object DfsTraversal {
   private case class Aux[A: Ordering](graph: Graph[A, UnDiEdge], path: List[A], visited: Set[A]) {
     def head: A = path.head
-    def next: Rngable[Option[Aux[A]]] = {
+    def next: RngableOption[Aux[A]] = {
       val head :: tail = path
       if (visited(head)) copy(path = tail).next else {
         // Sorting is required for reproducibility.
@@ -24,7 +24,7 @@ object DfsTraversal {
   }
 
   // A: Ordering is required for reproducibility.
-  def apply[A: Ordering](graph: Graph[A, UnDiEdge], startingPoint: A): Rngable[LazyIterable[A]] = Rngable
+  def apply[A: Ordering](graph: Graph[A, UnDiEdge], startingPoint: A): RngableIterable[A] = Rngable
       .iterateOptionally(Aux[A](graph, List(startingPoint), Set.empty))(_.next)
       .map(_.map(_.head))
 }

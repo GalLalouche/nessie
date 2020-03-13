@@ -1,5 +1,6 @@
 package com.nessie.common.rng
 
+import com.nessie.common.rng.Rngable.RngableOption
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import org.scalatest.PropSpec
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
@@ -98,7 +99,7 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     })
   }
 
-  private def someAddBinaryRngable(e: Int): Rngable[Option[Int]] = addBinaryRngable(e).map(Some.apply)
+  private def someAddBinaryRngable(e: Int): RngableOption[Int] = addBinaryRngable(e).map(Some.apply)
   property("Rngable.iterateOptionally") {
     forAll((rng: StdGen) => {
       val $ = Rngable.iterateOptionally(1)(

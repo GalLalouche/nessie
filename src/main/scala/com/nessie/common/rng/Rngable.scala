@@ -61,6 +61,8 @@ class Rngable[A](private val free: Free[Generator, A]) {
 }
 
 object Rngable {
+  type RngableIterable[A] = Rngable[LazyIterable[A]]
+  type RngableOption[A] = Rngable[Option[A]]
   def pure[A](a: A): Rngable[A] = Generator((a, _)).lift
 
   def fromRandom[A](f: Random => A): Rngable[A] = Generator {std =>
@@ -120,20 +122,20 @@ object Rngable {
   // The default implementation using TraversableInstances would never terminate, so we cheat a little bit
   // by constructing an Rngable from a StdGen and reusing that source.
   // TODO This should exist all Monads, shouldn't it?
-  def iterate[A](a: A)(f: A => Rngable[A]): Rngable[LazyIterable[A]] = Rngable.fromStdGen {
+  def iterate[A](a: A)(f: A => Rngable[A]): RngableIterable[A] = Rngable.fromStdGen {
     stdGen =>
       LazyIterable.iterate((a, stdGen)) {
         case (current, g) => f(current).random(g)
       }.map(_._1)
   }
-  def iterateOptionally[A](a: A)(f: A => Rngable[Option[A]]): Rngable[LazyIterable[A]] = Rngable.fromStdGen {
+  def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] = Rngable.fromStdGen {
     stdGen =>
       LazyIterable.iterate((Option(a), stdGen)) {
         case (current, g) => f(current.get).random(g)
       }.map(_._1).takeWhile(_.isDefined).map(_.get)
   }
 
-  def tryNTimes[A](n: Int)(r: => Rngable[Option[A]]): Rngable[Option[A]] =
+  def tryNTimes[A](n: Int)(r: => RngableOption[A]): RngableOption[A] =
     if (n == 0) pure(None) else r.flatMap {
       case None => tryNTimes(n - 1)(r)
       case Some(x) => pure(Some(x))

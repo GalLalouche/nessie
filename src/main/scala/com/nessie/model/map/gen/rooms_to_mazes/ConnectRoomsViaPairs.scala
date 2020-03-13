@@ -3,6 +3,7 @@ package com.nessie.model.map.gen.rooms_to_mazes
 import com.nessie.common.graph.DfsTraversal
 import com.nessie.common.graph.RichUndirected._
 import com.nessie.common.rng.Rngable
+import com.nessie.common.rng.Rngable.{RngableIterable, RngableOption}
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.{BattleMap, FullWall, MapPoint}
 
@@ -25,7 +26,7 @@ import common.uf.ImmutableUnionFind
 private object ConnectRoomsViaPairs {
   def go(map: BattleMap): Rngable[BattleMap] = iterate(map).map(_.last)
 
-  def iterate(map: BattleMap): Rngable[LazyIterable[BattleMap]] = Rngable.iterateOptionally(
+  def iterate(map: BattleMap): RngableIterable[BattleMap] = Rngable.iterateOptionally(
     new Aux(
       map = map,
       rooms = ImmutableUnionFind(
@@ -39,7 +40,7 @@ private object ConnectRoomsViaPairs {
       rooms: ImmutableUnionFind[Int],
       index: Int,
   ) {
-    def next: Rngable[Option[Aux]] = if (rooms.numberOfSets == 1) Rngable.pure(None) else for {
+    def next: RngableOption[Aux] = if (rooms.numberOfSets == 1) Rngable.pure(None) else for {
       (r1, r2) <- rooms.values.unorderedPairs.toIterator.filterNot(_ reduce rooms.sameSet).sample
       (map, rooms) <- Connector(map, rooms, r1, r2, RoomMapObject.getRooms(map), index).go
     } yield Some(new Aux(map, rooms, index + 1))

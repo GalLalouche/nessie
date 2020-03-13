@@ -2,15 +2,17 @@ package com.nessie.model.map.gen.cellular_automata
 
 import com.nessie.common.graph.AStarTraversal
 import com.nessie.common.rng.Rngable
+import com.nessie.common.rng.Rngable.RngableOption
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.BattleMap
 import com.nessie.model.map.gen.MapIterator
+
 import common.rich.RichT._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.primitives.RichBoolean._
 
 private class CellularDigger(private val map: BattleMap, caves: Caves) {
-  def next: Rngable[Option[CellularDigger]] = if (caves.isConnected) Rngable.pure(None) else {
+  def next: RngableOption[CellularDigger] = if (caves.isConnected) Rngable.pure(None) else {
     val pairs =
       caves.uf.values.unorderedPairs.filterNot(Function tupled caves.areConnected).toVector.sorted
     for {

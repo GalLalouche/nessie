@@ -4,10 +4,9 @@ import java.awt.image.BufferedImage
 import java.awt.Color
 
 import com.nessie.common.rng.Rngable
+import com.nessie.common.rng.Rngable.{RngableIterable, RngableOption}
 import com.nessie.model.map.{BattleMap, Direction, GridSize, MapPoint}
 import com.nessie.model.map.gen.bsp.Rooms.Room
-
-import common.rich.collections.LazyIterable
 
 private class Rooms private(
     val mp: MapPartitioning,
@@ -19,7 +18,7 @@ private class Rooms private(
     $
   }
   def toBattleMap: BattleMap = ???
-  def next: Rngable[Option[Rooms]] = remainingPartitions match {
+  def next: RngableOption[Rooms] = remainingPartitions match {
     case Nil => Rngable.pure(None)
     case ::(head, tl) => for {
       padLeft <- Rngable.intRange(0, head.size.width / 3)
@@ -51,6 +50,6 @@ private object Rooms {
       } $.setRGB(x, y, Color.GRAY.getRGB)
     }
   }
-  def apply(mp: MapPartitioning): Rngable[LazyIterable[Rooms]] =
+  def apply(mp: MapPartitioning): RngableIterable[Rooms] =
     Rngable.iterateOptionally(new Rooms(mp, Nil, mp.getPartitions))(_.next)
 }

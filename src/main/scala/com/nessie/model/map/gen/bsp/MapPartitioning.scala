@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage
 import java.awt.Color
 
 import com.nessie.common.rng.Rngable
+import com.nessie.common.rng.Rngable.RngableOption
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.{BattleMap, GridSize, MapPoint}
 import com.nessie.model.map.Direction.{Down, Right}
@@ -19,7 +20,7 @@ private class MapPartitioning private(tree: Tree, gs: GridSize) {
   ) <| tree.updateImage
 
   def toMap: BattleMap = ???
-  def split: Rngable[Option[MapPartitioning]] = tree.split.map(_.map(new MapPartitioning(_, gs)))
+  def split: RngableOption[MapPartitioning] = tree.split.map(_.map(new MapPartitioning(_, gs)))
 
   def getPartitions: List[Partition] = tree.toPartitions.toList
 }
@@ -37,7 +38,7 @@ private object MapPartitioning {
     def toPartitions: Iterator[Partition]
     def updateImage($: BufferedImage): Unit
 
-    def split: Rngable[Option[Tree]]
+    def split: RngableOption[Tree]
   }
 
   def hasValidDimensions(gs: GridSize) =
@@ -93,7 +94,7 @@ private object MapPartitioning {
     val c2 = t2.center
     assert(c1.x == c2.x || c1.y == c1.y)
 
-    private def splitRight: Rngable[Option[Tree]] = t2.split.map {
+    private def splitRight: RngableOption[Tree] = t2.split.map {
       case None => None
       case Some(x) => Some(Split(t1, x, startOnRight = true))
     }
