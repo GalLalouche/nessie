@@ -2,15 +2,17 @@ package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.common.rng.Rngable
 import com.nessie.model.map.{BattleMap, FullWall, MapPoint}
+
+import common.rich.func.MoreIterableInstances._
+import common.rich.func.ToMoreMonadPlusOps._
+
 import common.rich.RichT._
-import common.rich.func.{MoreIterableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
 
 /**
  * Creates a BattleMap made up of just non-overlapping rooms. At the end of this procedure the
  * resulting [[BattleMap]] will be made up of [[FullWall]]s and [[RoomMapObject]]s.
  */
-private object ConnectRooms
-    extends ToMoreFoldableOps with ToMoreMonadPlusOps with MoreIterableInstances {
+private object ConnectRooms {
   def go(map: BattleMap): Rngable[BattleMap] = {
     // TODO fix ToMoreMonadPlusOps.select to work with tuples
     Aux(

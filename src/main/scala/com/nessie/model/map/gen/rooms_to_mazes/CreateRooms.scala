@@ -1,21 +1,18 @@
 package com.nessie.model.map.gen.rooms_to_mazes
 
 import com.nessie.common.rng.Rngable
-import com.nessie.common.rng.Rngable.ToRngableOps
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.{BattleMap, FullWall, MapPoint}
+
 import common.rich.collections.RichSeq._
 import common.rich.collections.RichTraversableOnce._
 import common.rich.RichT._
-import common.rich.func.ToMoreFoldableOps
-import scalaz.std.OptionInstances
-import scalaz.syntax.ToMonadOps
 
 /**
  * Creates a BattleMap made up of just non-overlapping rooms. At the end of this procedure the resulting
  * [[BattleMap]] will be made up of [[FullWall]]s and [[RoomMapObject]]s.
  */
-private object CreateRooms
-    extends ToMoreFoldableOps with OptionInstances {
+private object CreateRooms {
   def go(
       initialMap: BattleMap,
       minRoomWidth: Int, maxRoomWidth: Int,
@@ -42,7 +39,7 @@ private object CreateRooms
       mapWidth: Int, mapHeight: Int,
       rooms: List[Room], maxAttempts: Int,
       allowAdjacentRooms: Boolean,
-  )(implicit rngableRoom: Rngable[Room]) extends ToMonadOps with ToRngableOps {
+  )(implicit rngableRoom: Rngable[Room]) {
     private def isValid(room: Room): Boolean = room.x + room.w < mapWidth && room.y + room.h < mapHeight
     private def isNonOverlapping(room: Room): Boolean =
       rooms.fornone(_.isOverlapping(room)) && (allowAdjacentRooms || rooms.fornone(_.isAdjacent(room)))

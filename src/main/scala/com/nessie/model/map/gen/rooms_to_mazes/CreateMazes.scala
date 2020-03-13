@@ -1,13 +1,12 @@
 //package com.nessie.model.map.gen
 //
 //import com.nessie.common.rng.Rngable
-//import com.nessie.common.rng.Rngable.ToRngableOps
+//import com.nessie.common.rng.Rngable.ToRngableOps._
 //import com.nessie.model.map.{BattleMap, DirectionalMapPoint, EmptyMapObject, FullWall, MapPoint}
 //import common.rich.RichT._
-//import common.rich.func.ToMoreFoldableOps
-//
-//import scalaz.std.OptionInstances
-//import scalaz.syntax.ToMonadOps
+//import common.rich.func.ToMoreFoldableOps._
+//import scalaz.std.option.optionInstance
+//import scalaz.syntax.monad.ToMonadOps
 //
 ///**
 // * Fills up the locations between the rooms. This is done by selecting a random non-room point in the graph
@@ -15,11 +14,10 @@
 // * At the end of this procedure all the points in the resulting BattleMap will be either [[RoomMapObject]] or
 // * [[TunnelMapObject]].
 // */
-//private object CreateMazes extends ToMoreFoldableOps with OptionInstances {
+//private object CreateMazes {
 //  def go(map: BattleMap): Rngable[BattleMap] = new Aux(nonEmptyPoints(map), map).finish
 //
-//  private class Aux(remainingCells: Set[MapPoint], result: BattleMap)
-//      extends ToMonadOps with ToRngableOps with ToMoreFoldableOps with OptionInstances {
+//  private class Aux(remainingCells: Set[MapPoint], result: BattleMap) {
 //    private def dig(mp: MapPoint): Rngable[Aux] = new Digger(result, List(mp), 0).dig
 //        .map(newMap => new Aux(nonEmptyPoints(newMap), newMap))
 //    def finish: Rngable[BattleMap] =

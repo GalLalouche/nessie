@@ -1,12 +1,11 @@
 package com.nessie.common
 
-import common.rich.func.MoreSeqInstances
-import scalaz.{Foldable, MonadPlus, Monoid}
-
 import scala.collection.immutable.IndexedSeq
 
+import scalaz.{Foldable, MonadPlus, Monoid}
+
 // TODO move to ScalaCommon
-object EnumUtils extends MoreSeqInstances {
+object EnumUtils {
   implicit object IndexedSeqEv extends MonadPlus[IndexedSeq] with Foldable[IndexedSeq] {
     override def bind[A, B](fa: IndexedSeq[A])(f: A => IndexedSeq[B]) = fa flatMap f
     override def point[A](a: => A) = IndexedSeq(a)

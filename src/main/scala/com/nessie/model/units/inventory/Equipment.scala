@@ -1,10 +1,10 @@
 package com.nessie.model.units.inventory
 
 import com.nessie.common.EnumUtils._
-import scalaz.syntax.ToFunctorOps
 
-class Equipment private(equippedItems: Map[EquipSlot, EquippableItem])
-    extends ToFunctorOps {
+import scalaz.syntax.functor.ToFunctorOps
+
+class Equipment private(equippedItems: Map[EquipSlot, EquippableItem]) {
   def apply(es: EquipSlot): Option[EquippableItem] = equippedItems get es
   def equip(item: EquippableItem): Equipment = {
     val defaults = EquipSlot.default(item.equipType)

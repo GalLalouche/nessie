@@ -1,13 +1,13 @@
 package com.nessie.model.map.gen.mob
 
 import com.nessie.common.rng.Rngable
-import com.nessie.common.rng.Rngable.ToRngableOps
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.gen.MapIterator
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.units.{Warrior, Zombie}
 import common.rich.collections.LazyIterable
 
-object DemoMobPlacer extends MobPlacer with ToRngableOps {
+object DemoMobPlacer extends MobPlacer {
   // Step 1: pick a nice open area to place the player
   // Step 2: pick another nicer open area, far enough from the first, to place monsters
   // Step 3: Profit

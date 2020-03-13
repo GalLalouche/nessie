@@ -5,14 +5,14 @@ import com.nessie.model.units.CombatUnit
 import rx.lang.scala.Observable
 import scalafx.scene.input.MouseEvent
 
-import scalaz.syntax.ToFunctorOps
-import common.rich.func.{MoreObservableInstances, TuplePLenses}
+import scalaz.syntax.functor.ToFunctorOps
+import common.rich.func.MoreObservableInstances._
+import common.rich.func.TuplePLenses
 
 import common.rich.RichObservable
 import common.rich.RichTuple._
 
-object NodeUtils
-    extends ToFunctorOps with MoreObservableInstances {
+object NodeUtils {
   def mouseEvents[Key, N: NodeLike](ns: Traversable[(Key, N)]): Observable[(MouseEvent, Key)] = {
     val keyedObservables: Iterator[(Key, Observable[MouseEvent])] = ns.toIterator
         .map(TuplePLenses.tuple2Second.modify(implicitly[NodeLike[N]].scalaNode(_).mouseEvents))

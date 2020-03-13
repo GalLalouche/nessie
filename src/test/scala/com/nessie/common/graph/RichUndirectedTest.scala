@@ -1,17 +1,18 @@
 package com.nessie.common.graph
 
 import com.nessie.common.graph.RichUndirected._
-import common.test.AuxSpecs
-import common.rich.RichTuple._
-import common.rich.collections.RichTraversableOnce._
+import org.scalatest.{FreeSpec, OneInstancePerTest}
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.time.Span
-import org.scalatest.{FreeSpec, OneInstancePerTest}
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
 import scalax.collection.immutable.Graph
 
 import scala.concurrent.duration.DurationInt
+
+import common.rich.RichTuple._
+import common.rich.collections.RichTraversableOnce._
+import common.test.AuxSpecs
 
 class RichUndirectedTest extends FreeSpec with AuxSpecs with TimeLimitedTests with OneInstancePerTest {
   override def timeLimit = Span.convertDurationToSpan(1.second)

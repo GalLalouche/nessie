@@ -3,17 +3,14 @@ package com.nessie.gm
 import com.nessie.gm.GameStateChange.{ActionTaken, NoOp}
 import com.nessie.gm.TurnAction.{ActualAction, EndTurn, MovementAction, StartTurn}
 import com.nessie.model.units.Owner._
-import common.rich.func.ToMoreFoldableOps
-import monocle.syntax.ApplySyntax
 
-import scalaz.std.OptionInstances
+import monocle.syntax.apply._
 
 /**
  * A GameMaster runs the game. It keeps the current state of the game, and can fetch the next state, either
  * by making applying a natural event, making an AI movie, or ask the user for input.
  */
-private class GameMaster private(playerInput: PlayerInput) extends ApplySyntax
-    with ToMoreFoldableOps with OptionInstances {
+private class GameMaster private(playerInput: PlayerInput) {
   private val ai = CatcherAI
 
   private def nextState(gs: GameState): (GameStateChange, GameState) = {

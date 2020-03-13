@@ -1,9 +1,12 @@
 package com.nessie.model.map
 
 import com.nessie.common.graph.Metric
+
+import scala.annotation.tailrec
+
 import common.rich.primitives.RichDouble._
 
-case class MapPoint(x: Int, y: Int) {
+final case class MapPoint(x: Int, y: Int) {
   def euclideanDistanceTo(p: MapPoint): Double = ((x - p.x).sq + (y - p.y).sq).sqrt
 
   def manhattanDistanceTo(unitLocation: MapPoint): Int =
@@ -15,6 +18,8 @@ case class MapPoint(x: Int, y: Int) {
     case Direction.Left => MapPoint(x - 1, y)
     case Direction.Right => MapPoint(x + 1, y)
   }
+  @tailrec def go(d: Direction, amount: Int): MapPoint =
+    if (amount == 0) this else go(d).go(d, amount - 1)
 
   // Opt for performance over pretty code
   lazy val neighbors: Iterable[MapPoint] = Array((x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y))

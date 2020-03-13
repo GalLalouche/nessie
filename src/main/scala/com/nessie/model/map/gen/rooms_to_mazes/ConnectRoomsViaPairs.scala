@@ -3,25 +3,26 @@ package com.nessie.model.map.gen.rooms_to_mazes
 import com.nessie.common.graph.DfsTraversal
 import com.nessie.common.graph.RichUndirected._
 import com.nessie.common.rng.Rngable
-import com.nessie.common.rng.Rngable.ToRngableOps
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.{BattleMap, FullWall, MapPoint}
+
+import scalaz.syntax.functor.ToFunctorOps
+import common.rich.func.MoreIterableInstances._
+import common.rich.func.MoreSeqInstances._
+import common.rich.func.ToMoreMonadPlusOps._
+
 import common.rich.RichT._
 import common.rich.RichTuple._
 import common.rich.collections.LazyIterable
 import common.rich.collections.RichTraversableOnce._
-import common.rich.func.{MoreIterableInstances, MoreSeqInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
 import common.uf.ImmutableUnionFind
-
-import scalaz.syntax.ToFunctorOps
 
 /**
  * Connects rooms by iterating over pairs of unconnected rooms and digging a random path from one room to
  * another. Completes when all rooms are connected together, at which point the resulting [[BattleMap]] will
  * be made up of [[RoomMapObject]]s, [[TunnelMapObject]]s, and [[FullWall]]s.
  */
-private object ConnectRoomsViaPairs
-    extends ToMoreFoldableOps with ToMoreMonadPlusOps with MoreIterableInstances with ToRngableOps
-        with ToFunctorOps with MoreSeqInstances {
+private object ConnectRoomsViaPairs {
   def go(map: BattleMap): Rngable[BattleMap] = iterate(map).map(_.last)
 
   def iterate(map: BattleMap): Rngable[LazyIterable[BattleMap]] = Rngable.iterateOptionally(

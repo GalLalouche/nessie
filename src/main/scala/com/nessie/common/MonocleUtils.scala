@@ -3,11 +3,11 @@ package com.nessie.common
 import scala.language.higherKinds
 
 import scalaz.Apply
-import scalaz.syntax.ToApplicativeOps
+import scalaz.syntax.apply._
 import monocle.{Iso, Lens, PLens}
-import monocle.std.FunctionOptics
+import monocle.std.function._
 
-object MonocleUtils extends ToApplicativeOps with FunctionOptics {
+object MonocleUtils {
   // Unsafe
   def castingIso[A, B <: A]: Iso[A, B] = Iso[A, B](_.asInstanceOf[B])(identity)
   def unsafeLens[A, B](f: A => Option[B])(g: B => A => Option[A]): Lens[A, B] = {

@@ -5,18 +5,18 @@ import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.model.map.{CombatUnitObject, MapPoint}
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{AbilityToTurnAction, CanBeUsed}
+import com.nessie.view.zirconview.{Instructions, InstructionsPanel, MapPointHighlighter}
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.input.MovementLayer.MovementLayerAction
 import com.nessie.view.zirconview.map.ZirconMap
-import com.nessie.view.zirconview.{Instructions, InstructionsPanel, MapPointHighlighter}
 import com.nessie.view.zirconview.screen.ZirconScreen
-import common.rich.RichT._
-import common.rich.func.{MoreObservableInstances, ToMoreFunctorOps, ToMoreMonadPlusOps}
-import org.hexworks.zircon.api.screen.Screen
 import org.hexworks.zircon.api.uievent.KeyCode
 
-import scalaz.concurrent.Task
 import scalaz.{-\/, \/-}
+import scalaz.concurrent.Task
+import common.rich.func.ToMoreFunctorOps._
+
+import common.rich.RichT._
 
 private[zirconview] class ZirconPlayerInput(
     screen: ZirconScreen,
@@ -24,8 +24,7 @@ private[zirconview] class ZirconPlayerInput(
     instructionsPanel: InstructionsPanel,
     screenDrawer: () => Unit,
     highlighter: MapPointHighlighter,
-) extends ToMoreMonadPlusOps with MoreObservableInstances
-    with ToMoreFunctorOps {
+) {
   def nextState(currentlyPlayingUnit: CombatUnit, gs: GameState): Task[TurnAction] = {
     val promise = PromiseZ[TurnAction]()
     val location = CombatUnitObject.findIn(currentlyPlayingUnit, gs.map).get

@@ -9,14 +9,15 @@ import org.scalatest.FreeSpec
 import org.scalatest.tags.Slow
 
 import scalaz.concurrent.Task
-import common.rich.func.{MoreIteratorInstances, ToMoreMonadPlusOps}
+import common.rich.func.MoreIteratorInstances._
+import common.rich.func.ToMoreMonadPlusOps._
 
 import common.rich.collections.RichIterator._
-import common.test.AuxSpecs
 import common.rich.RichT._
+import common.test.AuxSpecs
 
 @Slow
-class GameMasterTest extends FreeSpec with AuxSpecs with ToMoreMonadPlusOps with MoreIteratorInstances {
+class GameMasterTest extends FreeSpec with AuxSpecs {
   "If the player always ends the turn doing nothing, eventually all the player units die" in {
     // Tests the AI too.
     def hasRemainingPlayers(gs: GameState): Boolean =

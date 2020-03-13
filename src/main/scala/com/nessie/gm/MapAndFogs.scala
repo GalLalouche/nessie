@@ -5,7 +5,9 @@ import com.nessie.model.map.{BattleMap, CombatUnitObject}
 import com.nessie.model.map.fov.{FogOfWar, TeamFov}
 import com.nessie.model.units.{CombatUnit, Owner}
 
+import scalaz.syntax.functor._
 import common.rich.func.MoreIterableInstances._
+import common.rich.func.MoreIteratorInstances._
 import common.rich.func.ToMoreMonadPlusOps._
 import monocle.Lens
 import monocle.macros.Lenses
@@ -21,9 +23,6 @@ case class MapAndFogs(
 }
 
 object MapAndFogs {
-  import scalaz.syntax.functor._
-  import common.rich.func.MoreIteratorInstances._
-
   def fogForOwner(o: Owner): Lens[MapAndFogs, FogOfWar] =
     MonocleUtils.unsafeCovariance(MapAndFogs.fogsForOwner ^|-> MonocleUtils.unsafeMapLens(o))
 

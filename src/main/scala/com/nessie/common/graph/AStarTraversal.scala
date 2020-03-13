@@ -1,18 +1,19 @@
 package com.nessie.common.graph
 
 import com.nessie.common.rng.Rngable
-import com.nessie.common.rng.Rngable.ToRngableOps
-import common.rich.RichT._
-import common.rich.collections.LazyIterable
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
+
+import common.rich.RichT._
+import common.rich.collections.LazyIterable
 
 object AStarTraversal {
   import com.nessie.common.graph.Metric.Implicits._
 
   private case class Aux[A: Ordering : Metric](
       graph: Graph[A, UnDiEdge], path: List[A], visited: Set[A], destination: A,
-  ) extends ToRngableOps {
+  ) {
     def head: A = path.head
     def next: Rngable[Option[Aux[A]]] = {
       val head :: tail = path

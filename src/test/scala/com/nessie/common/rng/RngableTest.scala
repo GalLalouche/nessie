@@ -1,19 +1,21 @@
 package com.nessie.common.rng
 
-import com.nessie.common.rng.Rngable.ToRngableOps
-import common.test.AuxSpecs
-import common.rich.func.ToMoreFunctorOps
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import org.scalatest.PropSpec
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.time.SpanSugar._
-import scalaz.std.VectorInstances
-import scalaz.syntax.ToTraverseOps
 
 import scala.language.postfixOps
 
-class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with ToRngableOps
-    with ToTraverseOps with VectorInstances with TimeLimitedTests with ToMoreFunctorOps {
+import scalaz.std.vector.vectorInstance
+import scalaz.syntax.traverse.ToTraverseOps
+import common.rich.func.ToMoreFunctorOps._
+
+import common.test.AuxSpecs
+
+class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks
+    with TimeLimitedTests {
   override val timeLimit = 1000 millis
   override val defaultTestSignaler = Signaler(_.stop())
   private case class Person(age: Int, name: String)

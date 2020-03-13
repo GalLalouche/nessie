@@ -4,19 +4,13 @@ import java.io.IOException
 
 import com.nessie.common.PromiseZ
 import com.nessie.common.sfx.NodeUtils
+import com.nessie.common.sfx.RichNode._
 import com.nessie.gm.{GameState, TurnAction}
 import com.nessie.model.map._
 import com.nessie.model.units.CombatUnit
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility}
 import com.nessie.view.sfx.MapGrid._
-import com.nessie.common.sfx.RichNode._
-
-import common.rich.RichT._
-import common.rich.func.{MoreIterableInstances, MoreObservableInstances, ToMoreFunctorOps, TuplePLenses}
 import javafx.{scene => jfxs}
-
-import monocle.Optional
-import monocle.function.Index
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
 import scalafx.beans.property.ObjectProperty
@@ -26,8 +20,13 @@ import scalafx.scene.control.{Button, Label, ScrollPane}
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout._
 
-private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer)
-    extends ToMoreFunctorOps with MoreObservableInstances with MoreIterableInstances {
+import common.rich.func.TuplePLenses
+import monocle.Optional
+import monocle.function.Index
+
+import common.rich.RichT._
+
+private class MapGrid(map: BattleMap, customizer: ScalaFxMapCustomizer) {
   private val cells: Map[MapPoint, BorderPane] = map.objects.map {case (p, o) =>
     p -> MapGrid.createCell(o, customizer).<|(GridPane.setConstraints(_, p.x + 1, p.y + 1))
   }.toMap

@@ -1,10 +1,12 @@
 package com.nessie.model.units
 
 import com.nessie.model.units.abilities.{DamageAbility, MeleeAttack, MoveAbility, UnitAbility}
-import common.rich.func.{MoreIterableInstances, ToMoreMonadPlusOps}
+
+import common.rich.func.MoreIterableInstances._
+import common.rich.func.ToMoreMonadPlusOps._
 import monocle.Lens
 
-trait CombatUnit extends ToMoreMonadPlusOps with MoreIterableInstances {
+trait CombatUnit {
   def hitPoints: HitPoints
   // It is assumed that the actual source (its S) passed to the lens, will be of the correct type, e.g., for
   // PlayerUnit, this type would be PlayerUnit. Otherwise, as ClassCastException will be thrown.

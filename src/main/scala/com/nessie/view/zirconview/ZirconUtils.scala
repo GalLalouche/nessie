@@ -1,12 +1,6 @@
 package com.nessie.view.zirconview
 
 import com.nessie.model.map.GridSize
-import common.rich.RichObservable
-import common.rich.RichObservable.Unsubscribable
-import common.rich.RichT._
-import common.rich.collections.RichIterator._
-import common.rich.func.{MoreObservableInstances, ToMoreFoldableOps, ToMoreMonadPlusOps}
-import monocle.Optional
 import org.hexworks.cobalt.datatypes.Maybe
 import org.hexworks.cobalt.events.api.{CancelledByHand, Subscription}
 import org.hexworks.zircon.api.{Positions, Sizes}
@@ -22,11 +16,18 @@ import rx.lang.scala.Observable
 
 import scala.collection.JavaConverters._
 
-import scalaz.std.OptionInstances
+import scalaz.std.option.optionInstance
+import common.rich.func.MoreObservableInstances._
+import common.rich.func.ToMoreFoldableOps._
+import common.rich.func.ToMoreMonadPlusOps._
+import monocle.Optional
 
-private object ZirconUtils
-    extends ToMoreFoldableOps with OptionInstances
-        with ToMoreMonadPlusOps with MoreObservableInstances {
+import common.rich.RichObservable
+import common.rich.RichObservable.Unsubscribable
+import common.rich.RichT._
+import common.rich.collections.RichIterator._
+
+private object ZirconUtils {
   implicit class RichGridSize(private val $: GridSize) extends AnyVal {
     def toZirconSize: Size = Sizes.create($.width, $.height)
   }

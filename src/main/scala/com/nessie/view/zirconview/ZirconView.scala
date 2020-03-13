@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory
 
 import scalaz.std.option.optionInstance
 import scalaz.syntax.functor.ToFunctorOps
+import common.rich.func.MoreObservableInstances._
+import common.rich.func.ToMoreMonadPlusOps._
 
 import common.rich.RichT._
 

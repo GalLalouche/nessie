@@ -1,15 +1,14 @@
 package com.nessie.model.map
 
 import common.test.AuxSpecs
-import common.rich.func.MoreIterableInstances
+import common.rich.func.MoreIterableInstances._
 import monocle.Lens
 import org.scalatest.FreeSpec
 import org.scalatest.Inspectors._
 import scalax.collection.GraphEdge.UnDiEdge
-import scalaz.syntax.ToFunctorOps
+import scalaz.syntax.functor.ToFunctorOps
 
-abstract class GridLikeTest(factory: GridFactory) extends FreeSpec with AuxSpecs
-    with ToFunctorOps with MoreIterableInstances {
+abstract class GridLikeTest(factory: GridFactory) extends FreeSpec with AuxSpecs {
   private case class GridLikeImpl(grid: Grid[Int]) extends GridLike[GridLikeImpl, Int] {
     override protected def gridLens = Lens[GridLikeImpl, Grid[Int]](_.grid)(grid => _ => GridLikeImpl(grid))
   }

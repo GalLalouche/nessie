@@ -9,8 +9,8 @@
 //
 //import scala.annotation.tailrec
 //
-//import scalaz.std.VectorInstances
-//import scalaz.syntax.ToTraverseOps
+//import scalaz.std.vector.vectorInstance
+//import scalaz.syntax.traverse.ToTraverseOps
 //
 ///**
 // * Outline of algorithm:
@@ -45,7 +45,7 @@
 //      map: BattleMap,
 //      additionalPathProbability: Percentage,
 //      index: Int,
-//  ) extends ToTraverseOps with VectorInstances {
+//  ) {
 //    def finish: Rngable[BattleMap] = {
 //      val walls = perimeterWalls(map)
 //      if (walls.isEmpty) Rngable.pure(map) else for {

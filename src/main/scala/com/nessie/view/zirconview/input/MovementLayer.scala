@@ -4,19 +4,21 @@ import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.view.zirconview.SimpleKeyboardEvents
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.map.MapPointConverter
-import common.rich.RichT._
-import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
 import org.hexworks.zircon.api.Tiles
 import org.hexworks.zircon.api.color.ANSITileColor
 import org.hexworks.zircon.api.graphics.Layer
 import rx.lang.scala.Subscription
 
+import common.rich.func.MoreObservableInstances._
+import common.rich.func.ToMoreMonadPlusOps._
+
+import common.rich.RichT._
+
 private class MovementLayer(val layer: Layer, subscriptions: Subscription*) {
   def clear(): Unit = subscriptions.foreach(_.unsubscribe())
 }
 
-private object MovementLayer
-    extends ToMoreMonadPlusOps with MoreObservableInstances {
+private object MovementLayer {
   sealed trait MovementLayerAction
   case object OpenActionMenu extends MovementLayerAction
   case object Move extends MovementLayerAction

@@ -5,17 +5,17 @@ import com.nessie.model.map.{CombatUnitObject, MapPoint}
 import com.nessie.model.units.{CombatUnit, PlayerUnit}
 import com.nessie.model.units.inventory.Equipment
 import com.nessie.model.units.stats.Stats
-import common.rich.RichT._
-import common.rich.func.ToMoreFoldableOps
 import javafx.scene.control.Label
 import scalafx.scene.layout.VBox
 
 import scala.collection.JavaConverters._
 
-import scalaz.std.OptionInstances
+import scalaz.std.option.optionInstance
+import common.rich.func.ToMoreFoldableOps._
 
-private class PropertiesPane(gs: GameState)
-    extends ToMoreFoldableOps with OptionInstances {
+import common.rich.RichT._
+
+private class PropertiesPane(gs: GameState) {
   val node = new VBox()
 
   val pointHighlighter: Focuser[MapPoint] = new Focuser[MapPoint] {

@@ -4,8 +4,6 @@ import com.nessie.gm.{GameState, GameStateChange, PlayerInput, TurnAction, View}
 import com.nessie.gm.GameStateChange.NoOp
 import com.nessie.model.map.CombatUnitObject
 import com.nessie.model.units.CombatUnit
-import common.rich.RichT._
-import common.rich.func.{MoreObservableInstances, ToMoreMonadPlusOps}
 import javafx.stage.WindowEvent
 import scalafx.Includes._
 import scalafx.application.Platform
@@ -15,9 +13,13 @@ import scalafx.scene.layout.BorderPane
 import scalafx.stage.Stage
 
 import scalaz.concurrent.Task
+import common.rich.func.MoreObservableInstances._
+import common.rich.func.ToMoreMonadPlusOps._
 
-private class ScalaFxView(customizer: ScalaFxViewCustomizer, i: Option[Iterator[GameState]] = None) extends View
-    with MoreObservableInstances with ToMoreMonadPlusOps {
+import common.rich.RichT._
+
+private class ScalaFxView(customizer: ScalaFxViewCustomizer, i: Option[Iterator[GameState]] = None)
+    extends View {
   def this(customizer: ScalaFxViewCustomizer, i: Iterator[GameState]) = this(customizer, Some(i))
   private var stage: Stage = _
   private var mapGrid: MapGrid = _

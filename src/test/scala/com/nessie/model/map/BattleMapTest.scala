@@ -1,15 +1,12 @@
 package com.nessie.model.map
 
 import com.nessie.model.units.{Owner, Warrior}
-import common.test.AuxSpecs
-import common.rich.func.MoreIterableInstances
 import org.scalatest.FreeSpec
 import scalax.collection.GraphEdge.UnDiEdge
 
-import scalaz.syntax.ToFunctorOps
+import common.test.AuxSpecs
 
-class BattleMapTest extends FreeSpec with AuxSpecs
-    with ToFunctorOps with MoreIterableInstances {
+class BattleMapTest extends FreeSpec with AuxSpecs {
   "toGraph" in {
     val g = BattleMap.create(VectorGrid, width = 2, height = 3)
         .place(MapPoint(0, 1), FullWall)

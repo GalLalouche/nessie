@@ -1,18 +1,19 @@
 package com.nessie.model.map
 
-import common.rich.func.MoreIterableInstances
-import common.rich.primitives.RichBoolean._
-import common.rich.RichT._
-import monocle.Lens
 import scalax.collection.GraphEdge.UnDiEdge
 import scalax.collection.GraphPredef._
 import scalax.collection.immutable.Graph
-import scalaz.syntax.ToFunctorOps
 
 import scala.language.higherKinds
 
-trait GridLike[G, A]
-    extends ToFunctorOps with MoreIterableInstances {self: G =>
+import scalaz.syntax.functor.ToFunctorOps
+import common.rich.func.MoreIterableInstances._
+import monocle.Lens
+
+import common.rich.primitives.RichBoolean._
+import common.rich.RichT._
+
+trait GridLike[G, A] {self: G =>
   protected def gridLens: Lens[G, Grid[A]]
   private def grid: Grid[A] = gridLens.get(this)
   def width: Int = grid.width

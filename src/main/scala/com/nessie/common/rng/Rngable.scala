@@ -28,14 +28,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Adapted from https://github.com/NICTA/rng
 package com.nessie.common.rng
 
-import common.Percentage
-import common.rich.collections.LazyIterable
-import common.rich.collections.RichSeq._
-
 import scala.math.Ordering.Implicits._
 import scala.util.Random
 
 import scalaz.{-\/, \/-, Free, Monad}
+
+import common.Percentage
+import common.rich.collections.LazyIterable
+import common.rich.collections.RichSeq._
 
 class Rngable[A](private val free: Free[Generator, A]) {
   def map[B](f: A => B): Rngable[B] = new Rngable(free map f)
@@ -110,6 +110,7 @@ object Rngable {
       def shuffle: Rngable[Seq[A]] = Rngable.shuffle(xs.toIndexedSeq)
     }
   }
+  object ToRngableOps extends ToRngableOps
 
   implicit object ScalazInstances extends Monad[Rngable] {
     override def point[A](a: => A): Rngable[A] = Rngable.pure(a)
@@ -131,4 +132,10 @@ object Rngable {
         case (current, g) => f(current.get).random(g)
       }.map(_._1).takeWhile(_.isDefined).map(_.get)
   }
+
+  def tryNTimes[A](n: Int)(r: => Rngable[Option[A]]): Rngable[Option[A]] =
+    if (n == 0) pure(None) else r.flatMap {
+      case None => tryNTimes(n - 1)(r)
+      case Some(x) => pure(Some(x))
+    }
 }

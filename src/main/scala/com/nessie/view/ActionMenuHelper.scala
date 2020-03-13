@@ -3,14 +3,14 @@ package com.nessie.view
 import com.nessie.gm.GameState
 import com.nessie.model.map.{CombatUnitObject, MapPoint}
 import com.nessie.model.units.abilities.{CanBeUsed, MoveAbility, UnitAbility}
+
+import scalaz.std.vector.vectorInstance
+import scalaz.syntax.functor.ToFunctorOps
+
 import common.rich.RichT._
 import common.rich.primitives.RichBoolean._
 
-import scalaz.std.{OptionInstances, VectorInstances}
-import scalaz.syntax.ToFunctorOps
-
-private object ActionMenuHelper
-    extends ToFunctorOps with VectorInstances with OptionInstances {
+private object ActionMenuHelper {
   type IsDisabled = Boolean
   def usableAbilities(gs: GameState)(src: MapPoint, dst: MapPoint): Seq[(UnitAbility, IsDisabled)] = {
     val unitTurn = gs.currentTurn.get

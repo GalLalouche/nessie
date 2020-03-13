@@ -5,16 +5,14 @@ import com.nessie.model.map.BattleMap
 import com.nessie.view.zirconview.{ComponentWrapper, OnBuildWrapper, PanelPlacer, ZirconConstants}
 import com.nessie.view.zirconview.ZirconUtils._
 import com.nessie.view.zirconview.screen.DebugButtonPanel.StepperWrapper
-import common.rich.primitives.RichBoolean._
-import common.rich.RichT._
-import common.rich.func.ToMoreFoldableOps
 import org.hexworks.zircon.api.{Components, Positions}
 import org.hexworks.zircon.api.component.{Button, CheckBox, Component, Panel}
 import rx.lang.scala.{Observable, Subject}
 
 import scala.collection.JavaConverters._
 
-import scalaz.std.OptionInstances
+import common.rich.primitives.RichBoolean._
+import common.rich.RichT._
 
 private class DebugButtonPanel private(
     stepperWrapper: StepperWrapper,
@@ -53,8 +51,7 @@ private class DebugButtonPanel private(
   def debugButtons: Observable[DebugButton] = debugButtonsSubject
 }
 
-private object DebugButtonPanel
-    extends ToMoreFoldableOps with OptionInstances {
+private object DebugButtonPanel {
   private[this] def buildPanel(pp: PanelPlacer, bps: OnBuildWrapper[_ <: Component, _]*): Panel =
     Components.panel
         .withTitle("Debug")

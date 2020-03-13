@@ -1,7 +1,8 @@
 //package com.nessie.model.map.gen
 //
 //import com.nessie.model.map.{BattleMap, MapPoint}
-//import common.rich.func.{MoreIterableInstances, ToMoreMonadPlusOps}
+//import common.rich.func.MoreIterableInstances._
+//import common.rich.func.ToMoreMonadPlusOps._
 //
 //import scala.annotation.tailrec
 //import com.nessie.model.map.FullWall
@@ -14,7 +15,7 @@
 // * the original objects (probably [[ReachableMapObject]] if [[ConnectRoomsAndMazes]] was used before) and
 // * [[FullWall]]s.
 // */
-//private object RemoveDeadEnds extends ToMoreMonadPlusOps with MoreIterableInstances {
+//private object RemoveDeadEnds {
 //  def apply(map: BattleMap): BattleMap = {
 //    @tailrec
 //    def aux(map: BattleMap, deadEnds: Iterable[MapPoint]): BattleMap = {
