@@ -8,32 +8,33 @@ import com.nessie.common.rng.Rngable.{RngableIterable, RngableOption}
 import com.nessie.model.map.{BattleMap, Direction, GridSize, MapPoint}
 import com.nessie.model.map.gen.bsp.Rooms.Room
 
+import scalaz.syntax.monad.ToMonadOps
+import scalaz.OptionT
+
+import common.rich.RichT._
+
 private class Rooms private(
     val mp: MapPartitioning,
     rooms: List[Room],
     remainingPartitions: List[Partition]) {
-  def toImage: BufferedImage = {
-    val $ = mp.toImage
-    rooms.foreach(_.updateImage($))
-    $
-  }
+  def toImage: BufferedImage = mp.toImage.<|(i => rooms.foreach(_.updateImage(i)))
   def toBattleMap: BattleMap = ???
   def next: RngableOption[Rooms] = remainingPartitions match {
-    case Nil => Rngable.pure(None)
-    case ::(head, tl) => for {
+    case Nil => Rngable.none
+    case head :: tl => (for {
       padLeft <- Rngable.intRange(0, head.size.width / 3)
       padRight <- Rngable.intRange(0, head.size.width / 3)
       padTop <- Rngable.intRange(0, head.size.height / 3)
       padBottom <- Rngable.intRange(0, head.size.width / 3)
-    } yield {
-      val roomTopLeft = head.topLeftCorner.go(Direction.Down, padTop)
+      roomTopLeft = head.topLeftCorner.go(Direction.Down, padTop)
           .go(Direction.Right, padLeft)
+    } yield {
       val width = head.size.width - padLeft - padRight
       val height = head.size.height - padTop - padBottom
       val roomSize = GridSize(width, height)
       val room = Room(head, roomTopLeft, roomSize)
-      Some(new Rooms(mp, room :: rooms, tl))
-    }
+      new Rooms(mp, room :: rooms, tl)
+    }).liftM[OptionT]
   }
 }
 private object Rooms {

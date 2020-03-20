@@ -1,6 +1,5 @@
 package com.nessie.common.rng
 
-import com.nessie.common.rng.Rngable.RngableOption
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import org.scalatest.PropSpec
 import org.scalatest.concurrent.{Signaler, TimeLimitedTests}
@@ -10,7 +9,9 @@ import org.scalatest.time.SpanSugar._
 import scala.language.postfixOps
 
 import scalaz.std.vector.vectorInstance
+import scalaz.syntax.monad.ToMonadOps
 import scalaz.syntax.traverse.ToTraverseOps
+import scalaz.OptionT
 import common.rich.func.ToMoreFunctorOps._
 
 import common.test.AuxSpecs
@@ -99,11 +100,11 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     })
   }
 
-  private def someAddBinaryRngable(e: Int): RngableOption[Int] = addBinaryRngable(e).map(Some.apply)
+  private def someAddBinaryRngable(e: Int): Rngable[Int] = addBinaryRngable(e)
   property("Rngable.iterateOptionally") {
     forAll((rng: StdGen) => {
       val $ = Rngable.iterateOptionally(1)(
-        e => if (e >= 10) Rngable.pure(None) else someAddBinaryRngable(e)
+        e => Rngable.when(e < 10)(someAddBinaryRngable(e))
       ).mkRandom(rng)
       val vector = $.toVector
       verifyIncreasing(vector)
@@ -114,13 +115,54 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   }
   property("Rngable.iterateOptionally on infinite") {
     forAll((rng: StdGen) => {
-      val $ = Rngable.iterateOptionally(1)(someAddBinaryRngable)
+      val $ = Rngable.iterateOptionally(1)(someAddBinaryRngable(_).liftM[OptionT])
           .map(_.take(20))
           .mkRandom(rng)
       val vector = $.toVector
       verifyIncreasing(vector)
       vector.size shouldReturn 20
       vector shouldReturn $.toVector
+    })
+  }
+
+  property("Rngable.tryNTimes returns None on failure") {
+    forAll((rng: StdGen) => {
+      val $ = Rngable.tryNTimes(10)(Rngable.none).run.mkRandom(rng)
+      $ shouldReturn None
+    })
+  }
+
+  property("Rngable.tryNTimes tries n times") {
+    forAll((rng: StdGen) => {
+      var i = 1
+      val $ = Rngable.tryNTimes(10) {
+        i += 1
+        Rngable.when(i > 10)(Rngable.pure("foobar"))
+      }.run.mkRandom(rng)
+      $ shouldReturn Some("foobar")
+    })
+  }
+
+  property("Rngable.tryNTimes tries no more than n times") {
+    forAll((rng: StdGen) => {
+      var i = 0
+      val $ = Rngable.tryNTimes(10) {
+        i += 1
+        Rngable.when(i > 10)(Rngable.pure("foobar"))
+      }.run.mkRandom(rng)
+      $ shouldReturn None
+    })
+  }
+
+  property("Rngable.tryNTimes if as first you do succeed, try not to look so surprised") {
+    forAll((rng: StdGen) => {
+      var i = 0
+      val $ = Rngable.tryNTimes(10) {
+        i += 1
+        Rngable.some("foobar")
+      }.run.mkRandom(rng)
+      $ shouldReturn Some("foobar")
+      i shouldReturn 1
     })
   }
 }

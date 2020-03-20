@@ -6,6 +6,8 @@ import com.nessie.common.rng.Rngable.ToRngableOps._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
+import scalaz.OptionT
+
 import common.rich.RichT._
 
 object AStarTraversal {
@@ -17,12 +19,14 @@ object AStarTraversal {
     def head: A = path.head
     def next: RngableOption[Aux[A]] = {
       val head :: tail = path
-      if (head == destination) Rngable.pure(None) else if (visited(head)) copy(path = tail).next else {
+      if (head == destination) Rngable.none
+      else if (visited(head)) copy(path = tail).next
+      else {
         val nextNeighbors = graph.get(head)
             .~|
             .view
             .filterNot(visited)
-        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.pure(None) else nextNeighbors
+        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.none else nextNeighbors
             .map(_.toOuter)
             .groupBy(_.distanceTo(destination))
             .minBy(_._1)
@@ -31,7 +35,7 @@ object AStarTraversal {
             .sorted // Sorting is required to ensure deterministic results.
             .shuffle
             .map(_.toList ++ tail)
-            .map(Aux(graph, _, visited + head, destination).opt)
+            .map(Aux(graph, _, visited + head, destination).opt) |> OptionT.apply
       }
     }
   }

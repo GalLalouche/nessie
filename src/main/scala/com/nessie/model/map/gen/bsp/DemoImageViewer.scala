@@ -23,8 +23,8 @@ private object DemoImageViewer extends JFXApp {
     override def iterator =
       Iterator.iterate(0)(_ + 1).map(f.lift).takeWhile(_.isDefined).map(_.get)
   }
-  private val generator = new Generator(GridSize(50, 50))
-  private val stdGen = StdGen(0)
+  private val generator = new Generator(GridSize(75, 75))
+  private val stdGen = StdGen(2)
   private var currentX = 0
   private var currentWidth: Int = 1
   private var currentY = 0

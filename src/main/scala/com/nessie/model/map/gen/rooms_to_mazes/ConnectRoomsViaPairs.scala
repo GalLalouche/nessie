@@ -40,10 +40,12 @@ private object ConnectRoomsViaPairs {
       rooms: ImmutableUnionFind[Int],
       index: Int,
   ) {
-    def next: RngableOption[Aux] = if (rooms.numberOfSets == 1) Rngable.pure(None) else for {
-      (r1, r2) <- rooms.values.unorderedPairs.toIterator.filterNot(_ reduce rooms.sameSet).sample
-      (map, rooms) <- Connector(map, rooms, r1, r2, RoomMapObject.getRooms(map), index).go
-    } yield Some(new Aux(map, rooms, index + 1))
+    def next: RngableOption[Aux] = Rngable.when(rooms.numberOfSets != 1) {
+      for {
+        (r1, r2) <- rooms.values.unorderedPairs.toIterator.filterNot(_ reduce rooms.sameSet).sample
+        (map, rooms) <- Connector(map, rooms, r1, r2, RoomMapObject.getRooms(map), index).go
+      } yield new Aux(map, rooms, index + 1)
+    }
   }
 
   private case class Connector(

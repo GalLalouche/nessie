@@ -6,6 +6,8 @@ import com.nessie.common.rng.Rngable.ToRngableOps._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
+import scalaz.OptionT
+
 import common.rich.RichT._
 
 object DfsTraversal {
@@ -16,9 +18,9 @@ object DfsTraversal {
       if (visited(head)) copy(path = tail).next else {
         // Sorting is required for reproducibility.
         val nextNeighbors = graph.get(head).~|.filterNot(visited).view.map(_.toOuter).toVector.sorted
-        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.pure(None) else nextNeighbors.shuffle
+        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.none else nextNeighbors.shuffle
             .map(_.toList ++ tail)
-            .map(Aux(graph, _, visited + head).opt)
+            .map(Aux(graph, _, visited + head).opt) |> OptionT.apply
       }
     }
   }

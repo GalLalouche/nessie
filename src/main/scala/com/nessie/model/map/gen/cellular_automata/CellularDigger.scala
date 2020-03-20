@@ -12,22 +12,26 @@ import common.rich.collections.RichTraversableOnce._
 import common.rich.primitives.RichBoolean._
 
 private class CellularDigger(private val map: BattleMap, caves: Caves) {
-  def next: RngableOption[CellularDigger] = if (caves.isConnected) Rngable.pure(None) else {
-    val pairs =
-      caves.uf.values.unorderedPairs.filterNot(Function tupled caves.areConnected).toVector.sorted
-    for {
-      (src, dst) <- pairs.sample
-      start <- src.mapPoints.sample
-      end <- dst.mapPoints.sample
-      t <- AStarTraversal(map.toFullGraph, start, end)
-      tunnelWidth <- PathWidener.Width.values.sample
-    } yield {
-      val path = t.takeWhile(caves.cave(_).forall(caves.areConnected(src, _))).toVector
-      val widenedPath = PathWidener(path, tunnelWidth).toSet
-      val clearedMap = map.mapPoints((p, o) => o.mapIf(widenedPath(p) && o.canMoveThrough.isFalse).to(Tunnel))
-      Some(new CellularDigger(clearedMap, Caves.from(clearedMap)))
+  def next: RngableOption[CellularDigger] =
+    Rngable.unless(caves.isConnected) {
+      val pairs =
+        caves.uf.values.unorderedPairs.filterNot(Function tupled caves.areConnected).toVector.sorted
+      for {
+        (src, dst) <- pairs.sample
+        start <- src.mapPoints.sample
+        end <- dst.mapPoints.sample
+        t <- AStarTraversal(map.toFullGraph, start, end)
+        tunnelWidth <- PathWidener.Width.values.sample
+      } yield {
+        val path = t.takeWhile(caves.cave(_).forall(caves.areConnected(src, _))).toVector
+        val widenedPath = PathWidener(path, tunnelWidth).toSet
+        val clearedMap = map.mapPoints((p, o) =>
+          o.mapIf(widenedPath(p) && o.canMoveThrough.isFalse)
+              .to(Tunnel)
+        )
+        new CellularDigger(clearedMap, Caves.from(clearedMap))
+      }
     }
-  }
 }
 
 private object CellularDigger {

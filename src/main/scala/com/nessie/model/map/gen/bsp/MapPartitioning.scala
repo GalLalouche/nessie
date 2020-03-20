@@ -10,6 +10,8 @@ import com.nessie.model.map.{BattleMap, GridSize, MapPoint}
 import com.nessie.model.map.Direction.{Down, Right}
 import com.nessie.model.map.gen.bsp.MapPartitioning.Tree
 
+import scalaz.OptionT
+
 import common.rich.RichT._
 
 private class MapPartitioning private(tree: Tree, gs: GridSize) {
@@ -20,7 +22,7 @@ private class MapPartitioning private(tree: Tree, gs: GridSize) {
   ) <| tree.updateImage
 
   def toMap: BattleMap = ???
-  def split: RngableOption[MapPartitioning] = tree.split.map(_.map(new MapPartitioning(_, gs)))
+  def split: RngableOption[MapPartitioning] = tree.split.map(new MapPartitioning(_, gs))
 
   def getPartitions: List[Partition] = tree.toPartitions.toList
 }
@@ -48,7 +50,7 @@ private object MapPartitioning {
       override val topLeftCorner: MapPoint, override val gs: GridSize) extends Tree {
     assert(hasValidDimensions(gs))
     override def split = Rngable.tryNTimes(5) {
-      for {
+      val tree: Rngable[Option[Tree]] = for {
         isVertical <- mkRandom[Boolean]
         at <- Rngable.intRange(0, if (isVertical) gs.width else gs.height)
       } yield
@@ -73,6 +75,7 @@ private object MapPartitioning {
           else
             None
         }
+      OptionT(tree)
     }
     override def updateImage($: BufferedImage): Unit = {
       val mp = translate(topLeftCorner)
@@ -94,15 +97,9 @@ private object MapPartitioning {
     val c2 = t2.center
     assert(c1.x == c2.x || c1.y == c1.y)
 
-    private def splitRight: RngableOption[Tree] = t2.split.map {
-      case None => None
-      case Some(x) => Some(Split(t1, x, startOnRight = true))
-    }
+    private def splitRight: RngableOption[Tree] = t2.split.map(Split(t1, _, startOnRight = true))
     override def split =
-      if (startOnRight) splitRight else t1.split.flatMap {
-        case None => splitRight
-        case Some(x) => Rngable.pure(Some(Split(x, t2)))
-      }
+      if (startOnRight) splitRight else t1.split orElse splitRight
     override def updateImage($: BufferedImage): Unit = {
       t1.updateImage($)
       t2.updateImage($)

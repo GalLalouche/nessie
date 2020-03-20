@@ -31,8 +31,10 @@ package com.nessie.common.rng
 import scala.math.Ordering.Implicits._
 import scala.util.Random
 
-import scalaz.{-\/, \/-, Free, Monad}
+import scalaz.{-\/, \/-, Free, Monad, OptionT}
+import scalaz.syntax.monad.ToMonadOps
 
+import common.rich.primitives.RichBoolean._
 import common.Percentage
 import common.rich.collections.LazyIterable
 import common.rich.collections.RichSeq._
@@ -61,8 +63,6 @@ class Rngable[A](private val free: Free[Generator, A]) {
 }
 
 object Rngable {
-  type RngableIterable[A] = Rngable[LazyIterable[A]]
-  type RngableOption[A] = Rngable[Option[A]]
   def pure[A](a: A): Rngable[A] = Generator((a, _)).lift
 
   def fromRandom[A](f: Random => A): Rngable[A] = Generator {std =>
@@ -119,6 +119,20 @@ object Rngable {
     override def bind[A, B](fa: Rngable[A])(f: A => Rngable[B]): Rngable[B] = fa.flatMap(f)
   }
 
+  type RngableIterable[A] = Rngable[LazyIterable[A]]
+  type RngableOption[A] = OptionT[Rngable, A]
+  def none[A]: RngableOption[A] = OptionT.none
+  def some[A](a: A): RngableOption[A] = OptionT.some[Rngable, A](a)
+  // TODO move to MoreOptionTOps or something similar.
+  def when[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = whenM(Rngable.pure(b))(a)
+  def whenM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] = for {
+    b <- bm.liftM[OptionT]
+    result <- if (b) a.liftM[OptionT] else none
+  } yield result
+  def unless[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = when(b.isFalse)(a)
+  def unlessM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] =
+    whenM(bm.map(_.isFalse))(a)
+
   // The default implementation using TraversableInstances would never terminate, so we cheat a little bit
   // by constructing an Rngable from a StdGen and reusing that source.
   // TODO This should exist all Monads, shouldn't it?
@@ -131,13 +145,10 @@ object Rngable {
   def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] = Rngable.fromStdGen {
     stdGen =>
       LazyIterable.iterate((Option(a), stdGen)) {
-        case (current, g) => f(current.get).random(g)
+        case (current, g) => f(current.get).run.random(g)
       }.map(_._1).takeWhile(_.isDefined).map(_.get)
   }
 
   def tryNTimes[A](n: Int)(r: => RngableOption[A]): RngableOption[A] =
-    if (n == 0) pure(None) else r.flatMap {
-      case None => tryNTimes(n - 1)(r)
-      case Some(x) => pure(Some(x))
-    }
+    if (n == 0) none else r.orElse(tryNTimes(n - 1)(r))
 }
