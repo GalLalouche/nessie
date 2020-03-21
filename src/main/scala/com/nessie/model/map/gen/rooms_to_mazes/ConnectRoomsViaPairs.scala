@@ -24,8 +24,7 @@ import common.uf.ImmutableUnionFind
  * be made up of [[RoomMapObject]]s, [[TunnelMapObject]]s, and [[FullWall]]s.
  */
 private object ConnectRoomsViaPairs {
-  // TODO RichStreamT
-  def go(map: BattleMap): Rngable[BattleMap] = iterate(map).toStream.map(_.last)
+  def go(map: BattleMap): Rngable[BattleMap] = iterate(map).last
 
   def iterate(map: BattleMap): RngableIterable[BattleMap] = Rngable.iterateOptionally(
     new Aux(

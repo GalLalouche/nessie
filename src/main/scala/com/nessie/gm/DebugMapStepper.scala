@@ -38,7 +38,6 @@ object DebugMapStepper {
     override def canonize: BattleMap = canonizer(currentMap)
   }
   def from(iterator: MapIterator): Rngable[DebugMapStepper] = Rngable.fromStdGen {
-    // TODO mkRandom
     stdGen => new StreamStepper(iterator.steps.mkRandom(stdGen), iterator.canonize)
   }
   def from(factory: MapIteratorFactory): Rngable[DebugMapStepperFactory] =

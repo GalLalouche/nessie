@@ -33,9 +33,8 @@ import scala.util.Random
 
 import scalaz.{-\/, \/-, Free, Monad, OptionT, StreamT}
 import scalaz.syntax.monad.ToMonadOps
+import common.rich.func.{RichOptionT, RichStreamT}
 
-import common.rich.RichT._
-import common.rich.primitives.RichBoolean._
 import common.Percentage
 import common.rich.collections.RichSeq._
 
@@ -78,14 +77,17 @@ object Rngable {
   implicit val BooleanEv: Rngable[Boolean] = fromRandom(_.nextBoolean())
   def intRange(min: Int, max: Int): Rngable[Int] = {
     val range = max - min
-    require(range > 0)
-    fromRandom(_.nextInt(range) + min)
+    if (range == 0) Rngable.pure(min) else fromRandom(_.nextInt(range) + min)
   }
   implicit val DoubleEv: Rngable[Double] = fromRandom(_.nextDouble())
   implicit val FloatEv: Rngable[Float] = DoubleEv.map(_.toInt)
   implicit val CharEv: Rngable[Char] = fromRandom(_.nextPrintableChar())
+
+  implicit def enumEv[A <: enumeratum.EnumEntry : enumeratum.Enum]: Rngable[A] =
+    Rngable.sample(implicitly[enumeratum.Enum[A]].values)
+
   def boolean(p: Percentage): Rngable[Boolean] = DoubleEv.map(p > _)
-  def stringAtLength(length: Int): Rngable[String] = fromRandom(_.nextString(length))
+  def stringOfLength(length: Int): Rngable[String] = fromRandom(_.nextString(length))
 
   def sample[A](seq: IndexedSeq[A]): Rngable[A] = {
     require(seq.nonEmpty)
@@ -110,8 +112,7 @@ object Rngable {
   }
 
   type RngableIterable[A] = StreamT[Rngable, A]
-  def singleton[A](value: Rngable[A]): Rngable.RngableIterable[A] =
-    StreamT.fromStream(value.map(Stream(_)))
+  def singleton[A](value: Rngable[A]): Rngable.RngableIterable[A] = RichStreamT.singleton(value)
 
   object ToRngableOps {
     def mkRandom[A: Rngable]: Rngable[A] = implicitly[Rngable[A]]
@@ -120,6 +121,10 @@ object Rngable {
     implicit class RngableTraversableOnce[A](xs: TraversableOnce[A]) {
       def sample: Rngable[A] = Rngable.sample(xs.toIndexedSeq)
       def shuffle: Rngable[Seq[A]] = Rngable.shuffle(xs.toIndexedSeq)
+    }
+
+    implicit class RichRngable[A](private val $: Rngable[A]) extends AnyVal {
+      def liftSome: RngableOption[A] = RichOptionT.richFunctorToOptionT($).liftSome
     }
 
     implicit class RichRngableIterable[A](private val $: RngableIterable[A]) extends AnyVal {
@@ -139,25 +144,15 @@ object Rngable {
   type RngableOption[A] = OptionT[Rngable, A]
   def none[A]: RngableOption[A] = OptionT.none
   def some[A](a: A): RngableOption[A] = OptionT.some[Rngable, A](a)
-  // TODO move to MoreOptionTOps or something similar.
-  def when[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = whenM(Rngable.pure(b))(a)
-  def whenM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] = for {
-    b <- bm.liftM[OptionT]
-    result <- if (b) a.liftM[OptionT] else none
-  } yield result
-  def unless[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = when(b.isFalse)(a)
-  def unlessM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] =
-    whenM(bm.map(_.isFalse))(a)
+  def when[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = RichOptionT.when(b)(a)
+  def whenM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] = RichOptionT.whenM(bm)(a)
+  def withProbability[A](p: Percentage)(a: => Rngable[A]): RngableOption[A] = whenM(boolean(p))(a)
+  def unless[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = RichOptionT.unless(b)(a)
+  def unlessM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] = RichOptionT.unlessM(bm)(a)
 
-  def iterate[A](a: A)(f: A => Rngable[A]): RngableIterable[A] =
-    iterateOptionally(a)(f(_).map(Option(_)) |> OptionT.apply)
-  // TODO unfoldMFromA
-  private def notFirst[A](a: A) = (a, a -> false)
-  def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] =
-    StreamT.unfoldM((a, true)) {
-      case (a, isFirst) => (if (isFirst) some(notFirst(a)) else f(a).map(notFirst)).run
-    }
+  def iterate[A](a: A)(f: A => Rngable[A]): RngableIterable[A] = iterateOptionally(a)(f(_).liftM[OptionT])
+  def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] = RichStreamT.iterateM(a)(f)
 
   def tryNTimes[A](n: Int)(r: => RngableOption[A]): RngableOption[A] =
-    if (n == 0) none else r.orElse(tryNTimes(n - 1)(r))
+    if (n == 0) none else r ||| tryNTimes(n - 1)(r)
 }

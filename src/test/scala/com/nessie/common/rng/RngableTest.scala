@@ -16,15 +16,14 @@ import common.rich.func.ToMoreFunctorOps._
 
 import common.test.AuxSpecs
 
-class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks
-    with TimeLimitedTests {
+class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks with TimeLimitedTests {
   override val timeLimit = 2000 millis
   override val defaultTestSignaler = Signaler(_.stop())
   private case class Person(age: Int, name: String)
   private implicit val RngEv: Rngable[Person] = for {
     age <- mkRandom[Int]
     nameLength <- mkRandom[Int].map(_ % 100 + 1)
-    name <- Rngable.stringAtLength(nameLength)
+    name <- Rngable.stringOfLength(nameLength)
   } yield Person(age, name)
   property("Same result every time") {
     forAll((rng: StdGen) => {
@@ -33,11 +32,11 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
       p1 shouldReturn p2
     })
   }
-  private implicit val RngEv2: Rngable[(Int, Int)] = for {
-    x <- mkRandom[Int]
-    y <- mkRandom[Int]
-  } yield x -> y
   property("Different for loop") {
+    implicit val RngEv2: Rngable[(Int, Int)] = for {
+      x <- mkRandom[Int]
+      y <- mkRandom[Int]
+    } yield x -> y
     forAll((rng: StdGen) => {
       val (x, y) = mkRandom[(Int, Int)](rng)
       x should not equal y
