@@ -8,11 +8,11 @@ object RngableDeterministicTest extends GeneratorDrivenPropertyChecks with Match
   private implicit def genToArbitrary[A: Gen]: Arbitrary[A] = Arbitrary(implicitly[Gen[A]])
   /** Verifies that the result is deterministic, regardless of seed used. */
   def forAll(rngable: => Rngable[_]): Unit =
-    forAll((rng: StdGen) => rngable.mkRandom(rng) should ===(rngable.mkRandom(rng)) )
+    forAll {rng: StdGen => rngable.mkRandom(rng) should ===(rngable.mkRandom(rng))}
   /** Verifies that the result is deterministic for a pre-determined (but random!!!1) seed. */
   def apply(rngable: => Rngable[_]): Unit = {
     val seed = 4 // chosen by fair dice roll.
-                 // guaranteed to be random.
+    // guaranteed to be random.
     rngable.mkRandom(StdGen(seed)) should ===(rngable.mkRandom(StdGen(seed)))
   }
 }

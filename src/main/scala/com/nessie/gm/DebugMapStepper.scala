@@ -1,15 +1,16 @@
 package com.nessie.gm
 
 import com.nessie.common.rng.Rngable
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.BattleMap
 import com.nessie.model.map.gen.{MapIterator, MapIteratorFactory}
+
+import scala.annotation.tailrec
+
 import common.rich.collections.LazyIterable
 import common.rich.collections.RichList._
 import common.rich.collections.RichStream._
 import common.rich.primitives.RichBoolean._
-
-import scala.annotation.tailrec
-import com.nessie.common.rng.Rngable.ToRngableOps._
 
 trait DebugMapStepper {
   def currentMap: BattleMap

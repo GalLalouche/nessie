@@ -21,7 +21,7 @@ private class ActionMenuFactory(
     def toItem(unitAbility: UnitAbility, disabled: Boolean): MenuItem =
       new MenuItem() {
         disable = disabled
-        onAction = (_: ActionEvent) => {
+        onAction = {_ =>
           $.hide()
           observer onNext AbilityToTurnAction(unitAbility)(source, destination)
         }
@@ -31,7 +31,7 @@ private class ActionMenuFactory(
         .foreach($.items.+=(_))
     $.items += new MenuItem("Cancel") {onAction = (_: ActionEvent) => $.hide()}
     $.items += new MenuItem("End turn") {
-      onAction = (_: ActionEvent) => {
+      onAction = {_ =>
         $.hide()
         observer onNext EndTurn
       }

@@ -87,7 +87,7 @@ private object ZirconUtils {
 
   implicit class RichComponent(private val $: Component) extends AnyVal {
     def onActivation(f: () => Any): Unit =
-      $.onComponentEvent(ComponentEventType.ACTIVATED, (_: ComponentEvent) => {
+      $.onComponentEvent(ComponentEventType.ACTIVATED, {_: ComponentEvent =>
         if ($.safeAs[Disablable].mapHeadOrElse(_.isEnabled, true)) {
           f()
           Processed.INSTANCE

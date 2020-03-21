@@ -26,21 +26,21 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
     name <- Rngable.stringOfLength(nameLength)
   } yield Person(age, name)
   property("Same result every time") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val p1 = mkRandom[Person](rng)
       val p2 = mkRandom[Person](rng)
       p1 shouldReturn p2
-    })
+    }
   }
   property("Different for loop") {
     implicit val RngEv2: Rngable[(Int, Int)] = for {
       x <- mkRandom[Int]
       y <- mkRandom[Int]
     } yield x -> y
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val (x, y) = mkRandom[(Int, Int)](rng)
       x should not equal y
-    })
+    }
   }
 
   property("Computation is trampolined") {
@@ -75,19 +75,19 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   }
 
   property("From random modifies the stdgen") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val (x, y) = (for {
         x <- Rngable.fromRandom(_.nextInt())
         y <- Rngable.fromRandom(_.nextInt())
       } yield x -> y).mkRandom(rng)
       x should not equal y
-    })
+    }
   }
 
   private def verifyIncreasing(xs: Seq[Int]) = xs.sliding(2).foreach(v => v(0) should be <= v(1))
   private def addBinaryRngable(e: Int): Rngable[Int] = Rngable.BooleanEv.when(1, 0).map(e + _)
   property("Rngable.iterate") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val $ = Rngable.iterate(20)(addBinaryRngable)
           .take(10)
           .mkRandom(rng)
@@ -96,7 +96,7 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
       verifyIncreasing(vector)
       vector.last should be <= 30
       vector shouldReturn $.toVector
-    })
+    }
   }
   property("Rngable.iterate deterministic") {
     val $ = Rngable.iterate(1)(Rngable pure _ + 1)
@@ -109,7 +109,7 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
 
   private def someAddBinaryRngable(e: Int): Rngable[Int] = addBinaryRngable(e)
   property("Rngable.iterateOptionally") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val $ = Rngable.iterateOptionally(1)(
         e => Rngable.when(e < 10)(someAddBinaryRngable(e))
       ).mkRandom(rng)
@@ -118,10 +118,10 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
       vector.last shouldReturn 10
       vector(vector.length - 2) shouldReturn 9
       vector shouldReturn $.toVector
-    })
+    }
   }
   property("Rngable.iterateOptionally on infinite") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val $ = Rngable.iterateOptionally(1)(someAddBinaryRngable(_).liftM[OptionT])
           .take(10)
           .mkRandom(rng)
@@ -129,40 +129,40 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
       verifyIncreasing(vector)
       vector.size shouldReturn 10
       vector shouldReturn $.toVector
-    })
+    }
   }
 
   property("Rngable.tryNTimes returns None on failure") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       val $ = Rngable.tryNTimes(10)(Rngable.none).run.mkRandom(rng)
       $ shouldReturn None
-    })
+    }
   }
 
   property("Rngable.tryNTimes tries n times") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       var i = 1
       val $ = Rngable.tryNTimes(10) {
         i += 1
         Rngable.when(i > 10)(Rngable.pure("foobar"))
       }.run.mkRandom(rng)
       $ shouldReturn Some("foobar")
-    })
+    }
   }
 
   property("Rngable.tryNTimes tries no more than n times") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       var i = 0
       val $ = Rngable.tryNTimes(10) {
         i += 1
         Rngable.when(i > 10)(Rngable.pure("foobar"))
       }.run.mkRandom(rng)
       $ shouldReturn None
-    })
+    }
   }
 
   property("Rngable.tryNTimes if as first you do succeed, try not to look so surprised") {
-    forAll((rng: StdGen) => {
+    forAll {rng: StdGen =>
       var i = 0
       val $ = Rngable.tryNTimes(10) {
         i += 1
@@ -170,6 +170,6 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
       }.run.mkRandom(rng)
       $ shouldReturn Some("foobar")
       i shouldReturn 1
-    })
+    }
   }
 }
