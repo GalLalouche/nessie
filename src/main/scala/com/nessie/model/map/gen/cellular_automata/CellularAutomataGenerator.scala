@@ -5,6 +5,8 @@ import com.nessie.common.rng.Rngable.RngableIterable
 import com.nessie.model.map.{BattleMap, BattleMapObject, GridSize, MapPoint, VectorGrid}
 import com.nessie.model.map.gen.{MapIterator, MapIteratorFactory}
 
+import scalaz.StreamT
+
 import common.Percentage
 import common.rich.RichT._
 import common.rich.collections.LazyIterable
@@ -14,11 +16,12 @@ private class CellularAutomataGenerator private(gs: GridSize) extends MapIterato
   override def steps: RngableIterable[BattleMap] = {
     val initialProbability: Percentage = 0.52
     //val initialMap = BattleMap.create(VectorGrid, gs)
-    for {
+    val stream = for {
       initialMap <- Rngable.fromRandom(random => {
         Vector.fill(gs.height, gs.width)(if (initialProbability.roll(random)) Empty(0) else Wall(0))
       }).map(VectorGrid.apply[BattleMapObject]).map(BattleMap.apply)
-    } yield LazyIterable.iterateOptionally(new Aux(initialMap, 1))(_.next).map(_.map)
+    } yield LazyIterable.iterateOptionally(new Aux(initialMap, 1))(_.next).map(_.map).toStream
+    StreamT.fromStream(stream)
   }
 
   private class Aux(val map: BattleMap, n: Int) {

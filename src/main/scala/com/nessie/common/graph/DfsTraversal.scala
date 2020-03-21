@@ -28,5 +28,5 @@ object DfsTraversal {
   // A: Ordering is required for reproducibility.
   def apply[A: Ordering](graph: Graph[A, UnDiEdge], startingPoint: A): RngableIterable[A] = Rngable
       .iterateOptionally(Aux[A](graph, List(startingPoint), Set.empty))(_.next)
-      .map(_.map(_.head))
+      .map(_.head)
 }

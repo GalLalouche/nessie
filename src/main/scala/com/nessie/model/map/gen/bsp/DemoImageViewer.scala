@@ -2,6 +2,7 @@ package com.nessie.model.map.gen.bsp
 
 import java.awt.image.BufferedImage
 
+import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.common.rng.StdGen
 import com.nessie.common.sfx.RichNode._
 import com.nessie.model.map.GridSize
@@ -23,15 +24,15 @@ private object DemoImageViewer extends JFXApp {
     override def iterator =
       Iterator.iterate(0)(_ + 1).map(f.lift).takeWhile(_.isDefined).map(_.get)
   }
-  private val generator = new Generator(GridSize(75, 75))
+  private val generator = new Generator(GridSize(60, 60))
   private val stdGen = StdGen(2)
   private var currentX = 0
   private var currentWidth: Int = 1
   private var currentY = 0
   private var currentHeight: Int = 1
   private val maps: Seq[Stream[BufferedImage]] = {
-    val base = generator.partitions.mkRandom(stdGen.split._1).toStream
-    lazy val rooms = Rooms(base.last).map(_.toStream).mkRandom(stdGen.split._2)
+    val base = generator.partitions.mkRandom(stdGen.split._1)
+    lazy val rooms = Rooms(base.last).mkRandom(stdGen.split._2)
     new LazySeq({
       case 0 => base.map(_.toImage)
       case 1 => rooms.map(_.toImage)

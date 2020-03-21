@@ -12,9 +12,9 @@ import common.rich.func.MoreIterableInstances._
 import common.rich.func.MoreSeqInstances._
 import common.rich.func.ToMoreMonadPlusOps._
 
+import common.rich.primitives.RichBoolean._
 import common.rich.RichT._
 import common.rich.RichTuple._
-import common.rich.collections.LazyIterable
 import common.rich.collections.RichTraversableOnce._
 import common.uf.ImmutableUnionFind
 
@@ -24,7 +24,8 @@ import common.uf.ImmutableUnionFind
  * be made up of [[RoomMapObject]]s, [[TunnelMapObject]]s, and [[FullWall]]s.
  */
 private object ConnectRoomsViaPairs {
-  def go(map: BattleMap): Rngable[BattleMap] = iterate(map).map(_.last)
+  // TODO RichStreamT
+  def go(map: BattleMap): Rngable[BattleMap] = iterate(map).toStream.map(_.last)
 
   def iterate(map: BattleMap): RngableIterable[BattleMap] = Rngable.iterateOptionally(
     new Aux(
@@ -33,7 +34,7 @@ private object ConnectRoomsViaPairs {
         map.objects.view.map(_._2).select[RoomMapObject].map(_.index).toSet),
       index = 0,
     )
-  )(_.next).map(_.map(_.map))
+  )(_.next).map(_.map)
 
   private class Aux(
       val map: BattleMap,
@@ -62,9 +63,11 @@ private object ConnectRoomsViaPairs {
         for {
           startingPoint <- startingPoints.sample
           points = rooms(r1).mapPoints
-          path: LazyIterable[MapPoint] <- DfsTraversal(map.toFullGraph.removeNodes(points), startingPoint)
+          path <- DfsTraversal(map.toFullGraph.removeNodes(points), startingPoint)
+              .takeWhile(keepMoving(_).isFalse)
+              .toStream
         } yield {
-          val fullWalls = path.takeUntil(keepMoving).toVector
+          val fullWalls = path.toVector
           val connectedRooms = map.neighbors(fullWalls.last)
               .map(map.apply)
               .select[RoomMapObject]

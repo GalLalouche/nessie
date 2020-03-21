@@ -21,9 +21,11 @@ private class CellularDigger(private val map: BattleMap, caves: Caves) {
         start <- src.mapPoints.sample
         end <- dst.mapPoints.sample
         t <- AStarTraversal(map.toFullGraph, start, end)
+            .takeWhile(caves.cave(_).forall(caves.areConnected(src, _)))
+            .toStream
         tunnelWidth <- PathWidener.Width.values.sample
       } yield {
-        val path = t.takeWhile(caves.cave(_).forall(caves.areConnected(src, _))).toVector
+        val path = t.toVector
         val widenedPath = PathWidener(path, tunnelWidth).toSet
         val clearedMap = map.mapPoints((p, o) =>
           o.mapIf(widenedPath(p) && o.canMoveThrough.isFalse)
@@ -40,7 +42,7 @@ private object CellularDigger {
     val markedMap = caves.mark(map)
     new MapIterator {
       override def steps =
-        Rngable.iterateOptionally(new CellularDigger(markedMap, caves))(_.next).map(_.map(_.map))
+        Rngable.iterateOptionally(new CellularDigger(markedMap, caves))(_.next).map(_.map)
       override def canonize(map: BattleMap) = AutomataGeneration.canonize(map)
     }
   }

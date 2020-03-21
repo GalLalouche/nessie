@@ -8,7 +8,7 @@ import com.nessie.model.map.gen.{MapIterator, MapIteratorFactory}
 private class Generator(gs: GridSize) extends MapIterator {
   def partitions: RngableIterable[MapPartitioning] =
     Rngable.iterateOptionally(MapPartitioning(gs))(_.split)
-  override def steps = partitions.map(_.map(_.toMap))
+  override def steps = partitions.map(_.toMap)
   override def canonize(map: BattleMap) = ???
 }
 private object Generator extends MapIteratorFactory {

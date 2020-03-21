@@ -81,7 +81,7 @@ private object MapPartitioning {
       val mp = translate(topLeftCorner)
       val gs = translate(this.gs)
       for {
-        x <- mp.x to (mp.x + gs.width)
+        x <- mp.x to mp.x + gs.width
         y <- Vector(mp.y, mp.y + gs.height)
       } $.setRGB(x, y, Color.BLACK.getRGB)
       for {
@@ -99,21 +99,20 @@ private object MapPartitioning {
 
     private def splitRight: RngableOption[Tree] = t2.split.map(Split(t1, _, startOnRight = true))
     override def split =
-      if (startOnRight) splitRight else t1.split orElse splitRight
+      if (startOnRight) splitRight else t1.split.map(Split(_, t2): Tree) orElse splitRight
     override def updateImage($: BufferedImage): Unit = {
       t1.updateImage($)
       t2.updateImage($)
     }
     override def toPartitions = t1.toPartitions ++ t2.toPartitions
 
-    def connect(c1: MapPoint, c2: MapPoint): Iterable[MapPoint] = {
+    def connect(c1: MapPoint, c2: MapPoint): Iterable[MapPoint] =
       if (c1.x == c2.x)
         c1.y.to(c2.y).map(MapPoint(c1.x, _))
       else {
         assert(c1.y == c2.y, c1 -> c2)
         c1.x.to(c2.x).map(MapPoint(_, c1.y))
       }
-    }
 
     override def getConnections = t1.getConnections ++ t2.getConnections ++
         connect(t1.center, t2.center)
@@ -122,7 +121,7 @@ private object MapPartitioning {
       assert(t1.topLeftCorner.y <= t2.topLeftCorner.y)
       t1.topLeftCorner
     }
-    override def gs = {
+    override def gs =
       if (t1.topLeftCorner.x == t2.topLeftCorner.x) {
         assert(t1.gs.width == t2.gs.width)
         GridSize(width = t1.gs.width, height = t1.gs.height + t2.gs.height)
@@ -131,6 +130,5 @@ private object MapPartitioning {
         assert(t1.gs.height == t2.gs.height)
         GridSize(width = t1.gs.width + t2.gs.width, height = t1.gs.height)
       }
-    }
   }
 }

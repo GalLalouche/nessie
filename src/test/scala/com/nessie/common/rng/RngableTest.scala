@@ -18,7 +18,7 @@ import common.test.AuxSpecs
 
 class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChecks
     with TimeLimitedTests {
-  override val timeLimit = 1000 millis
+  override val timeLimit = 2000 millis
   override val defaultTestSignaler = Signaler(_.stop())
   private case class Person(age: Int, name: String)
   private implicit val RngEv: Rngable[Person] = for {
@@ -89,15 +89,23 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   private def addBinaryRngable(e: Int): Rngable[Int] = Rngable.BooleanEv.when(1, 0).map(e + _)
   property("Rngable.iterate") {
     forAll((rng: StdGen) => {
-      val $ = Rngable.iterate(1)(addBinaryRngable)
-          .map(_ take 10)
+      val $ = Rngable.iterate(20)(addBinaryRngable)
+          .take(10)
           .mkRandom(rng)
       val vector = $.toVector
       vector.size shouldReturn 10
       verifyIncreasing(vector)
-      vector.last should be <= 10
+      vector.last should be <= 30
       vector shouldReturn $.toVector
     })
+  }
+  property("Rngable.iterate deterministic") {
+    val $ = Rngable.iterate(1)(Rngable pure _ + 1)
+        .take(10)
+        .mkRandom(StdGen(0))
+    val vector = $.toVector
+    vector shouldReturn 1.to(10).toVector
+    vector shouldReturn $.toVector
   }
 
   private def someAddBinaryRngable(e: Int): Rngable[Int] = addBinaryRngable(e)
@@ -116,11 +124,11 @@ class RngableTest extends PropSpec with AuxSpecs with GeneratorDrivenPropertyChe
   property("Rngable.iterateOptionally on infinite") {
     forAll((rng: StdGen) => {
       val $ = Rngable.iterateOptionally(1)(someAddBinaryRngable(_).liftM[OptionT])
-          .map(_.take(20))
+          .take(10)
           .mkRandom(rng)
       val vector = $.toVector
       verifyIncreasing(vector)
-      vector.size shouldReturn 20
+      vector.size shouldReturn 10
       vector shouldReturn $.toVector
     })
   }

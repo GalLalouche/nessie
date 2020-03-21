@@ -6,7 +6,7 @@ import com.nessie.model.map.BattleMap
 
 trait MapIterator {
   def steps: RngableIterable[BattleMap]
-  def finalStep: Rngable[BattleMap] = steps.map(_.last)
+  def finalStep: Rngable[BattleMap] = steps.toStream.map(_.last)
 
   // Remove any internal map objects and replace them with the canonical ones, e.g., replace Tunnel and Cave
   // objects with FullWall and EmptyMapObject.

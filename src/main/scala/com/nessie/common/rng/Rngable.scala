@@ -31,12 +31,12 @@ package com.nessie.common.rng
 import scala.math.Ordering.Implicits._
 import scala.util.Random
 
-import scalaz.{-\/, \/-, Free, Monad, OptionT}
+import scalaz.{-\/, \/-, Free, Monad, OptionT, StreamT}
 import scalaz.syntax.monad.ToMonadOps
 
+import common.rich.RichT._
 import common.rich.primitives.RichBoolean._
 import common.Percentage
-import common.rich.collections.LazyIterable
 import common.rich.collections.RichSeq._
 
 class Rngable[A](private val free: Free[Generator, A]) {
@@ -104,22 +104,38 @@ object Rngable {
     aux(as.toList)
   }
 
-  trait ToRngableOps {
-    def mkRandom[A: Rngable]: Rngable[A] = implicitly[Rngable[A]]
-    def mkRandom[A: Rngable](rng: StdGen): A = implicitly[Rngable[A]].mkRandom(rng)
-    implicit class RngableTraversableOnce[A](xs: TraversableOnce[A]) {
-      def sample: Rngable[A] = Rngable.sample(xs.toIndexedSeq)
-      def shuffle: Rngable[Seq[A]] = Rngable.shuffle(xs.toIndexedSeq)
-    }
-  }
-  object ToRngableOps extends ToRngableOps
-
   implicit object ScalazInstances extends Monad[Rngable] {
     override def point[A](a: => A): Rngable[A] = Rngable.pure(a)
     override def bind[A, B](fa: Rngable[A])(f: A => Rngable[B]): Rngable[B] = fa.flatMap(f)
   }
 
-  type RngableIterable[A] = Rngable[LazyIterable[A]]
+  type RngableIterable[A] = StreamT[Rngable, A]
+  def singleton[A](value: Rngable[A]): Rngable.RngableIterable[A] =
+    StreamT.fromStream(value.map(Stream(_)))
+
+  object ToRngableOps {
+    def mkRandom[A: Rngable]: Rngable[A] = implicitly[Rngable[A]]
+
+    def mkRandom[A: Rngable](rng: StdGen): A = implicitly[Rngable[A]].mkRandom(rng)
+    implicit class RngableTraversableOnce[A](xs: TraversableOnce[A]) {
+      def sample: Rngable[A] = Rngable.sample(xs.toIndexedSeq)
+      def shuffle: Rngable[Seq[A]] = Rngable.shuffle(xs.toIndexedSeq)
+    }
+
+    implicit class RichRngableIterable[A](private val $: RngableIterable[A]) extends AnyVal {
+      def random(stdGen: StdGen): (Stream[A], StdGen) = {
+        val (s1, s2) = stdGen.split
+        $.uncons.map {
+          case Some((head, tail)) => head #:: tail.mkRandom(s1)
+          case None => Stream.empty
+        }.random(s2)
+      }
+      // TODO handle duplication with definition of Rngable
+      def mkRandom(stdGen: StdGen): Stream[A] = random(stdGen)._1
+      def last: Rngable[A] = $.toStream.map(_.last)
+    }
+  }
+
   type RngableOption[A] = OptionT[Rngable, A]
   def none[A]: RngableOption[A] = OptionT.none
   def some[A](a: A): RngableOption[A] = OptionT.some[Rngable, A](a)
@@ -133,21 +149,14 @@ object Rngable {
   def unlessM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] =
     whenM(bm.map(_.isFalse))(a)
 
-  // The default implementation using TraversableInstances would never terminate, so we cheat a little bit
-  // by constructing an Rngable from a StdGen and reusing that source.
-  // TODO This should exist all Monads, shouldn't it?
-  def iterate[A](a: A)(f: A => Rngable[A]): RngableIterable[A] = Rngable.fromStdGen {
-    stdGen =>
-      LazyIterable.iterate((a, stdGen)) {
-        case (current, g) => f(current).random(g)
-      }.map(_._1)
-  }
-  def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] = Rngable.fromStdGen {
-    stdGen =>
-      LazyIterable.iterate((Option(a), stdGen)) {
-        case (current, g) => f(current.get).run.random(g)
-      }.map(_._1).takeWhile(_.isDefined).map(_.get)
-  }
+  def iterate[A](a: A)(f: A => Rngable[A]): RngableIterable[A] =
+    iterateOptionally(a)(f(_).map(Option(_)) |> OptionT.apply)
+  // TODO unfoldMFromA
+  private def notFirst[A](a: A) = (a, a -> false)
+  def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] =
+    StreamT.unfoldM((a, true)) {
+      case (a, isFirst) => (if (isFirst) some(notFirst(a)) else f(a).map(notFirst)).run
+    }
 
   def tryNTimes[A](n: Int)(r: => RngableOption[A]): RngableOption[A] =
     if (n == 0) none else r.orElse(tryNTimes(n - 1)(r))

@@ -5,6 +5,9 @@ import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.gen.MapIterator
 import com.nessie.model.map.{BattleMap, CombatUnitObject, MapPoint}
 import com.nessie.model.units.{Warrior, Zombie}
+
+import scalaz.StreamT
+
 import common.rich.collections.LazyIterable
 
 object DemoMobPlacer extends MobPlacer {
@@ -12,6 +15,7 @@ object DemoMobPlacer extends MobPlacer {
   // Step 2: pick another nicer open area, far enough from the first, to place monsters
   // Step 3: Profit
   override def place(map: BattleMap): Rngable[BattleMap] = {
+    // TODO handle code duplication with CellularAutomataGenerator.wallIsInDistance
     def isOpen(n: Int)(mp: MapPoint): Boolean = (for {
       x <- mp.x - n to mp.x + n
       y <- mp.y - n to mp.y + n
@@ -26,7 +30,7 @@ object DemoMobPlacer extends MobPlacer {
         .place(enemySpot, CombatUnitObject(Zombie.create))
   }
   override def iterator(map: BattleMap): MapIterator = new MapIterator {
-    override def steps = place(map).map(LazyIterable(_))
+    override def steps = Rngable.singleton(place(map))
     override def canonize(map: BattleMap) = map
   }
 }

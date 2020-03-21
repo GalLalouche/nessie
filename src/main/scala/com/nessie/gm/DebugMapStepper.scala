@@ -9,6 +9,7 @@ import common.rich.collections.RichStream._
 import common.rich.primitives.RichBoolean._
 
 import scala.annotation.tailrec
+import com.nessie.common.rng.Rngable.ToRngableOps._
 
 trait DebugMapStepper {
   def currentMap: BattleMap
@@ -36,8 +37,10 @@ object DebugMapStepper {
     override def nextBigStep(): Option[DebugMapStepper] = None
     override def canonize: BattleMap = canonizer(currentMap)
   }
-  def from(iterator: MapIterator): Rngable[DebugMapStepper] =
-    iterator.steps.map(_.toStream).map(new StreamStepper(_, iterator.canonize))
+  def from(iterator: MapIterator): Rngable[DebugMapStepper] = Rngable.fromStdGen {
+    // TODO mkRandom
+    stdGen => new StreamStepper(iterator.steps.mkRandom(stdGen), iterator.canonize)
+  }
   def from(factory: MapIteratorFactory): Rngable[DebugMapStepperFactory] =
     Rngable.fromStdGen(stdGen => gs => from(factory.generate(gs)).mkRandom(stdGen))
 

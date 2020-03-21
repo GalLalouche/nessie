@@ -6,6 +6,8 @@ import com.nessie.common.rng.Rngable.ToRngableOps._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.UnDiEdge
 
+import scala.annotation.tailrec
+
 import scalaz.OptionT
 
 import common.rich.RichT._
@@ -13,11 +15,11 @@ import common.rich.RichT._
 object AStarTraversal {
   import com.nessie.common.graph.Metric.Implicits._
 
-  private case class Aux[A: Ordering : Metric](
+  private final case class Aux[A: Ordering : Metric](
       graph: Graph[A, UnDiEdge], path: List[A], visited: Set[A], destination: A,
   ) {
     def head: A = path.head
-    def next: RngableOption[Aux[A]] = {
+    @tailrec def next: RngableOption[Aux[A]] = {
       val head :: tail = path
       if (head == destination) Rngable.none
       else if (visited(head)) copy(path = tail).next
@@ -26,16 +28,19 @@ object AStarTraversal {
             .~|
             .view
             .filterNot(visited)
-        if (nextNeighbors.isEmpty && tail.isEmpty) Rngable.none else nextNeighbors
-            .map(_.toOuter)
-            .groupBy(_.distanceTo(destination))
-            .minBy(_._1)
-            ._2
-            .toVector
-            .sorted // Sorting is required to ensure deterministic results.
-            .shuffle
-            .map(_.toList ++ tail)
-            .map(Aux(graph, _, visited + head, destination).opt) |> OptionT.apply
+        if (nextNeighbors.isEmpty && tail.isEmpty)
+          Rngable.none
+        else
+          nextNeighbors
+              .map(_.toOuter)
+              .groupBy(_.distanceTo(destination))
+              .minBy(_._1)
+              ._2
+              .toVector
+              .sorted // Sorting is required to ensure deterministic results.
+              .shuffle
+              .map(_.toList ++ tail)
+              .map(Aux(graph, _, visited + head, destination).opt) |> OptionT.apply
       }
     }
   }
@@ -45,5 +50,5 @@ object AStarTraversal {
   def apply[A: Ordering : Metric](graph: Graph[A, UnDiEdge], startingPoint: A, target: A): RngableIterable[A] =
     Rngable
         .iterateOptionally(Aux[A](graph, List(startingPoint), Set.empty, target))(_.next)
-        .map(_.map(_.head))
+        .map(_.head)
 }
