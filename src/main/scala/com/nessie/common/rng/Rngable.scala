@@ -37,6 +37,7 @@ import common.rich.func.{RichOptionT, RichStreamT}
 
 import common.Percentage
 import common.rich.collections.RichSeq._
+import common.rich.RichT._
 
 class Rngable[A](private val free: Free[Generator, A]) {
   def map[B](f: A => B): Rngable[B] = new Rngable(free map f)
@@ -150,6 +151,7 @@ object Rngable {
   def unless[A](b: Boolean)(a: => Rngable[A]): RngableOption[A] = RichOptionT.unless(b)(a)
   def unlessM[A](bm: Rngable[Boolean])(a: => Rngable[A]): RngableOption[A] = RichOptionT.unlessM(bm)(a)
 
+  def infinite[A](a: Rngable[A]): RngableIterable[A] = StreamT.unfoldM(0)(a.map(e => Option(e -> 0)).const)
   def iterate[A](a: A)(f: A => Rngable[A]): RngableIterable[A] = iterateOptionally(a)(f(_).liftM[OptionT])
   def iterateOptionally[A](a: A)(f: A => RngableOption[A]): RngableIterable[A] = RichStreamT.iterateM(a)(f)
 

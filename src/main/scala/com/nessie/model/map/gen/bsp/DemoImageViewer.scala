@@ -19,24 +19,27 @@ import common.rich.collections.RichIterable._
 
 private object DemoImageViewer extends JFXApp {
   private class LazySeq[A](f: PartialFunction[Int, A]) extends Seq[A] {
-    override def length = iterator.length
-    override def apply(idx: Int) = f(idx)
-    override def iterator =
-      Iterator.iterate(0)(_ + 1).map(f.lift).takeWhile(_.isDefined).map(_.get)
+    private val stream = Stream.iterate(0)(_ + 1).map(f.lift).takeWhile(_.isDefined).map(_.get)
+    override def length = stream.length
+    override def apply(idx: Int) = stream(idx)
+    override def iterator = stream.iterator
   }
-  private val generator = new Generator(GridSize(60, 60))
-  private val stdGen = StdGen(2)
+  private val generator = new Generator(GridSize(50, 50))
+  private val stdGen = StdGen(0)
   private var currentX = 0
   private var currentWidth: Int = 1
   private var currentY = 0
   private var currentHeight: Int = 1
   private val maps: Seq[Stream[BufferedImage]] = {
-    val base = generator.partitions.mkRandom(stdGen.split._1)
-    lazy val rooms = Rooms(base.last).mkRandom(stdGen.split._2)
+    val s1 :: s2 :: s3 :: Nil = stdGen.iterator.take(3).toList
+    val base = generator.partitions.mkRandom(s1)
+    lazy val rooms = Rooms(base.last).mkRandom(s2)
+    val joinedRooms = JoinedRooms(rooms.last, maxWidth = 5).mkRandom(s3)
     new LazySeq({
       case 0 => base.map(_.toImage)
       case 1 => rooms.map(_.toImage)
-      case 2 => Stream(JoinedRooms(rooms.last).toImage)
+      case 2 => joinedRooms.map(_.toImage)
+      case 3 => Stream(joinedRooms.last.toPlainImage)
     })
   }
   val mapTracker = new GridPane {

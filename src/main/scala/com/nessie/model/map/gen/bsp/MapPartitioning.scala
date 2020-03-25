@@ -1,22 +1,20 @@
 package com.nessie.model.map.gen.bsp
 
 import java.awt.image.BufferedImage
-import java.awt.Color
 
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.RngableOption
 import com.nessie.common.rng.Rngable.ToRngableOps._
-import com.nessie.model.map.{BattleMap, GridSize, MapPoint}
+import com.nessie.model.map.{BattleMap, Direction, GridSize, MapPoint}
 import com.nessie.model.map.Direction.{Down, Right}
-import com.nessie.model.map.gen.bsp.MapPartitioning.Tree
+import com.nessie.model.map.gen.bsp.MapPartitioning.{Leaf, Tree}
 
 import scalaz.OptionT
+import monocle.syntax.apply._
 
 import common.rich.RichT._
 
-private class MapPartitioning private(tree: Tree, gs: GridSize) {
-  def getConnections: Set[MapPoint] = tree.getConnections
-
+private class MapPartitioning private(val tree: Tree, gs: GridSize) {
   def toImage: BufferedImage = new BufferedImage(
     gs.width * ImageScale + 1, gs.height * ImageScale + 1, BufferedImage.TYPE_INT_ARGB
   ) <| tree.updateImage
@@ -24,98 +22,70 @@ private class MapPartitioning private(tree: Tree, gs: GridSize) {
   def toMap: BattleMap = ???
   def split: RngableOption[MapPartitioning] = tree.split.map(new MapPartitioning(_, gs))
 
-  def getPartitions: List[Partition] = tree.toPartitions.toList
+  def getPartitions: List[Leaf] = tree.getPartitions.toList
 }
 
 private object MapPartitioning {
   private val MinDimensions = 3
-  def apply(gs: GridSize): MapPartitioning = new MapPartitioning(Empty(MapPoint(0, 0), gs), gs)
-  private sealed trait Tree {
-    def center = topLeftCorner.go(Right, gs.width / 2).go(Down, gs.height / 2)
+  def apply(gs: GridSize): MapPartitioning = new MapPartitioning(Leaf(MapPoint(0, 0), gs), gs)
+  sealed trait Tree {
+    def center: MapPoint = topLeftCorner.go(Right, gs.width / 2).go(Down, gs.height / 2)
     def topLeftCorner: MapPoint
     def gs: GridSize
 
-    def getConnections: Set[MapPoint]
+    def getPartitions: Iterator[Leaf]
+    private[MapPartitioning] def updateImage($: BufferedImage): Unit
 
-    def toPartitions: Iterator[Partition]
-    def updateImage($: BufferedImage): Unit
-
-    def split: RngableOption[Tree]
+    private[MapPartitioning] def split: RngableOption[Tree]
   }
 
   def hasValidDimensions(gs: GridSize) =
     gs.height > MinDimensions && gs.width > MinDimensions &&
         2.2 >= math.max(gs.height, gs.width) / math.min(gs.height, gs.width)
-  private case class Empty(
+  case class Leaf(
       override val topLeftCorner: MapPoint, override val gs: GridSize) extends Tree {
     assert(hasValidDimensions(gs))
-    override def split = Rngable.tryNTimes(5) {
+    override private[MapPartitioning] def split = Rngable.tryNTimes(5) {
       val tree: Rngable[Option[Tree]] = for {
         isVertical <- mkRandom[Boolean]
         at <- Rngable.intRange(0, if (isVertical) gs.width else gs.height)
-      } yield
-        if (isVertical) {
-          val leftGs = gs.copy(width = at)
-          val rightGs = GridSize.width.modify(_ - at)(gs)
-          if (hasValidDimensions(leftGs) && hasValidDimensions(rightGs))
-            Some(Split(
-              Empty(topLeftCorner, leftGs),
-              Empty(topLeftCorner.go(Right, at), rightGs),
-            ))
-          else
-            None
-        } else {
-          val leftGs = gs.copy(height = at)
-          val rightGs = GridSize.height.modify(_ - at)(gs)
-          if (hasValidDimensions(leftGs) && hasValidDimensions(rightGs))
-            Some(Split(
-              Empty(topLeftCorner, leftGs),
-              Empty(topLeftCorner.go(Down, at), rightGs),
-            ))
-          else
-            None
-        }
+      } yield {
+        val lens = if (isVertical) GridSize.width else GridSize.height
+        val leftGs = gs &|-> lens set at
+        val rightGs = gs &|-> lens modify (_ - at)
+        Split(
+          Leaf(topLeftCorner, leftGs),
+          Leaf(topLeftCorner.go(if (isVertical) Direction.Right else Direction.Down, at), rightGs),
+        ).onlyIf(hasValidDimensions(leftGs) && hasValidDimensions(rightGs))
+      }
       OptionT(tree)
     }
-    override def updateImage($: BufferedImage): Unit = {
+    override private[MapPartitioning] def updateImage($: BufferedImage): Unit = {
       val mp = translate(topLeftCorner)
       val gs = translate(this.gs)
-      for {
-        x <- mp.x to mp.x + gs.width
-        y <- Vector(mp.y, mp.y + gs.height)
-      } $.setRGB(x, y, Color.BLACK.getRGB)
-      for {
-        y <- mp.y to (mp.y + gs.height)
-        x <- Vector(mp.x, mp.x + gs.width)
-      } $.setRGB(x, y, Color.BLACK.getRGB)
+      def color(xRange: Iterable[Int], yRange: Iterable[Int]): Unit = for {
+        x <- xRange.iterator
+        y <- yRange.iterator
+      } $.setRGB(x, y, GridColor.getRGB)
+      color(mp.x to mp.x + gs.width, Vector(mp.y, mp.y + gs.height))
+      color(Vector(mp.x, mp.x + gs.width), mp.y.to(mp.y + gs.height))
     }
-    override def toPartitions = Iterator(Partition(topLeftCorner, gs))
-    override def getConnections = Set()
+    override def getPartitions = Iterator(this)
   }
-  private case class Split(t1: Tree, t2: Tree, startOnRight: Boolean = false) extends Tree {
-    val c1 = t1.center
-    val c2 = t2.center
+  case class Split(t1: Tree, t2: Tree, private val startOnRight: Boolean = false) extends Tree {
+    private val c1 = t1.center
+    private val c2 = t2.center
     assert(c1.x == c2.x || c1.y == c1.y)
 
-    private def splitRight: RngableOption[Tree] = t2.split.map(Split(t1, _, startOnRight = true))
-    override def split =
+    override private[MapPartitioning] def split = {
+      lazy val splitRight: RngableOption[Tree] = t2.split.map(Split(t1, _, startOnRight = true))
       if (startOnRight) splitRight else t1.split.map(Split(_, t2): Tree) orElse splitRight
-    override def updateImage($: BufferedImage): Unit = {
+    }
+    override private[MapPartitioning] def updateImage($: BufferedImage): Unit = {
       t1.updateImage($)
       t2.updateImage($)
     }
-    override def toPartitions = t1.toPartitions ++ t2.toPartitions
-
-    def connect(c1: MapPoint, c2: MapPoint): Iterable[MapPoint] =
-      if (c1.x == c2.x)
-        c1.y.to(c2.y).map(MapPoint(c1.x, _))
-      else {
-        assert(c1.y == c2.y, c1 -> c2)
-        c1.x.to(c2.x).map(MapPoint(_, c1.y))
-      }
-
-    override def getConnections = t1.getConnections ++ t2.getConnections ++
-        connect(t1.center, t2.center)
+    override def getPartitions = t1.getPartitions ++ t2.getPartitions
     override def topLeftCorner = {
       assert(t1.topLeftCorner.x <= t2.topLeftCorner.x)
       assert(t1.topLeftCorner.y <= t2.topLeftCorner.y)
