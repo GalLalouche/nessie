@@ -1,13 +1,13 @@
 package com.nessie.model.map
 
 import com.nessie.model.map.GridParser.CharParsable
+
 import common.rich.RichT._
 
-trait BattleMapParser {
+private trait BattleMapParser {
   def parse(s: String): BattleMap
 }
-
-object BattleMapParser {
+private object BattleMapParser {
   private implicit val BattleMapObjectEv: CharParsable[BattleMapObject] = CharParsable {
     case '*' => FullWall
     case '_' => EmptyMapObject

@@ -4,9 +4,7 @@ import com.nessie.model.units.CombatUnit
 import monocle.Lens
 import monocle.macros.Lenses
 
-@Lenses
-case class CombatUnitObject(unit: CombatUnit) extends BattleMapObject
-
+@Lenses case class CombatUnitObject(unit: CombatUnit) extends BattleMapObject
 object CombatUnitObject {
   def findIn(u: CombatUnit, map: BattleMap): Option[MapPoint] = map.objects.collectFirst {
     case (p, CombatUnitObject(unit)) if unit == u => p

@@ -4,7 +4,7 @@ import common.test.AuxSpecs
 import org.scalatest.FreeSpec
 
 class BattleMapParserTest extends FreeSpec with AuxSpecs {
-  def createParser: BattleMapParser = BattleMapParser.fromFactory(VectorGrid)
+  private def createParser: BattleMapParser = BattleMapParser.fromFactory(VectorGrid)
 
   "empty throws" in {
     an[IllegalArgumentException] shouldBe thrownBy {createParser.parse("")}

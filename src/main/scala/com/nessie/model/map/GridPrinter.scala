@@ -2,7 +2,7 @@ package com.nessie.model.map
 
 import common.rich.collections.RichTraversableOnce._
 
-object GridPrinter {
+private object GridPrinter {
   trait CharPrintable[A] {
     def apply(a: A): Char
   }
