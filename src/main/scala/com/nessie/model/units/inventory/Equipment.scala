@@ -1,8 +1,7 @@
 package com.nessie.model.units.inventory
 
-import com.nessie.common.EnumUtils._
-
 import scalaz.syntax.functor.ToFunctorOps
+import common.rich.func.MoreEnumeratumInstances._
 
 class Equipment private(equippedItems: Map[EquipSlot, EquippableItem]) {
   def apply(es: EquipSlot): Option[EquippableItem] = equippedItems get es
