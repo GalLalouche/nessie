@@ -21,9 +21,10 @@ trait GridLike[G, A] {self: G =>
 
   def size: GridSize = GridSize(width, height)
   // TODO rename MapPoint to LatticePoint or do *something* about the naming dissonance
-  @inline def isInBounds(p: MapPoint): Boolean = p.x >= 0 && p.y >= 0 && p.x < width && p.y < height
+  @inline def isInBounds(p: MapPoint): Boolean = grid.isInBounds(p)
+  @inline def isOutBounds(p: MapPoint): Boolean = grid.isOutBounds(p)
   @inline private def checkBounds(p: MapPoint): Unit =
-    if (isInBounds(p).isFalse)
+    if (isOutBounds(p))
       throw new IndexOutOfBoundsException(
         s"Point <$p> is out of bounds for map of dimensions <($width, $height)>")
   @inline def isBorder(p: MapPoint): Boolean = p.x == 0 || p.y == 0 || p.x == width - 1 || p.y == height - 1

@@ -16,6 +16,7 @@ trait Grid[A] {
   def mapPoints[B](f: (MapPoint, A) => B): Grid[B]
   val size = GridSize(width, height)
   def isInBounds(mp: MapPoint): Boolean = size.isInBounds(mp)
+  def isOutBounds(mp: MapPoint): Boolean = size.isOutBounds(mp)
 }
 
 object Grid {
