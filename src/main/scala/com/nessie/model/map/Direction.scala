@@ -1,13 +1,30 @@
 package com.nessie.model.map
 
-sealed trait Direction
+import common.rich.primitives.RichBoolean._
+import enumeratum.{Enum, EnumEntry}
 
-object Direction {
-  val values: Iterable[Direction] = Vector(Up, Down, Left, Right)
-  case object Up extends Direction
-  case object Down extends Direction
-  case object Left extends Direction
-  case object Right extends Direction
+import scala.collection.immutable
+
+sealed trait Direction extends EnumEntry {
+  def isVertical: Boolean = this == Direction.Up || this == Direction.Down
+  def isHorizontal: Boolean = isVertical.isFalse
+  def opposite: Direction
+}
+
+object Direction extends Enum[Direction] {
+  override val values: immutable.IndexedSeq[Direction] = findValues
+  case object Up extends Direction {
+    override def opposite = Down
+  }
+  case object Down extends Direction {
+    override def opposite: Direction = Up
+  }
+  case object Left extends Direction {
+    override def opposite: Direction = Right
+  }
+  case object Right extends Direction {
+    override def opposite: Direction = Left
+  }
 
   def from(mp1: MapPoint, mp2: MapPoint): Option[Direction] =
     if (mp1.manhattanDistanceTo(mp2) != 1) None else Some {
