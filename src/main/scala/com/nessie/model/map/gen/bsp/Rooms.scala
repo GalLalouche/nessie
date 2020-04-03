@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage
 import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.{RngableIterable, RngableOption}
 import com.nessie.model.map.{BattleMap, Direction, GridSize, MapPoint}
+import com.nessie.model.map.gen.DemoImageViewer._
 import com.nessie.model.map.gen.bsp.MapPartitioning.Leaf
 import com.nessie.model.map.gen.bsp.Rooms.Room
 

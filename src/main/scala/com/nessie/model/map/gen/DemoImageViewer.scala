@@ -1,11 +1,11 @@
-package com.nessie.model.map.gen.bsp
+package com.nessie.model.map.gen
 
 import java.awt.image.BufferedImage
+import java.awt.Color
 
-import com.nessie.common.rng.Rngable.ToRngableOps._
-import com.nessie.common.rng.StdGen
 import com.nessie.common.sfx.RichNode._
-import com.nessie.model.map.GridSize
+import com.nessie.model.map.gen.DemoImageViewer.LazySeq
+import com.nessie.model.map.{GridSize, MapPoint}
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.embed.swing.SwingFXUtils
@@ -17,34 +17,16 @@ import scalafx.scene.layout.{BorderPane, GridPane}
 
 import common.rich.collections.RichIterable._
 
-private object DemoImageViewer extends JFXApp {
-  private class LazySeq[A](f: PartialFunction[Int, A]) extends Seq[A] {
-    private val stream = Stream.iterate(0)(_ + 1).map(f.lift).takeWhile(_.isDefined).map(_.get)
-    override def length = stream.length
-    override def apply(idx: Int) = stream(idx)
-    override def iterator = stream.iterator
-  }
-  private val generator = new Generator(GridSize(50, 50))
-  private val stdGen = StdGen(0)
+private abstract class DemoImageViewer extends JFXApp {
+  protected def mapFunction: PartialFunction[Int, Stream[BufferedImage]]
+  private lazy val maps: Seq[Seq[BufferedImage]] = new LazySeq(mapFunction)
   private var currentX = 0
   private var currentWidth: Int = 1
   private var currentY = 0
   private var currentHeight: Int = 1
-  private val maps: Seq[Stream[BufferedImage]] = {
-    val s1 :: s2 :: s3 :: Nil = stdGen.iterator.take(3).toList
-    val base = generator.partitions.mkRandom(s1)
-    lazy val rooms = Rooms(base.last).mkRandom(s2)
-    val joinedRooms = JoinedRooms(rooms.last, maxWidth = 5).mkRandom(s3)
-    new LazySeq({
-      case 0 => base.map(_.toImage)
-      case 1 => rooms.map(_.toImage)
-      case 2 => joinedRooms.map(_.toImage)
-      case 3 => Stream(joinedRooms.last.toPlainImage)
-    })
-  }
   val mapTracker = new GridPane {
     prefHeight = 300
-    prefWidth = 1000
+    prefWidth = 1300
   }
   val bp = new BorderPane {
     padding = Insets(25)
@@ -62,8 +44,8 @@ private object DemoImageViewer extends JFXApp {
           j <- 0 until currentHeight
         } {
           val node = new BorderPane {
-            prefHeight = 20
-            prefWidth = 20
+            prefHeight = 10
+            prefWidth = 10
           }
           if (i == currentX && j == currentY)
             node.setBackgroundColor("Green")
@@ -96,9 +78,17 @@ private object DemoImageViewer extends JFXApp {
               currentWidth = math.max(currentWidth, currentX + 1)
               redraw()
             }
+          case KeyCode.Digit0 =>
+            currentX = 0
+            redraw()
           case KeyCode.H =>
             if (currentX != 0) {
               currentX -= 1
+              redraw()
+            }
+          case KeyCode.Digit4 if event.shiftDown =>
+            while(currentX < maps(currentY).length - 1) {
+              currentX += 1
               redraw()
             }
           case _ =>
@@ -107,4 +97,19 @@ private object DemoImageViewer extends JFXApp {
       }
     }
   }
+}
+
+private object DemoImageViewer {
+  private class LazySeq[A](f: PartialFunction[Int, A]) extends Seq[A] {
+    private val stream = Stream.iterate(0)(_ + 1).map(f.lift).takeWhile(_.isDefined).map(_.get)
+    override def length = stream.length
+    override def apply(idx: Int) = stream(idx)
+    override def iterator = stream.iterator
+  }
+
+  private[gen] val ImageScale = 20
+  private[gen] def translate(mp: MapPoint) = MapPoint(mp.x * ImageScale, mp.y * ImageScale)
+  private[gen] def translate(gs: GridSize) = GridSize(gs.width * ImageScale, gs.height * ImageScale)
+  private[gen] val RoomColor = Color.GRAY
+  private[gen] val GridColor = Color.BLACK
 }

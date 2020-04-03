@@ -6,6 +6,7 @@ import com.nessie.common.rng.Rngable
 import com.nessie.common.rng.Rngable.RngableOption
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.{BattleMap, Direction, GridSize, MapPoint}
+import com.nessie.model.map.gen.DemoImageViewer._
 import com.nessie.model.map.Direction.{Down, Right}
 import com.nessie.model.map.gen.bsp.MapPartitioning.{Leaf, Tree}
 

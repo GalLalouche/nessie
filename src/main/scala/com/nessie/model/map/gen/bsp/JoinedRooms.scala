@@ -8,6 +8,7 @@ import com.nessie.common.rng.Rngable.{RngableIterable, RngableOption}
 import com.nessie.common.rng.Rngable.ToRngableOps._
 import com.nessie.model.map.{Direction, MapPoint}
 import com.nessie.model.map.gen.bsp.MapPartitioning.{Split, Tree}
+import com.nessie.model.map.gen.DemoImageViewer._
 
 import common.rich.RichT._
 import common.uf.ImmutableUnionFind
