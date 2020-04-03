@@ -28,9 +28,25 @@ final case class MapPoint(x: Int, y: Int) {
     (x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y),
     (x - 1, y - 1), (x + 1, y + 1), (x - 1, y + 1), (x + 1, y - 1),
   ).filter(MapPoint.isValid).map(MapPoint.apply).toVector
+
+  def squareRadius(r: Int): Iterable[MapPoint] = for {
+    x <- this.x - r to this.x + r
+    y <- this.y - r to this.y + r
+  } yield MapPoint(x = x, y = y)
 }
 
 object MapPoint {
+  def squareInclusive(minX: Int, minY: Int, maxX: Int, maxY: Int): Iterable[MapPoint] = {
+    require(minX <= maxX)
+    require(minY <= maxY)
+    for {
+      x <- minX to maxX
+      y <- minY to maxY
+    } yield MapPoint(x = x, y = y)
+  }
+  def squareExclusive(minX: Int, minY: Int, maxX: Int, maxY: Int): Iterable[MapPoint] =
+    squareInclusive(minX = minX, minY = minY, maxX = maxX - 1, maxY = maxY - 1)
+
   private def isValid(e: (Int, Int)): Boolean = e._1 >= 0 && e._2 >= 0
   def apply(t: (Int, Int)): MapPoint = MapPoint(t._1, t._2)
 

@@ -10,7 +10,6 @@ import scalaz.StreamT
 import common.Percentage
 import common.rich.RichT._
 import common.rich.collections.LazyIterable
-import common.rich.primitives.RichBoolean._
 
 private class CellularAutomataGenerator private(gs: GridSize) extends MapIterator {
   override def steps: RngableIterable[BattleMap] = {
@@ -25,12 +24,8 @@ private class CellularAutomataGenerator private(gs: GridSize) extends MapIterato
   }
 
   private class Aux(val map: BattleMap, n: Int) {
-    private def wallsInDistance(mp: MapPoint, n: Int): Int = (
-        for {
-          x <- mp.x - n to mp.x + n
-          y <- mp.y - n to mp.y + n
-        } yield MapPoint(x, y)
-        ).count(mp => map.isInBounds(mp).isFalse || map(mp).isInstanceOf[Wall])
+    private def wallsInDistance(mp: MapPoint, n: Int): Int =
+      mp.squareRadius(n).count(mp => map.isOutBounds(mp) || map(mp).isInstanceOf[Wall])
 
     def next: Option[Aux] = {
       val nextMap: BattleMap = map.mapPoints((p, o) => {
